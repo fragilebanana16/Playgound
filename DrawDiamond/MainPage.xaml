@@ -1,0 +1,39 @@
+﻿<Page
+    x:Class="App1.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App1"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Foreground="Yellow"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid x:Name="contentGrid">
+        <Polyline Name="polyline1" StrokeThickness="3" Stretch="Uniform"
+                  HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Polyline.Stroke>
+                <ImageBrush x:Name="imgBrush1" ImageSource="https://tva4.sinaimg.cn/large/bfe05ea9ly1fxgvbb1u4qj21hc0u0n6b.jpg" 
+                            Stretch="UniformToFill"
+                            AlignmentY="Top">
+                </ImageBrush>
+            </Polyline.Stroke>
+        </Polyline>
+        <Polyline Name="polyline2" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Center" VerticalAlignment="Top"></Polyline>
+        <Polyline Name="polyline3" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Left" VerticalAlignment="Center"></Polyline>
+        <Polyline Name="polyline4" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Right" VerticalAlignment="Center"></Polyline>
+        <Polyline Name="polyline5" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Center" VerticalAlignment="Bottom"></Polyline>
+        <Polyline Name="polyline6" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Left" VerticalAlignment="Top"></Polyline>
+        <Polyline Name="polyline7" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Right" VerticalAlignment="Top"></Polyline>
+        <Polyline Name="polyline8" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Left" VerticalAlignment="Bottom"></Polyline>
+        <Polyline Name="polyline9" StrokeThickness="3" Stroke="{StaticResource ApplicationForegroundThemeBrush}"
+                  HorizontalAlignment="Right" VerticalAlignment="Bottom"></Polyline>
+        <Slider x:Name="slider1" HorizontalAlignment="Left" Margin="356,10,0,0" VerticalAlignment="Top" Width="455" Height="49" Maximum="20"/>
+    </Grid>
+</Page>
