@@ -1,0 +1,6 @@
+# Ignore everything
+bin/Debug/*
+obj/Debug/*
+# But not these files...
+!.gitignore
+!bin/Debug/*.xml
