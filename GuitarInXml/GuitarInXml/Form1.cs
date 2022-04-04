@@ -40,8 +40,16 @@ namespace GuitarInXml
 
             // TODO:check if empty
 
-            Guitar customer = ser.Deserialize<Guitar>(xmlInputData);
-            xmlOutputData = ser.Serialize<Guitar>(customer);
+            Guitar guitar = ser.Deserialize<Guitar>(xmlInputData);
+
+            this.label1.Text = guitar.Songs[0].TabStrings[0].StringLine;
+            this.label2.Text = guitar.Songs[0].TabStrings[1].StringLine;
+            this.label3.Text = guitar.Songs[0].TabStrings[2].StringLine;
+            this.label4.Text = guitar.Songs[0].TabStrings[3].StringLine;
+            this.label5.Text = guitar.Songs[0].TabStrings[4].StringLine;
+            this.label6.Text = guitar.Songs[0].TabStrings[5].StringLine;
+
+            xmlOutputData = ser.Serialize<Guitar>(guitar);
             File.WriteAllText(Directory.GetCurrentDirectory() + @"\Output.xml", xmlOutputData, Encoding.UTF8);
         }
     }
