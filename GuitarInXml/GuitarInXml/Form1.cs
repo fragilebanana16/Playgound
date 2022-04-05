@@ -51,6 +51,9 @@ namespace GuitarInXml
 
             xmlOutputData = ser.Serialize<Guitar>(guitar);
             File.WriteAllText(Directory.GetCurrentDirectory() + @"\Output.xml", xmlOutputData, Encoding.UTF8);
+
+            this.songCard1.SongAuthor = guitar.Songs[0].Author;
+            this.songCard1.SongName = guitar.Songs[0].SongName;
         }
     }
 
