@@ -13,7 +13,7 @@
 
 -- ALTER TABLE song RENAME more TO moreInfo; -- Change Column Name
 
--- DELETE FROM song;
+-- DELETE FROM song; -- 删除所有行
 -- INSERT INTO song(title, author, capo, chords, createDate, moreInfo) VALUES -- 每列必须对应，哪怕是空
 -- ('In the Dark', 'Charlie Puth', 0, 'G Em Bm A D','2022-06-18', ''),
 -- ('All Falls Down', 'Alan Walker', 1, 'F G C Am','2022-06-18', ''),
@@ -260,3 +260,37 @@
 -- 	'E|-0---------------------3---------|-0---------------------3---------|x2|-0---------------------3---------|-0--------------------------3----|',
 -- 	'2022-06-19'
 -- );
+
+-- UPDATE songtab set id=id-2; -- id didnt start from 3, update to start at 1
+
+-- SELECT max(capo) FROM song;
+-- SELECT title as MaxCapoSong FROM song WHERE max(capo)=capo; --[WRONG]聚合函数不允许出现在WHERE中，计算max循环依赖
+-- SELECT title as MaxCapoSong FROM song WHERE capo=(SELECT max(capo) FROM song); -- 使用子句去除依赖，查找最大capo的歌
+
+-- SELECT author, max(capo) FROM song GROUP BY author ORDER BY max(capo); -- 查找作者歌曲中最大capo
+
+-- SELECT author, title FROM song WHERE title LIKE 'S%'; -- 查找S开头的歌
+-- SELECT author, title FROM song WHERE title LIKE '%S%'; -- 查找含有S的歌
+
+-- UPDATE songtab SET author='Dan+Shay' WHERE author='Dan + Shay';
+
+-- DELETE FROM songtab WHERE author='Dan+Shay';
+
+-- CREATE VIEW queryCharliePuth AS SELECT title, capo, chords FROM song WHERE author='Charlie Puth';
+-- SELECT *FROM querycharlieputh; -- query for charlie puth but in view
+
+-- ALTER TABLE song ADD UNIQUE (title); -- set title unique
+-- INSERT INTO song(title, author, capo, chords, createDate, moreInfo) VALUES -- 补一个：键值对(title)=(为你唱这首歌2)没有在表"song"中出现.
+-- ('为你唱这首歌2', '殆死悲爱', 0, '','2022-06-21', '');
+-- ALTER TABLE songtab ADD CONSTRAINT fk_song_songtab FOREIGN KEY (title) REFERENCES song (title); -- 外键需唯一
+-- INSERT INTO songtab(title, author, minorEString, BString, GString, DString, AString, EString, createdate) VALUES
+-- (
+-- 	'Invalid', 'Invalid2', 
+-- 	'e|----THIS-WILL-NOT-WORK-------', 
+-- 	'B|----BECAUSE-fk_song_songtab--',
+-- 	'G|----RESTRICT-THE-INSERT------', 
+-- 	'D|----TAHT-THERE-MUST-HAVE-----',
+-- 	'A|----TITLE-IN-song-OTHERWISE--', 
+-- 	'E|----ERROR--------------------',
+-- 	'2022-06-21'
+-- ); --插入不合法，外键限制
