@@ -294,3 +294,23 @@
 -- 	'E|----ERROR--------------------',
 -- 	'2022-06-21'
 -- ); --插入不合法，外键限制
+
+-- -- 事务BEGIN、ROLLBACK、COMMIT，先BEGIN再执行操作，最后确定了再COMMIT
+-- BEGIN;
+-- DELETE FROM song WHERE title = '我不配';  -- 使用事务删除'我不配'
+-- SELECT * FROM song WHERE capo=3; 		-- 事务开始已经删除了'我不配'
+-- ROLLBACK;                        		-- 回滚
+-- SELECT * FROM song WHERE capo=3; 		-- 在COMMIT前回滚操作，撤销原先的删除，此时'我不配'出现
+-- COMMIT; 								    -- 没COMMIT之前的都不算生效
+
+-- -- 事务SAVEPOINT，类似goto
+-- BEGIN;
+-- DELETE FROM song WHERE title = '我不配';   -- 使用事务删除'我不配'
+-- SAVEPOINT JUST_DELETE_FIRST;              -- 存档点
+-- DELETE FROM song WHERE title = 'He Said'; -- 再删除'He Said'
+-- SELECT * FROM song WHERE capo=3; 		  -- 已经删除了'我不配'
+-- ROLLBACK TO JUST_DELETE_FIRST;            -- 回滚到只删除'我不配'， 'He Said'复原
+-- SELECT * FROM song WHERE capo=3; 		  -- 在COMMIT前回滚操作，撤销原先的删除，此时'He Said'出现
+-- ROLLBACK;								  -- 后悔了，还想复原'我不配'
+-- SELECT * FROM song WHERE capo=3; 		  -- 在COMMIT前回滚操作，撤销原先的删除，此时'我不配'出现
+-- COMMIT;								      -- 属于是啥也没干，全回滚了
