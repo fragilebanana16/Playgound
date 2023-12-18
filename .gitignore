@@ -1,3 +1,6 @@
 /DesignPatterns/**/*.class
 
 /ChordsGraph/node_modules
+
+/MVVM/**/bin
+/MVVM/**/obj
