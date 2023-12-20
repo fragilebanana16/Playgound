@@ -4,13 +4,14 @@ using System.Text;
 
 namespace SimpleTrader.Domain.Models
 {
-    public class AssetTransaction
+    public class AssetTransaction : DomainObject
     {
-        public string Id { get; set; }
         public Account Account { get; set; }
         public bool IsPurchase { get; set; }
         public Stock Stock { get; set; }
         public int Shares { get; set; }
+
+        public DateTime DateProcessed { get; set; }
 
     }
 }

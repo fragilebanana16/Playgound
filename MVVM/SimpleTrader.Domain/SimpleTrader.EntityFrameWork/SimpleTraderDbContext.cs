@@ -8,18 +8,14 @@ namespace SimpleTrader.EntityFrameWork
 {
     public class SimpleTraderDbContext : DbContext
     {
-        //public DbSet<User> Users { get; set; }
-        //public DbSet<Account> Accounts { get; set; }
-        //public DbSet<AssetTransaction> AssetTransactions { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<AssetTransaction> AssetTransactions { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseNpgsql("User ID=postgres;Password=jaydean;Host=localhost;Port=5432;Database=mydb;");
-        }
-
+        public SimpleTraderDbContext(DbContextOptions dbContextOptions):base(dbContextOptions) {}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<AssetTransaction>().OwnsOne(a => a.Stock);
+            modelBuilder.Entity<AssetTransaction>().OwnsOne(a => a.Stock);
             base.OnModelCreating(modelBuilder);
         }
     }

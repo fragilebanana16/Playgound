@@ -5,7 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20231218142349_init.cs" />
+    <Compile Remove="Migrations\20231218142349_init.Designer.cs" />
+    <Compile Remove="Migrations\20231218142520_delete table.cs" />
+    <Compile Remove="Migrations\20231218142520_delete table.Designer.cs" />
+    <Compile Remove="Migrations\20231219141549_switch to sql server.cs" />
+    <Compile Remove="Migrations\20231219141549_switch to sql server.Designer.cs" />
+    <Compile Remove="Migrations\20231219141708_switch to sql server.cs" />
+    <Compile Remove="Migrations\20231219141708_switch to sql server.Designer.cs" />
+    <Compile Remove="Migrations\20231219142422_switch to sql server.cs" />
+    <Compile Remove="Migrations\20231219142422_switch to sql server.Designer.cs" />
+    <Compile Remove="Migrations\20231219142555_switch to sql server.cs" />
+    <Compile Remove="Migrations\20231219142555_switch to sql server.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

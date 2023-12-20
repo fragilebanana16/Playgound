@@ -2,7 +2,7 @@
 
 namespace SimpleTrader.EntityFrameWork.Migrations
 {
-    public partial class init : Migration
+    public partial class switchtosqlserver : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -10,7 +10,8 @@ namespace SimpleTrader.EntityFrameWork.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Email = table.Column<string>(nullable: true),
                     Username = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<string>(nullable: true)
@@ -24,8 +25,9 @@ namespace SimpleTrader.EntityFrameWork.Migrations
                 name: "Accounts",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    AccountHolderId = table.Column<string>(nullable: true),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountHolderId = table.Column<int>(nullable: true),
                     Balance = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
@@ -43,8 +45,9 @@ namespace SimpleTrader.EntityFrameWork.Migrations
                 name: "AssetTransactions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    AccountId = table.Column<string>(nullable: true),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AccountId = table.Column<int>(nullable: true),
                     IsPurchase = table.Column<bool>(nullable: false),
                     Stock_Symbol = table.Column<string>(nullable: true),
                     Stock_PricePerShare = table.Column<double>(nullable: true),
