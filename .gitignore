@@ -4,3 +4,4 @@
 
 /MVVM/**/bin
 /MVVM/**/obj
+/MVVM/**/*.config
