@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/Common.xaml" />
+                <ResourceDictionary Source="/Styles/NavigationBar.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!--if <ContentControl Content="{Binding Navigator.CurrentViewModel}"/> changed Content, show view depends on Datatype-->
             <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
