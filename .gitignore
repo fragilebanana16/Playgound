@@ -2,6 +2,8 @@
 
 /ChordsGraph/node_modules
 
+/**/node_modules
+
 /MVVM/**/bin
 /MVVM/**/obj
 /MVVM/**/*.config
