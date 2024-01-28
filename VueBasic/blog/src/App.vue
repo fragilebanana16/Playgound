@@ -3,16 +3,17 @@
     <div class="app">
       <Navigation/>
       <router-view />
+      <Footer />
     </div>
   </div>
 </template>
 
 <script>
 import Navigation from "./components/Navigation";
-
+import Footer from "./components/Footer";
 export default {
   name: "app",
-  components: { Navigation, },
+  components: { Navigation, Footer },
   data() {
     return {};
   },
@@ -42,6 +43,19 @@ export default {
 .container {
   max-width: 1440px;
   margin: 0 auto;
+}
+
+.arrow {
+  margin-left: 8px;
+  width: 12px;
+  path {
+    fill: #000;
+  }
+}
+.arrow-light {
+  path {
+    fill: #fff;
+  }
 }
 
 .link {
