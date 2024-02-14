@@ -30,8 +30,8 @@
 import Arrow from "../assets/Icons/arrow-right-light.svg";
 
 export default {
-    name: "blog",
-    props: ["post"],
+    name: "blogPost",
+    props: ["post"], // look for the prop for post
     components: { Arrow, },
     computed: {
 
