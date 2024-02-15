@@ -45,8 +45,7 @@
     },
     computed: {
       editPost() {
-        return true;
-        // return this.$store.state.editPost;
+        return this.$store.state.editPost;
       },
 
     },
