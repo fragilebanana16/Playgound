@@ -24,7 +24,7 @@
               <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
               <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
               <router-link class="link" :to="{ name: 'CreatePost' }">Create Post</router-link>
-              <router-link class="link" :to="{ name: 'Login' }">Login In / Register</router-link>
+              <router-link v-if="!user" class="link" :to="{ name: 'Login' }">Login In / Register</router-link>
             </ul>
           </div>
         </div>
@@ -49,9 +49,9 @@
       linkedin,
     },
     computed: {
-    //   user() {
-    //     return this.$store.state.user;
-    //   },
+      user() {
+        return this.$store.state.user;
+      },
     //   admin() {
     //     return this.$store.state.profileAdmin;
     //   },

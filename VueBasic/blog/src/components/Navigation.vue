@@ -6,13 +6,45 @@
             </div>
 
             <div class="nav-links">
-                <ul v-show="!mobile">
-                    <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
-                    <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
-                    <router-link class="link" :to="{ name: 'Blogs' }">Create Post</router-link>
-                    <router-link class="link" :to="{ name: 'Login' }">Login</router-link>
-                </ul>
-            </div>
+                  <ul v-show="!mobile">
+                      <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
+                      <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
+                      <router-link class="link" :to="{ name: 'Blogs' }">Create Post</router-link>
+                      <router-link v-if="!user" class="link" :to="{ name: 'Login' }">Login</router-link>
+                  </ul>
+                  <!-- avatar -->
+                  <div v-if="user" :class="{ 'mobile-user-menu': mobile }" @click="toggleProfileMenu" class="profile" ref="profile">
+                    <span>{{ this.$store.state.profileInitials }}</span>
+                    <div v-show="profileMenu" class="profile-menu">
+                      <div class="info">
+                        <p class="initials">{{ this.$store.state.profileInitials }}</p>
+                        <div class="right">
+                          <p>{{ this.$store.state.profileFirstName }} {{ this.$store.state.profileLastName }}</p>
+                          <p>{{ this.$store.state.profileUsername }}</p>
+                          <p>{{ this.$store.state.profileEmail }}</p>
+                        </div>
+                      </div>
+                      <div class="options">
+                        <div class="option">
+                          <router-link class="option" :to="{ name: 'Profile' }">
+                            <userIcon class="icon" />
+                            <p>Profile</p>
+                          </router-link>
+                        </div>
+                        <div v-if="admin" class="option">
+                          <router-link class="option" :to="{ name: 'Admin' }">
+                            <adminIcon class="icon" />
+                            <p>Admin</p>
+                          </router-link>
+                        </div>
+                        <div @click="signOut" class="option">
+                          <signOutIcon class="icon" />
+                          <p>Sign Out</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
         </nav>
 
         <menuIcon @click="toggleMobileNav" class="menu-icon" v-show="mobile" />
@@ -22,7 +54,7 @@
                 <router-link class="link" :to="{ name: 'Home' }">Home</router-link>
                 <router-link class="link" :to="{ name: 'Blogs' }">Blogs</router-link>
                 <router-link class="link" :to="{ name: 'Blogs' }">Create Post</router-link>
-                <router-link class="link" :to="{ name: 'Login' }">Login</router-link>
+                <router-link v-if="!user" class="link" :to="{ name: 'Login' }">Login</router-link>
             </ul>
         </transition>
     </header>
@@ -30,16 +62,21 @@
 
 <script>
 import menuIcon from "../assets/Icons/bars-regular.svg";
-
+import userIcon from "../assets/Icons/user-alt-light.svg";
+import adminIcon from "../assets/Icons/user-crown-light.svg";
+import signOutIcon from "../assets/Icons/sign-out-alt-regular.svg";
+import firebase from "firebase/app";
+import "firebase/auth";
 
 export default {
   name: "navigation",
   components: {
-    menuIcon,
+    menuIcon, userIcon, adminIcon, signOutIcon
   },
 
   data() {
     return {
+      profileMenu: null,
       mobile: null,
       mobileNav: null, // bar opened
       windownWidth: null,
@@ -68,10 +105,26 @@ export default {
       this.mobileNav = !this.mobileNav;
     },
 
+    toggleProfileMenu(e) {
+      // only click profile ref change
+      if (e.target === this.$refs.profile) {
+        this.profileMenu = !this.profileMenu;
+      }
+    },
+
+    signOut() {
+      firebase.auth().signOut();
+      window.location.reload();
+    },
   },
 
   computed: {
-    
+    user() {
+      return this.$store.state.user;
+    },
+    admin() {
+      return this.$store.state.profileAdmin;
+    },
   },
 };
 </script>
@@ -141,7 +194,7 @@ header {
         background-color: #303030;
 
         span {
-          pointer-events: none;
+          pointer-events: none; // avoid click short not responding
         }
 
         .profile-menu {
