@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SimpleTrader.Domain.Models;
 using SimpleTrader.Domain.Services;
+using SimpleTrader.FinancialModelingPrepAPI.Results;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,12 +15,10 @@ namespace SimpleTrader.FinancialModelingPrepAPI.Services
     {
         public async Task<MajorIndex> GetMajorIndex(MajorIndexType indexType)
         {
-            string uri = "https://financialmodelingprep.com/api/v3/majors-indexes/" + GetUriSuffix(indexType);
-            using (HttpClient client = new HttpClient())
+            string uri = "majors-indexes/" + GetUriSuffix(indexType);
+            using (FinancialModelingPrepHttpClient client = new FinancialModelingPrepHttpClient())
             {
-                HttpResponseMessage rsp = await client.GetAsync(uri + "?apikey=" + ConfigurationManager.AppSettings.Get("financeApiKey"));
-                string jsonRsp = await rsp.Content.ReadAsStringAsync();
-                MajorIndex majorIndex = JsonConvert.DeserializeObject<MajorIndex>(jsonRsp);
+                MajorIndex majorIndex = await client.GetAsync<MajorIndex>(uri);
                 majorIndex.Type = indexType;
                 return majorIndex;
             }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SimpleTrader.Domain.Models;
 using SimpleTrader.Domain.Services;
+using SimpleTrader.FinancialModelingPrepAPI.Results;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,7 +15,12 @@ namespace SimpleTrader.FinancialModelingPrepAPI.Services
     {
         public async Task<double> GetPrice(string symbol)
         {
-            return 1.0;
+            string uri = "stock/real-time-price/" + symbol;
+            using (FinancialModelingPrepHttpClient client = new FinancialModelingPrepHttpClient())
+            {
+                StockPriceResult stockPriceResult = await client.GetAsync<StockPriceResult>(uri);
+                return stockPriceResult.Price;
+            }
         }
     }
 }
