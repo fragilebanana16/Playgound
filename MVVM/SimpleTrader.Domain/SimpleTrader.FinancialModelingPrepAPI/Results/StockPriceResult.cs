@@ -4,8 +4,14 @@ using System.Text;
 
 namespace SimpleTrader.FinancialModelingPrepAPI.Results
 {
-    public class StockPriceResult
+    public class CompanyPrice
     {
-        public double Price{ get;  set; }
+        public string Symbol { get; set; }
+        public double Price { get; set; }
+    }
+
+    public class CompaniesPrices
+    {
+        public List<CompanyPrice> CompaniesPriceList { get; set; }
     }
 }

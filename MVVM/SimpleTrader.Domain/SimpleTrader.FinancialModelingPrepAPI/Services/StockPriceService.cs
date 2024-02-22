@@ -18,8 +18,8 @@ namespace SimpleTrader.FinancialModelingPrepAPI.Services
             string uri = "stock/real-time-price/" + symbol;
             using (FinancialModelingPrepHttpClient client = new FinancialModelingPrepHttpClient())
             {
-                StockPriceResult stockPriceResult = await client.GetAsync<StockPriceResult>(uri);
-                return stockPriceResult.Price;
+                CompaniesPrices stockPriceResult = await client.GetAsync<CompaniesPrices>(uri);
+                return stockPriceResult.CompaniesPriceList[0].Price;
             }
         }
     }
