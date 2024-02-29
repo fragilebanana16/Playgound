@@ -5,6 +5,7 @@ using SimpleTrader.Domain.Services.TransactionServices;
 using SimpleTrader.EntityFrameWork;
 using SimpleTrader.EntityFrameWork.Services;
 using SimpleTrader.FinancialModelingPrepAPI.Services;
+using SimpleTrader.WPF.State.Navigators;
 using SimpleTrader.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -24,9 +25,10 @@ namespace SimpleTrader.WPF
         protected override async void OnStartup(StartupEventArgs e)
         {
 
+            IServiceProvider serviceProvider = this.CreateServiceProvider();
 
             Window window = new MainWindow();
-            window.DataContext = new MainViewModel();
+            window.DataContext = serviceProvider.GetRequiredService<MainViewModel>();
             window.Show();
 
             // test
@@ -43,7 +45,6 @@ namespace SimpleTrader.WPF
             //Account buyer = await accountService.Get(1);
             //await buyStockService.BuyStock(buyer, "T", 5);
 
-            IServiceProvider serviceProvider = this.CreateServiceProvider();
             IBuyStockService buyStockService = serviceProvider.GetRequiredService<IBuyStockService>();
 
             base.OnStartup(e);
@@ -58,6 +59,10 @@ namespace SimpleTrader.WPF
             services.AddSingleton<IDataService<Account>, AccountDataService>();
             services.AddSingleton<IStockPriceService, StockPriceService>();
             services.AddSingleton<IBuyStockService, BuyStockService>();
+
+            services.AddScoped<INavigator, Navigator>();
+            services.AddScoped<MainViewModel>(); // model have state, like current model
+
 
             return services.BuildServiceProvider();
         }
