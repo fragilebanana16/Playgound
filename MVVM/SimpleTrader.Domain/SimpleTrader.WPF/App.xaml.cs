@@ -1,4 +1,5 @@
-﻿using SimpleTrader.Domain.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SimpleTrader.Domain.Models;
 using SimpleTrader.Domain.Services;
 using SimpleTrader.Domain.Services.TransactionServices;
 using SimpleTrader.EntityFrameWork;
@@ -36,12 +37,29 @@ namespace SimpleTrader.WPF
             //    var index = task.Result;
             //});
 
-            IDataService<Account> accountService = new AccountDataService(new SimpleTraderDbContextFactory());
-            IStockPriceService stockPriceService = new StockPriceService();
-            IBuyStockService buyStockService = new BuyStockService(stockPriceService, accountService);
-            Account buyer = await accountService.Get(1);
-            await buyStockService.BuyStock(buyer, "T", 5);
+            //IDataService<Account> accountService = new AccountDataService(new SimpleTraderDbContextFactory());
+            //IStockPriceService stockPriceService = new StockPriceService();
+            //IBuyStockService buyStockService = new BuyStockService(stockPriceService, accountService);
+            //Account buyer = await accountService.Get(1);
+            //await buyStockService.BuyStock(buyer, "T", 5);
+
+            IServiceProvider serviceProvider = this.CreateServiceProvider();
+            IBuyStockService buyStockService = serviceProvider.GetRequiredService<IBuyStockService>();
+
             base.OnStartup(e);
+        }
+
+        private IServiceProvider CreateServiceProvider()
+        {
+            IServiceCollection services = new ServiceCollection();
+
+            // register service
+            services.AddSingleton<SimpleTraderDbContextFactory>();
+            services.AddSingleton<IDataService<Account>, AccountDataService>();
+            services.AddSingleton<IStockPriceService, StockPriceService>();
+            services.AddSingleton<IBuyStockService, BuyStockService>();
+
+            return services.BuildServiceProvider();
         }
     }
 }
