@@ -7,6 +7,7 @@ using SimpleTrader.EntityFrameWork.Services;
 using SimpleTrader.FinancialModelingPrepAPI.Services;
 using SimpleTrader.WPF.State.Navigators;
 using SimpleTrader.WPF.ViewModels;
+using SimpleTrader.WPF.ViewModels.Factories;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,6 +15,8 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Markup;
+using static SimpleTrader.WPF.ViewModels.Factories.ISimpleTraderViewModelAbstractFactory;
 
 namespace SimpleTrader.WPF
 {
@@ -27,8 +30,7 @@ namespace SimpleTrader.WPF
 
             IServiceProvider serviceProvider = this.CreateServiceProvider();
 
-            Window window = new MainWindow();
-            window.DataContext = serviceProvider.GetRequiredService<MainViewModel>();
+            Window window = serviceProvider.GetRequiredService<MainWindow>();
             window.Show();
 
             // test
@@ -60,8 +62,20 @@ namespace SimpleTrader.WPF
             services.AddSingleton<IStockPriceService, StockPriceService>();
             services.AddSingleton<IBuyStockService, BuyStockService>();
 
+            services.AddSingleton<IMajorIndexService, MajorIndexService>();
+
+            services.AddSingleton<ISimpleTraderViewModelAbstractFactory, SimpleTraderViewModelAbstractFactory>();
+            services.AddSingleton<ISimpleTraderViewModelFactory<HomeViewModel>, HomeViewModelFactory>();
+            services.AddSingleton<ISimpleTraderViewModelFactory<PortfolioViewModel>, PortfolioViewModelFactory>();
+            services.AddSingleton<ISimpleTraderViewModelFactory<MajorIndexListingViewModel>, MajorIndexListingViewModelFactory>();
+
+            
             services.AddScoped<INavigator, Navigator>();
             services.AddScoped<MainViewModel>(); // model have state, like current model
+
+            services.AddScoped<MainWindow>(s => new MainWindow(s.GetRequiredService<MainViewModel>()));
+
+            
 
 
             return services.BuildServiceProvider();
