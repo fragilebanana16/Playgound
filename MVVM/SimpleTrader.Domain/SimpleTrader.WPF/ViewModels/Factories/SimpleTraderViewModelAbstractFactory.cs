@@ -28,6 +28,7 @@ namespace SimpleTrader.WPF.ViewModels.Factories
                 case ViewType.Portfolio:
                     return _portfolioViewModelFactory.CreateViewModel();
                 case ViewType.Buy:
+                    return new BuyViewModel();
                 case ViewType.Sell:
                 default:
                     throw new ArgumentException("The ViewType does not have a ViewModel.", "viewType");
