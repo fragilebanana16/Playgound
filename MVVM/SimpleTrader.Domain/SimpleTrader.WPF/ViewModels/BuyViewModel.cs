@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Input;
+using SimpleTrader.WPF.Commands;
 
 namespace SimpleTrader.WPF.ViewModels
 {
@@ -23,13 +24,49 @@ namespace SimpleTrader.WPF.ViewModels
             }
         }
 
-     
+        private double _stockPrice;
+        public double StockPrice
+        {
+            get
+            {
+                return _stockPrice;
+            }
+            set
+            {
+                _stockPrice = value;
+                OnPropertyChanged(nameof(StockPrice));
+            }
+        }
+        private int _sharesToBuy;
+        public int SharesToBuy
+        {
+            get
+            {
+                return _sharesToBuy;
+            }
+            set
+            {
+                _sharesToBuy = value;
+                OnPropertyChanged(nameof(TotalPrice));
+                OnPropertyChanged(nameof(SharesToBuy));
+            }
+        }
+
+        public double TotalPrice
+        {
+            get
+            {
+                return SharesToBuy * StockPrice;
+            }
+        }
+
         public ICommand SearchSymbolCommand { get; set; }
         public ICommand BuyStockCommand { get; set; }
 
-        public BuyViewModel()
+        public BuyViewModel(IStockPriceService stockPriceService, IBuyStockService buyStockService)
         {
-          
+            SearchSymbolCommand = new SearchSymbolCommand(this, stockPriceService);
+            BuyStockCommand = new BuyStockCommand(this, buyStockService);
         }
 
     }
