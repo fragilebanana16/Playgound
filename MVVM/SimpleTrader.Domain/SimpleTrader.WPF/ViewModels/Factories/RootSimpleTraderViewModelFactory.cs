@@ -5,13 +5,13 @@ using System.Text;
 
 namespace SimpleTrader.WPF.ViewModels.Factories
 {
-    public class SimpleTraderViewModelAbstractFactory : ISimpleTraderViewModelAbstractFactory
+    public class RootSimpleTraderViewModelFactory : IRootSimpleTraderViewModelFactory
     {
         private readonly ISimpleTraderViewModelFactory<HomeViewModel> _homeviewModelFactory;
         private readonly ISimpleTraderViewModelFactory<PortfolioViewModel> _portfolioViewModelFactory;
         private readonly BuyViewModel _buyViewModel;
 
-        public SimpleTraderViewModelAbstractFactory(
+        public RootSimpleTraderViewModelFactory(
             ISimpleTraderViewModelFactory<HomeViewModel> homeviewModelFactory,
             ISimpleTraderViewModelFactory<PortfolioViewModel> portfolioViewModelFactory,
             BuyViewModel buyViewModel)
