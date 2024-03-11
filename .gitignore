@@ -7,6 +7,6 @@
 /MVVM/**/bin
 /MVVM/**/obj
 /MVVM/**/*.config
-
+/MVVM/SimpleTrader.Domain/.vs
 
 /VueBasic/blog/src/firebase
