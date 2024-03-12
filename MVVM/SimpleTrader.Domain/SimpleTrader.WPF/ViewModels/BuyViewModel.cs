@@ -48,6 +48,7 @@ namespace SimpleTrader.WPF.ViewModels
             set
             {
                 _stockPrice = value;
+                OnPropertyChanged(nameof(TotalPrice));
                 OnPropertyChanged(nameof(StockPrice));
             }
         }
