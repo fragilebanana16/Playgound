@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SimpleTrader.Domain.Models;
 using SimpleTrader.Domain.Services;
+using SimpleTrader.Domain.Services.AuthenticationServices;
 using SimpleTrader.Domain.Services.TransactionServices;
 using SimpleTrader.EntityFrameWork;
 using SimpleTrader.EntityFrameWork.Services;
@@ -49,6 +50,12 @@ namespace SimpleTrader.WPF
 
             IBuyStockService buyStockService = serviceProvider.GetRequiredService<IBuyStockService>();
 
+            // register/login
+            IAuthenticationService authentication = serviceProvider.GetRequiredService<IAuthenticationService>();
+            await authentication.Register("testIAuth@mail.com", "testRegUser", "123", "123");
+
+            await authentication.Login("testRegUser", "123");
+
             base.OnStartup(e);
         }
 
@@ -58,7 +65,9 @@ namespace SimpleTrader.WPF
 
             // register service
             services.AddSingleton<SimpleTraderDbContextFactory>();
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddSingleton<IDataService<Account>, AccountDataService>();
+            services.AddSingleton<IAccountService, AccountDataService>();
             services.AddSingleton<IStockPriceService, StockPriceService>();
             services.AddSingleton<IBuyStockService, BuyStockService>();
             services.AddSingleton<IMajorIndexService, MajorIndexService>();

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SimpleTrader.EntityFrameWork.Services
 {
-    public class AccountDataService : IDataService<Account>
+    public class AccountDataService : IAccountService
     {
         private readonly SimpleTraderDbContextFactory _contextFactory;
         private readonly NonQueryDataService<Account> _nonQueryDataService;
