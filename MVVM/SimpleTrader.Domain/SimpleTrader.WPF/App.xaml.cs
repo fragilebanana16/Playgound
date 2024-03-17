@@ -48,13 +48,13 @@ namespace SimpleTrader.WPF
             //Account buyer = await accountService.Get(1);
             //await buyStockService.BuyStock(buyer, "T", 5);
 
-            IBuyStockService buyStockService = serviceProvider.GetRequiredService<IBuyStockService>();
+            //IBuyStockService buyStockService = serviceProvider.GetRequiredService<IBuyStockService>();
 
             // register/login
-            IAuthenticationService authentication = serviceProvider.GetRequiredService<IAuthenticationService>();
-            await authentication.Register("testIAuth@mail.com", "testRegUser", "123", "123");
+            //IAuthenticationService authentication = serviceProvider.GetRequiredService<IAuthenticationService>();
+            //await authentication.Register("testIAuth@mail.com", "testRegUser", "123", "123");
 
-            await authentication.Login("testRegUser", "123");
+            //await authentication.Login("testRegUser", "123");
 
             base.OnStartup(e);
         }

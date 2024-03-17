@@ -26,7 +26,7 @@ namespace SimpleTrader.Domain.Services.AuthenticationServices
 
             if (!storedAccount.AccountHolder.PasswordHash.Equals(password))
             {
-                throw new Exception(username + " dismatch " + password);
+                throw new Exception("username dismatch password");
             }
 
             return storedAccount;
