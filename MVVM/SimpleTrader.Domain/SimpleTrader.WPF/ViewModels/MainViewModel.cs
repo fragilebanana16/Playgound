@@ -11,7 +11,7 @@ namespace SimpleTrader.WPF.ViewModels
         public MainViewModel(INavigator navigator)
         {
             this.Navigator = navigator;
-            Navigator.UpdateCurrentViewModelCommand.Execute(ViewType.Home);
+            Navigator.UpdateCurrentViewModelCommand.Execute(ViewType.Login);
         }
     }
 }
