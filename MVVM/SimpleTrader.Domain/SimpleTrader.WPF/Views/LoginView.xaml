@@ -13,7 +13,7 @@
     <Border Margin="25" Padding="50"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
-        Background="#7EEE"
+        Background="#DEEE"
         BorderBrush="{StaticResource BrushPrimary2}"
         BorderThickness="3"
         CornerRadius="10">
