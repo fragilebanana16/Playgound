@@ -25,9 +25,9 @@ namespace SimpleTrader.WPF.ViewModels
 		}
 
 		public ICommand LoginCommand { get; }
-		public LoginViewModel(IAuthenticator authenticator)
+		public LoginViewModel(IAuthenticator authenticator, INavigator navigator)
 		{
-			LoginCommand = new LoginCommand(this, authenticator);
+			LoginCommand = new LoginCommand(this, authenticator, navigator);
 		}
 	}
 }
