@@ -10,16 +10,17 @@ namespace SimpleTrader.WPF.ViewModels.Factories
     public class LoginViewModelFactory : ISimpleTraderViewModelFactory<LoginViewModel>
     {
         private readonly IAuthenticator _authenticator;
-        public readonly INavigator _navigator;
+        public readonly IRenavigator _reNavigator;
 
-        public LoginViewModelFactory(IAuthenticator authenticator, INavigator navigator)
+        public LoginViewModelFactory(IAuthenticator authenticator, IRenavigator reNavigator)
         {
             _authenticator = authenticator;
-            _navigator = navigator;
+            _reNavigator = reNavigator;
+
         }
         public LoginViewModel CreateViewModel()
         {
-            return new LoginViewModel(_authenticator, _navigator);
+            return new LoginViewModel(_authenticator, _reNavigator);
         }
     }
 }
