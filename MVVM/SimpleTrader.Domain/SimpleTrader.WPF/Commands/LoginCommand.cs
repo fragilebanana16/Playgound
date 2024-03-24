@@ -15,9 +15,11 @@ namespace SimpleTrader.WPF.Commands
         private readonly LoginViewModel _loginViewModel; 
         private readonly IAuthenticator _authenticator;
         private readonly IRenavigator _renavigator;
+        private readonly MainViewModel _mvm;
 
-        public LoginCommand(LoginViewModel loginViewModel, IAuthenticator authenticator, IRenavigator renavigator)
+        public LoginCommand(MainViewModel mvm, LoginViewModel loginViewModel, IAuthenticator authenticator, IRenavigator renavigator)
         {
+            _mvm = mvm;
             _authenticator = authenticator;
             _renavigator = renavigator;
             _loginViewModel = loginViewModel;
@@ -36,8 +38,9 @@ namespace SimpleTrader.WPF.Commands
             bool success = await _authenticator.Login(_loginViewModel.Username, parameter.ToString());
             if (success)
             {
-                _renavigator.Renavigate();
+                // _renavigator.Renavigate();
                 //_navigator.UpdateCurrentViewModelCommand.Execute(ViewType.Home);
+                _mvm.UpdateCurrentViewModelCommand.Execute(ViewType.Home);
             }
         }
 
