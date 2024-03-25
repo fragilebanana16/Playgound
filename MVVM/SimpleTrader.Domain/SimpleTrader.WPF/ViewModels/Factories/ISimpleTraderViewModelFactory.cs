@@ -5,8 +5,9 @@ using System.Text;
 
 namespace SimpleTrader.WPF.ViewModels.Factories
 {
-    public interface ISimpleTraderViewModelFactory<T> where T : ViewModelBase
+    public interface ISimpleTraderViewModelFactory
     {
-        T CreateViewModel();
+        ViewModelBase CreateViewModel(ViewType viewType);
+
     }
 }

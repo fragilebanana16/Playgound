@@ -14,7 +14,7 @@ namespace SimpleTrader.WPF.ViewModels
         public INavigator Navigator { get; set; }
         public IAuthenticator Authenticator { get; }
         public ICommand UpdateCurrentViewModelCommand { get; }
-        public MainViewModel(INavigator navigator, IAuthenticator authenticator, IRootSimpleTraderViewModelFactory rootSimpleTraderViewModelFactory)
+        public MainViewModel(INavigator navigator, IAuthenticator authenticator, ISimpleTraderViewModelFactory rootSimpleTraderViewModelFactory)
         {
             Navigator = navigator;
             Authenticator = authenticator;
