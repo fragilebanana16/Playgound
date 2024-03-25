@@ -78,12 +78,15 @@ namespace SimpleTrader.WPF
             services.AddSingleton<PortfolioViewModel>();
             services.AddSingleton<ViewModelDelegateRenavigator<HomeViewModel>>();
 
+            services.AddSingleton<HomeViewModel>(services =>
+            {
+                return new HomeViewModel(MajorIndexListingViewModel.LoadMajorIndexViewModel(services.GetRequiredService<IMajorIndexService>())); // api call count limit, only one single in application
+            });
+
             // register delegate
             services.AddSingleton<CreateViewModel<HomeViewModel>>(services =>
             {
-                return () => new HomeViewModel(
-                    MajorIndexListingViewModel.LoadMajorIndexViewModel(
-                        services.GetRequiredService<IMajorIndexService>()));
+                return () => services.GetRequiredService<HomeViewModel>();
             });
 
             services.AddSingleton<CreateViewModel<BuyViewModel>>(services =>
