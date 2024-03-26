@@ -16,7 +16,7 @@
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Authenticator.IsLoggedIn}" Value="false">
+                        <DataTrigger Binding="{Binding IsLoggedIn}" Value="false">
                             <Setter Property="Visibility" Value="Collapsed"></Setter>
                         </DataTrigger>
                     </Style.Triggers>
@@ -26,7 +26,7 @@
         </Grid>
         
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <ContentControl Content="{Binding Navigator.CurrentViewModel}"/>
+            <ContentControl Content="{Binding CurrentViewModel}"/>
         </ScrollViewer>
     </Grid>
 </Window>
