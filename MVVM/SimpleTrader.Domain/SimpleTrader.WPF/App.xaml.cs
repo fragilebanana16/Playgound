@@ -6,6 +6,7 @@ using SimpleTrader.Domain.Services.TransactionServices;
 using SimpleTrader.EntityFrameWork;
 using SimpleTrader.EntityFrameWork.Services;
 using SimpleTrader.FinancialModelingPrepAPI.Services;
+using SimpleTrader.WPF.State.Accounts;
 using SimpleTrader.WPF.State.Authenticators;
 using SimpleTrader.WPF.State.Navigators;
 using SimpleTrader.WPF.ViewModels;
@@ -107,6 +108,7 @@ namespace SimpleTrader.WPF
 
             services.AddScoped<INavigator, Navigator>();
             services.AddScoped<IAuthenticator, Authenticator>();
+            services.AddScoped<IAccountStore, AccountStore>();
             services.AddScoped<MainViewModel>(); // model have state, like current model
             services.AddScoped<BuyViewModel>();
             services.AddScoped<MainWindow>(s => new MainWindow(s.GetRequiredService<MainViewModel>()));
