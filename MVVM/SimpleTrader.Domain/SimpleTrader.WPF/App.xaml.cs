@@ -7,6 +7,7 @@ using SimpleTrader.EntityFrameWork;
 using SimpleTrader.EntityFrameWork.Services;
 using SimpleTrader.FinancialModelingPrepAPI.Services;
 using SimpleTrader.WPF.State.Accounts;
+using SimpleTrader.WPF.State.Assets;
 using SimpleTrader.WPF.State.Authenticators;
 using SimpleTrader.WPF.State.Navigators;
 using SimpleTrader.WPF.ViewModels;
@@ -78,10 +79,11 @@ namespace SimpleTrader.WPF
             services.AddSingleton<BuyViewModel>();
             services.AddSingleton<PortfolioViewModel>();
             services.AddSingleton<ViewModelDelegateRenavigator<HomeViewModel>>();
+            services.AddSingleton<AssetSummaryViewModel>();
 
             services.AddSingleton<HomeViewModel>(services =>
             {
-                return new HomeViewModel(MajorIndexListingViewModel.LoadMajorIndexViewModel(services.GetRequiredService<IMajorIndexService>())); // api call count limit, only one single in application
+                return new HomeViewModel(services.GetRequiredService<AssetSummaryViewModel>(), MajorIndexListingViewModel.LoadMajorIndexViewModel(services.GetRequiredService<IMajorIndexService>())); // api call count limit, only one single in application
             });
 
             // register delegate
@@ -106,9 +108,11 @@ namespace SimpleTrader.WPF
                     services.GetRequiredService<ViewModelDelegateRenavigator<HomeViewModel>>()); // login to home
             });
 
-            services.AddScoped<INavigator, Navigator>();
-            services.AddScoped<IAuthenticator, Authenticator>();
-            services.AddScoped<IAccountStore, AccountStore>();
+            services.AddSingleton<INavigator, Navigator>();
+            services.AddSingleton<IAuthenticator, Authenticator>();
+            services.AddSingleton<IAccountStore, AccountStore>();
+            services.AddSingleton<AssetStore>();
+
             services.AddScoped<MainViewModel>(); // model have state, like current model
             services.AddScoped<BuyViewModel>();
             services.AddScoped<MainWindow>(s => new MainWindow(s.GetRequiredService<MainViewModel>()));
