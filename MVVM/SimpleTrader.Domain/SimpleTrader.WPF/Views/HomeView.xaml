@@ -12,6 +12,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
+        <controls:AssetSummary Grid.Row="0" DataContext="{Binding AssetSummaryViewModel}"/>
         <controls:MajorIndexListing Grid.Row="1" Margin="0 10" DataContext="{Binding MajorIndexListingViewModel}"/>
     </Grid>
 </UserControl>
