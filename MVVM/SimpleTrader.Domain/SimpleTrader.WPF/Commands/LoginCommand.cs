@@ -10,7 +10,7 @@ using System.Windows.Input;
 
 namespace SimpleTrader.WPF.Commands
 {
-    public class LoginCommand : ICommand
+    public class LoginCommand : AsyncCommandBase
     {
         private readonly LoginViewModel _loginViewModel; 
         private readonly IAuthenticator _authenticator;
@@ -24,21 +24,23 @@ namespace SimpleTrader.WPF.Commands
             _loginViewModel.PropertyChanged += LoginViewModel_PropertyChanged;
         }
 
-        public event EventHandler CanExecuteChanged;
 
-        public bool CanExecute(object parameter)
+        public override async Task ExecuteAsync(object parameter)
         {
-            return true;
-        }
-
-        public async void Execute(object parameter)
-        {
-            bool success = await _authenticator.Login(_loginViewModel.Username, parameter.ToString());
-            if (success)
+            try
             {
-                _renavigator.Renavigate();
-                //_navigator.UpdateCurrentViewModelCommand.Execute(ViewType.Home);
+                bool success = await _authenticator.Login(_loginViewModel.Username, parameter.ToString());
+                if (success)
+                {
+                    _renavigator.Renavigate();
+                    //_navigator.UpdateCurrentViewModelCommand.Execute(ViewType.Home);
+                }
             }
+            catch (Exception e)
+            {
+                _loginViewModel.ErrorMessage = e.Message;
+            }
+
         }
 
         private void LoginViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

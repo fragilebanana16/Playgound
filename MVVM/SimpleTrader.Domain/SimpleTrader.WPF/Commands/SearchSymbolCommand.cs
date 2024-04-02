@@ -7,14 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace SimpleTrader.WPF.Commands
 {
-    public class SearchSymbolCommand : ICommand
+    public class SearchSymbolCommand : AsyncCommandBase
     {
         private readonly BuyViewModel _viewModel;
         private readonly IStockPriceService _stockPriceService;
-        public event EventHandler CanExecuteChanged;
 
         public SearchSymbolCommand(BuyViewModel viewModel, IStockPriceService stockPriceService)
         {
@@ -22,7 +22,7 @@ namespace SimpleTrader.WPF.Commands
             _stockPriceService = stockPriceService;
         }
 
-        public async void Execute(object parameter)
+        public override async Task ExecuteAsync(object parameter)
         {
             try
             {
@@ -32,13 +32,9 @@ namespace SimpleTrader.WPF.Commands
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                _viewModel.ErrorMessage = "Failed to get Symbol info...";
             }
         }
 
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
     }
 }

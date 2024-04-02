@@ -9,13 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace SimpleTrader.WPF.Commands
 {
-    public class BuyStockCommand : ICommand
+    public class BuyStockCommand : AsyncCommandBase
     {
-        public event EventHandler CanExecuteChanged;
-
         private readonly BuyViewModel _buyViewModel;
         private readonly IBuyStockService _buyStockService;
         private readonly IAccountStore _accountStore;
@@ -27,22 +26,23 @@ namespace SimpleTrader.WPF.Commands
             _accountStore = accountStore;
         }
 
-
-        public bool CanExecute(object parameter)
+        public override async Task ExecuteAsync(object parameter)
         {
-            return true;
-        }
+            _buyViewModel.ErrorMessage = string.Empty;
+            _buyViewModel.StatusMessage = string.Empty;
 
-        public async void Execute(object parameter)
-        {
             try
             {
-                Account account = await _buyStockService.BuyStock(_accountStore.CurrentAccount, _buyViewModel.Symbol, _buyViewModel.SharesToBuy);
+                string symbol = _buyViewModel.Symbol;
+                int shares = _buyViewModel.SharesToBuy;
+                Account account = await _buyStockService.BuyStock(_accountStore.CurrentAccount,
+                    symbol, shares);
                 _accountStore.CurrentAccount = account;
+                _buyViewModel.StatusMessage = $"Successfully purchased {shares} share of {symbol}";
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                _buyViewModel.ErrorMessage = e.Message;
             }
         }
     }
