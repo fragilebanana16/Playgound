@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SimpleTrader.Domain.Models;
 using SimpleTrader.Domain.Services;
 using SimpleTrader.Domain.Services.AuthenticationServices;
 using SimpleTrader.Domain.Services.TransactionServices;
 using SimpleTrader.EntityFrameWork;
 using SimpleTrader.EntityFrameWork.Services;
+using SimpleTrader.FinancialModelingPrepAPI;
 using SimpleTrader.FinancialModelingPrepAPI.Services;
 using SimpleTrader.WPF.State.Accounts;
 using SimpleTrader.WPF.State.Assets;
@@ -29,6 +31,7 @@ namespace SimpleTrader.WPF
     /// </summary>
     public partial class App : Application
     {
+
         protected override async void OnStartup(StartupEventArgs e)
         {
 
@@ -65,6 +68,9 @@ namespace SimpleTrader.WPF
         private IServiceProvider CreateServiceProvider()
         {
             IServiceCollection services = new ServiceCollection();
+
+            string apiKey = ConfigurationManager.AppSettings.Get("financeApiKey");
+            services.AddSingleton<FinancialModelingPrepHttpClientFactory>(new FinancialModelingPrepHttpClientFactory(apiKey));
 
             // register service
             services.AddSingleton<SimpleTraderDbContextFactory>();
