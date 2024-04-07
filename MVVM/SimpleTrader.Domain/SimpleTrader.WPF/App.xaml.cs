@@ -31,13 +31,81 @@ namespace SimpleTrader.WPF
     /// </summary>
     public partial class App : Application
     {
+        private readonly IHost _host;
+
+        public App()
+        {
+            _host = CreateHostBuilder().Build();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args = null)
+        {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices(services =>
+                {
+                    string apiKey = ConfigurationManager.AppSettings.Get("financeApiKey");
+                    services.AddSingleton<FinancialModelingPrepHttpClientFactory>(new FinancialModelingPrepHttpClientFactory(apiKey));
+
+                    // register service
+                    services.AddSingleton<SimpleTraderDbContextFactory>();
+                    services.AddSingleton<IAuthenticationService, AuthenticationService>();
+                    services.AddSingleton<IDataService<Account>, AccountDataService>();
+                    services.AddSingleton<IAccountService, AccountDataService>();
+                    services.AddSingleton<IStockPriceService, StockPriceService>();
+                    services.AddSingleton<IBuyStockService, BuyStockService>();
+                    services.AddSingleton<IMajorIndexService, MajorIndexService>();
+
+                    services.AddSingleton<ISimpleTraderViewModelFactory, SimpleTraderViewModelFactory>();
+                    services.AddSingleton<BuyViewModel>();
+                    services.AddSingleton<PortfolioViewModel>();
+                    services.AddSingleton<ViewModelDelegateRenavigator<HomeViewModel>>();
+                    services.AddSingleton<AssetSummaryViewModel>();
+
+                    services.AddSingleton<HomeViewModel>(services =>
+                    {
+                        return new HomeViewModel(services.GetRequiredService<AssetSummaryViewModel>(), MajorIndexListingViewModel.LoadMajorIndexViewModel(services.GetRequiredService<IMajorIndexService>())); // api call count limit, only one single in application
+                    });
+
+                    // register delegate
+                    services.AddSingleton<CreateViewModel<HomeViewModel>>(services =>
+                    {
+                        return () => services.GetRequiredService<HomeViewModel>();
+                    });
+
+                    services.AddSingleton<CreateViewModel<BuyViewModel>>(services =>
+                    {
+                        return () => services.GetRequiredService<BuyViewModel>(); // new  BuyViewModel() if each time needs a new model
+                    });
+
+                    services.AddSingleton<CreateViewModel<PortfolioViewModel>>(services =>
+                    {
+                        return () => services.GetRequiredService<PortfolioViewModel>();
+                    });
+
+                    services.AddSingleton<CreateViewModel<LoginViewModel>>(services =>
+                    {
+                        return () => new LoginViewModel(services.GetRequiredService<IAuthenticator>(),
+                            services.GetRequiredService<ViewModelDelegateRenavigator<HomeViewModel>>()); // login to home
+                    });
+
+                    services.AddSingleton<INavigator, Navigator>();
+                    services.AddSingleton<IAuthenticator, Authenticator>();
+                    services.AddSingleton<IAccountStore, AccountStore>();
+                    services.AddSingleton<AssetStore>();
+
+                    services.AddScoped<MainViewModel>(); // model have state, like current model
+                    services.AddScoped<BuyViewModel>();
+                    services.AddScoped<MainWindow>(s => new MainWindow(s.GetRequiredService<MainViewModel>()));
+
+                });
+        }
+
 
         protected override async void OnStartup(StartupEventArgs e)
         {
+            _host.Start();
 
-            IServiceProvider serviceProvider = this.CreateServiceProvider();
-
-            Window window = serviceProvider.GetRequiredService<MainWindow>();
+            Window window = _host.Services.GetRequiredService<MainWindow>();
             window.Show();
 
             // test
@@ -65,65 +133,12 @@ namespace SimpleTrader.WPF
             base.OnStartup(e);
         }
 
-        private IServiceProvider CreateServiceProvider()
+        protected override async void OnExit(ExitEventArgs e)
         {
-            IServiceCollection services = new ServiceCollection();
+            await _host.StopAsync();
+            _host.Dispose();
 
-            string apiKey = ConfigurationManager.AppSettings.Get("financeApiKey");
-            services.AddSingleton<FinancialModelingPrepHttpClientFactory>(new FinancialModelingPrepHttpClientFactory(apiKey));
-
-            // register service
-            services.AddSingleton<SimpleTraderDbContextFactory>();
-            services.AddSingleton<IAuthenticationService, AuthenticationService>();
-            services.AddSingleton<IDataService<Account>, AccountDataService>();
-            services.AddSingleton<IAccountService, AccountDataService>();
-            services.AddSingleton<IStockPriceService, StockPriceService>();
-            services.AddSingleton<IBuyStockService, BuyStockService>();
-            services.AddSingleton<IMajorIndexService, MajorIndexService>();
-
-            services.AddSingleton<ISimpleTraderViewModelFactory, SimpleTraderViewModelFactory>();
-            services.AddSingleton<BuyViewModel>();
-            services.AddSingleton<PortfolioViewModel>();
-            services.AddSingleton<ViewModelDelegateRenavigator<HomeViewModel>>();
-            services.AddSingleton<AssetSummaryViewModel>();
-
-            services.AddSingleton<HomeViewModel>(services =>
-            {
-                return new HomeViewModel(services.GetRequiredService<AssetSummaryViewModel>(), MajorIndexListingViewModel.LoadMajorIndexViewModel(services.GetRequiredService<IMajorIndexService>())); // api call count limit, only one single in application
-            });
-
-            // register delegate
-            services.AddSingleton<CreateViewModel<HomeViewModel>>(services =>
-            {
-                return () => services.GetRequiredService<HomeViewModel>();
-            });
-
-            services.AddSingleton<CreateViewModel<BuyViewModel>>(services =>
-            {
-                return () => services.GetRequiredService<BuyViewModel>(); // new  BuyViewModel() if each time needs a new model
-            });
-
-            services.AddSingleton<CreateViewModel<PortfolioViewModel>>(services =>
-            {
-                return () => services.GetRequiredService<PortfolioViewModel>();
-            });
-
-            services.AddSingleton<CreateViewModel<LoginViewModel>>(services =>
-            {
-                return () => new LoginViewModel(services.GetRequiredService<IAuthenticator>(),
-                    services.GetRequiredService<ViewModelDelegateRenavigator<HomeViewModel>>()); // login to home
-            });
-
-            services.AddSingleton<INavigator, Navigator>();
-            services.AddSingleton<IAuthenticator, Authenticator>();
-            services.AddSingleton<IAccountStore, AccountStore>();
-            services.AddSingleton<AssetStore>();
-
-            services.AddScoped<MainViewModel>(); // model have state, like current model
-            services.AddScoped<BuyViewModel>();
-            services.AddScoped<MainWindow>(s => new MainWindow(s.GetRequiredService<MainViewModel>()));
-
-            return services.BuildServiceProvider();
+            base.OnExit(e);
         }
     }
 }
