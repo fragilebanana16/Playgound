@@ -11,7 +11,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            IDataService<User> userService = new GenericDataService<User>(new SimpleTraderDbContextFactory());
+            //IDataService<User> userService = new GenericDataService<User>(new SimpleTraderDbContextFactory());
             // Create
             //userService.Create(new User { Username = "Test" }).Wait();
 

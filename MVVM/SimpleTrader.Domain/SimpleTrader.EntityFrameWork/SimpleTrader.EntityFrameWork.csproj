@@ -19,6 +19,8 @@
     <Compile Remove="Migrations\20231219142555_switch to sql server.Designer.cs" />
     <Compile Remove="Migrations\20240220140548_rename-stock-to-asset2.cs" />
     <Compile Remove="Migrations\20240220140548_rename-stock-to-asset2.Designer.cs" />
+    <Compile Remove="Migrations\20240407125919_test.cs" />
+    <Compile Remove="Migrations\20240407125919_test.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
