@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleTrader.Domain.Models;
 using SimpleTrader.Domain.Services;
@@ -41,13 +43,20 @@ namespace SimpleTrader.WPF
         public static IHostBuilder CreateHostBuilder(string[] args = null)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureServices(services =>
+                .ConfigureAppConfiguration(c =>
                 {
-                    string apiKey = ConfigurationManager.AppSettings.Get("financeApiKey");
+                    c.AddJsonFile("appsettings.json");
+                    // c.AddEnvironmentVariables(); // get this way: string apiKey = context.Configuration.GetValue<string>("FINANCE_API_KEY");
+                })
+                .ConfigureServices((context, services) =>
+                {
+                    string apiKey = context.Configuration.GetConnectionString("FINANCE_API_KEY");
                     services.AddSingleton<FinancialModelingPrepHttpClientFactory>(new FinancialModelingPrepHttpClientFactory(apiKey));
 
+                    string connectionString = context.Configuration.GetConnectionString("default");
+                    services.AddDbContext<SimpleTraderDbContext>(o => o.UseSqlServer(connectionString));
                     // register service
-                    services.AddSingleton<SimpleTraderDbContextFactory>();
+                    services.AddSingleton<SimpleTraderDbContextFactory>(new SimpleTraderDbContextFactory(connectionString)); // DI doesnot know the string for ctor(string str) of SimpleTraderDbContextFactory if u write services.AddSingleton<SimpleTraderDbContextFactory>();
                     services.AddSingleton<IAuthenticationService, AuthenticationService>();
                     services.AddSingleton<IDataService<Account>, AccountDataService>();
                     services.AddSingleton<IAccountService, AccountDataService>();

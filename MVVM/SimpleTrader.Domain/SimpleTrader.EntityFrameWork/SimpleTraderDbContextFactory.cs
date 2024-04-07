@@ -7,12 +7,20 @@ using System.Text;
 
 namespace SimpleTrader.EntityFrameWork
 {
-    public class SimpleTraderDbContextFactory:IDesignTimeDbContextFactory<SimpleTraderDbContext>
+    public class SimpleTraderDbContextFactory
     {
-        public SimpleTraderDbContext CreateDbContext(string[] args = null)
+        private readonly string _connectionString;
+
+        public SimpleTraderDbContextFactory(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+        public SimpleTraderDbContext CreateDbContext()
         {
             DbContextOptionsBuilder<SimpleTraderDbContext> options = new DbContextOptionsBuilder<SimpleTraderDbContext>();
-            options.UseSqlServer(@"Data Source=(local)\SQLEXPRESS;Initial Catalog=LifeRecorder;Integrated Security=True;Pooling=False");
+            options.UseSqlServer(_connectionString);
+            // options.UseSqlServer(@"Data Source=(local)\SQLEXPRESS;Initial Catalog=LifeRecorder;Integrated Security=True;Pooling=False");
             return new SimpleTraderDbContext(options.Options);
         }
     }
