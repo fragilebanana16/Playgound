@@ -7,7 +7,7 @@ namespace SimpleTrader.WPF.ViewModels
 {
     public class HomeViewModel : ViewModelBase
     {
-        public AssetSummaryViewModel AssetSummaryViewModel { get; }
+        public AssetSummaryViewModel AssetSummaryViewModel { get; } // home can bind its  property
         public MajorIndexListingViewModel MajorIndexListingViewModel { get; }
 
         public HomeViewModel(AssetSummaryViewModel assetSummaryViewModel, MajorIndexListingViewModel majorIndexListingViewModel)
