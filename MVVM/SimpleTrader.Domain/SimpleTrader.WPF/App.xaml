@@ -24,8 +24,12 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type viewmodels:LoginViewModel}">
-                <!--the second LoginCommand is from LoginViewModel-->
-                <views:LoginView LoginCommand="{Binding LoginCommand}" />
+                <views:LoginView/>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewmodels:RegisterViewModel}">
+                <!--when the viewmodel is set to registerVm show the register view-->
+                <views:RegisterView />
             </DataTemplate>
         </ResourceDictionary>
 

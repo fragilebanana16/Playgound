@@ -29,7 +29,7 @@ namespace SimpleTrader.WPF.Commands
         {
             try
             {
-                bool success = await _authenticator.Login(_loginViewModel.Username, parameter.ToString());
+                bool success = await _authenticator.Login(_loginViewModel.Username, _loginViewModel.Password);
                 if (success)
                 {
                     _renavigator.Renavigate();

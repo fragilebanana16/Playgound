@@ -68,6 +68,8 @@ namespace SimpleTrader.WPF
                     services.AddSingleton<BuyViewModel>();
                     services.AddSingleton<PortfolioViewModel>();
                     services.AddSingleton<ViewModelDelegateRenavigator<HomeViewModel>>();
+                    services.AddSingleton<ViewModelDelegateRenavigator<RegisterViewModel>>();
+                    services.AddSingleton<ViewModelDelegateRenavigator<LoginViewModel>>();
                     services.AddSingleton<AssetSummaryViewModel>();
 
                     services.AddSingleton<HomeViewModel>(services =>
@@ -91,10 +93,19 @@ namespace SimpleTrader.WPF
                         return () => services.GetRequiredService<PortfolioViewModel>();
                     });
 
+                    services.AddSingleton<CreateViewModel<RegisterViewModel>>(services =>
+                    {
+                        return () => new RegisterViewModel(
+                            services.GetRequiredService<IAuthenticator>(),
+                            services.GetRequiredService<ViewModelDelegateRenavigator<LoginViewModel>>(),
+                            services.GetRequiredService<ViewModelDelegateRenavigator<LoginViewModel>>());
+                    });
+
                     services.AddSingleton<CreateViewModel<LoginViewModel>>(services =>
                     {
                         return () => new LoginViewModel(services.GetRequiredService<IAuthenticator>(),
-                            services.GetRequiredService<ViewModelDelegateRenavigator<HomeViewModel>>()); // login to home
+                            services.GetRequiredService<ViewModelDelegateRenavigator<HomeViewModel>>(),
+                             services.GetRequiredService<ViewModelDelegateRenavigator<RegisterViewModel>>()); // login to home
                     });
 
                     services.AddSingleton<INavigator, Navigator>();
@@ -103,7 +114,6 @@ namespace SimpleTrader.WPF
                     services.AddSingleton<AssetStore>();
 
                     services.AddScoped<MainViewModel>(); // model have state, like current model
-                    services.AddScoped<BuyViewModel>();
                     services.AddScoped<MainWindow>(s => new MainWindow(s.GetRequiredService<MainViewModel>()));
 
                 });
