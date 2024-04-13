@@ -38,8 +38,17 @@ namespace SimpleTrader.WPF
         public App()
         {
             _host = CreateHostBuilder().Build();
+            TestSellShare();
         }
 
+        private async void TestSellShare()
+        {
+            var accountService = _host.Services.GetService<IAccountService>();
+            var account = await accountService.GetByUsername("testRegUser");
+            var sellStockService = _host.Services.GetService<ISellStockService>();
+            account = await sellStockService.SellStock(account, "pp", 1);
+            Console.WriteLine();
+        }
         public static IHostBuilder CreateHostBuilder(string[] args = null)
         {
             return Host.CreateDefaultBuilder(args)
@@ -62,6 +71,7 @@ namespace SimpleTrader.WPF
                     services.AddSingleton<IAccountService, AccountDataService>();
                     services.AddSingleton<IStockPriceService, StockPriceService>();
                     services.AddSingleton<IBuyStockService, BuyStockService>();
+                    services.AddSingleton<ISellStockService, SellStockService>();
                     services.AddSingleton<IMajorIndexService, MajorIndexService>();
 
                     services.AddSingleton<ISimpleTraderViewModelFactory, SimpleTraderViewModelFactory>();
