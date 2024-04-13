@@ -25,7 +25,7 @@ namespace SimpleTrader.Domain.Services.TransactionServices
 
             if (transactionPrice > buyer.Balance)
             {
-                throw new Exception();
+                throw new Exception("transactionPrice > buyer.Balance");
             }
 
             AssetTransaction transaction = new AssetTransaction()
