@@ -9,17 +9,17 @@ namespace SimpleTrader.EntityFrameWork
 {
     public class SimpleTraderDbContextFactory
     {
-        private readonly string _connectionString;
+        private readonly Action<DbContextOptionsBuilder> _configureDbContext;
 
-        public SimpleTraderDbContextFactory(string connectionString)
+        public SimpleTraderDbContextFactory(Action<DbContextOptionsBuilder> configureDbContext)
         {
-            _connectionString = connectionString;
+            _configureDbContext = configureDbContext;
         }
 
         public SimpleTraderDbContext CreateDbContext()
         {
             DbContextOptionsBuilder<SimpleTraderDbContext> options = new DbContextOptionsBuilder<SimpleTraderDbContext>();
-            options.UseSqlServer(_connectionString);
+            _configureDbContext(options);
             // options.UseSqlServer(@"Data Source=(local)\SQLEXPRESS;Initial Catalog=LifeRecorder;Integrated Security=True;Pooling=False");
             return new SimpleTraderDbContext(options.Options);
         }

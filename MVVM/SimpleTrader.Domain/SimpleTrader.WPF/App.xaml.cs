@@ -53,10 +53,12 @@ namespace SimpleTrader.WPF
                     string apiKey = context.Configuration.GetConnectionString("FINANCE_API_KEY");
                     services.AddSingleton<FinancialModelingPrepHttpClientFactory>(new FinancialModelingPrepHttpClientFactory(apiKey));
 
-                    string connectionString = context.Configuration.GetConnectionString("default");
-                    services.AddDbContext<SimpleTraderDbContext>(o => o.UseSqlServer(connectionString));
+                    string connectionString = context.Configuration.GetConnectionString("sqlite");
+                    Action<DbContextOptionsBuilder> configureDbContext = o => o.UseSqlite(connectionString);
+
+                    services.AddDbContext<SimpleTraderDbContext>(configureDbContext);
                     // register service
-                    services.AddSingleton<SimpleTraderDbContextFactory>(new SimpleTraderDbContextFactory(connectionString)); // DI doesnot know the string for ctor(string str) of SimpleTraderDbContextFactory if u write services.AddSingleton<SimpleTraderDbContextFactory>();
+                    services.AddSingleton<SimpleTraderDbContextFactory>(new SimpleTraderDbContextFactory(configureDbContext)); // DI doesnot know the string for ctor(string str) of SimpleTraderDbContextFactory if u write services.AddSingleton<SimpleTraderDbContextFactory>();
                     services.AddSingleton<IAuthenticationService, AuthenticationService>();
                     services.AddSingleton<IDataService<Account>, AccountDataService>();
                     services.AddSingleton<IAccountService, AccountDataService>();
@@ -149,6 +151,13 @@ namespace SimpleTrader.WPF
             //await authentication.Register("testIAuth@mail.com", "testRegUser", "123", "123");
 
             //await authentication.Login("testRegUser", "123");
+
+            // config doesnt apply migration, run it manually
+            SimpleTraderDbContextFactory contextFactory = _host.Services.GetRequiredService<SimpleTraderDbContextFactory>();
+            using (SimpleTraderDbContext context = contextFactory.CreateDbContext())
+            {
+                context.Database.Migrate();
+            }
 
             base.OnStartup(e);
         }
