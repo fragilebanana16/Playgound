@@ -10,8 +10,7 @@ using System.Windows.Input;
 
 namespace SimpleTrader.WPF.ViewModels
 {
-    public class SellViewModel : ViewModelBase
-        //, ISearchSymbolViewModel
+    public class SellViewModel : ViewModelBase, ISearchSymbolViewModel
     {
         public AssetListingViewModel AssetListingViewModel { get; }
 
@@ -91,7 +90,7 @@ namespace SimpleTrader.WPF.ViewModels
             set => StatusMessageViewModel.Message = value;
         }
 
-        public ICommand SearchSymbolCommand { get; }
+        public ICommand SearchSymbolCommand { get; } // binded to SelectedAssetChangedCommand on sell view
         public ICommand SellStockCommand { get; }
 
         public SellViewModel(AssetStore assetStore,
@@ -101,8 +100,8 @@ namespace SimpleTrader.WPF.ViewModels
         {
             AssetListingViewModel = new AssetListingViewModel(assetStore);
 
-            //SearchSymbolCommand = new SearchSymbolCommand(this, stockPriceService);
-            //SellStockCommand = new SellStockCommand(this, sellStockService, accountStore);
+            SearchSymbolCommand = new SearchSymbolCommand(this, stockPriceService);
+            SellStockCommand = new SellStockCommand(this, sellStockService, accountStore);
 
             ErrorMessageViewModel = new MessageViewModel();
             StatusMessageViewModel = new MessageViewModel();

@@ -18,9 +18,29 @@ namespace SimpleTrader.WPF.Views
     /// </summary>
     public partial class SellView : UserControl
     {
+        public static readonly DependencyProperty SelectedAssetChangedCommandProperty =
+            DependencyProperty.Register("SelectedAssetChangedCommand", typeof(ICommand), typeof(SellView),
+                new PropertyMetadata(null));
+
+        public ICommand SelectedAssetChangedCommand
+        {
+            get { return (ICommand)GetValue(SelectedAssetChangedCommandProperty); }
+            set { SetValue(SelectedAssetChangedCommandProperty, value); }
+        }
+
         public SellView()
         {
             InitializeComponent();
+        }
+
+        private void cbAssets_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // set current account of store raise state changed, then handler ResetAssets()
+            // then binding combox become null, and it will call api again
+            if (cbAssets.SelectedItem != null) 
+            {
+                SelectedAssetChangedCommand?.Execute(null);
+            }
         }
     }
 }

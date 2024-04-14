@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:SimpleTrader.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <!--using template in order to parse sell or buy content with tempaltebinding-->
     <UserControl.Template>
         <ControlTemplate TargetType="UserControl">
             <Grid MaxWidth="500">
