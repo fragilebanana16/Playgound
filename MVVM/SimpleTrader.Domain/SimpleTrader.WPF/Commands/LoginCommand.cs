@@ -24,6 +24,10 @@ namespace SimpleTrader.WPF.Commands
             _loginViewModel.PropertyChanged += LoginViewModel_PropertyChanged;
         }
 
+        public override bool CanExecute(object parameter)
+        {
+            return _loginViewModel.CanLogin && base.CanExecute(parameter);
+        }
 
         public override async Task ExecuteAsync(object parameter)
         {
@@ -45,7 +49,10 @@ namespace SimpleTrader.WPF.Commands
 
         private void LoginViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            
+            if (e.PropertyName == nameof(LoginViewModel.CanLogin))
+            {
+                OnCanExecuteChanged(); // tell ui changed
+            }
         }
     }
 }

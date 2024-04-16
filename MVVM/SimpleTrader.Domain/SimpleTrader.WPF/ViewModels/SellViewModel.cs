@@ -13,7 +13,8 @@ namespace SimpleTrader.WPF.ViewModels
     public class SellViewModel : ViewModelBase, ISearchSymbolViewModel
     {
         public AssetListingViewModel AssetListingViewModel { get; }
-
+        public bool CanSellStock => SharesToSell > 0;
+        public bool CanSearchSymbol => !string.IsNullOrEmpty(Symbol);
         private AssetViewModel _selectedAsset;
         public AssetViewModel SelectedAsset
         {
@@ -25,6 +26,8 @@ namespace SimpleTrader.WPF.ViewModels
             {
                 _selectedAsset = value;
                 OnPropertyChanged(nameof(SelectedAsset));
+                OnPropertyChanged(nameof(Symbol));
+                OnPropertyChanged(nameof(CanSearchSymbol));
             }
         }
 
@@ -71,6 +74,7 @@ namespace SimpleTrader.WPF.ViewModels
                 _sharesToSell = value;
                 OnPropertyChanged(nameof(SharesToSell));
                 OnPropertyChanged(nameof(TotalPrice));
+                OnPropertyChanged(nameof(CanSellStock));
             }
         }
 

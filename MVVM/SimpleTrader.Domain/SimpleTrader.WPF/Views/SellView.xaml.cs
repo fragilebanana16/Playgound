@@ -39,7 +39,10 @@ namespace SimpleTrader.WPF.Views
             // then binding combox become null, and it will call api again
             if (cbAssets.SelectedItem != null) 
             {
-                SelectedAssetChangedCommand?.Execute(null);
+                if (SelectedAssetChangedCommand.CanExecute(null))
+                {
+                    SelectedAssetChangedCommand?.Execute(null);
+                }
             }
         }
     }

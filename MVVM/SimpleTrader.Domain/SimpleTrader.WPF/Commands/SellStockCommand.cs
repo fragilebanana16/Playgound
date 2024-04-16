@@ -4,6 +4,7 @@ using SimpleTrader.WPF.State.Accounts;
 using SimpleTrader.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace SimpleTrader.WPF.Commands
             _viewModel = viewModel;
             _sellStockService = sellStockService;
             _accountStore = accountStore;
+
+            _viewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
 
         public override async Task ExecuteAsync(object parameter)
@@ -41,6 +44,18 @@ namespace SimpleTrader.WPF.Commands
             catch (Exception)
             {
                 _viewModel.ErrorMessage = "Transaction failed.";
+            }
+        }
+        public override bool CanExecute(object parameter)
+        {
+            return _viewModel.CanSellStock && base.CanExecute(parameter);
+        }
+
+        private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SellViewModel.CanSellStock))
+            {
+                OnCanExecuteChanged();
             }
         }
     }

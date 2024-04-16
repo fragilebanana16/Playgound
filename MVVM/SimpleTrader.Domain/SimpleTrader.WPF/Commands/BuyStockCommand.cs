@@ -24,6 +24,8 @@ namespace SimpleTrader.WPF.Commands
             _buyViewModel = buyViewModel;
             _buyStockService = buyStockService;
             _accountStore = accountStore;
+
+            _buyViewModel.PropertyChanged += BuyViewModel_PropertyChanged;
         }
 
         public override async Task ExecuteAsync(object parameter)
@@ -43,6 +45,19 @@ namespace SimpleTrader.WPF.Commands
             catch (Exception e)
             {
                 _buyViewModel.ErrorMessage = e.Message;
+            }
+        }
+
+        public override bool CanExecute(object parameter)
+        {
+            return _buyViewModel.CanBuyStock && base.CanExecute(parameter);
+        }
+
+        private void BuyViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(BuyViewModel.CanBuyStock))
+            {
+                OnCanExecuteChanged();
             }
         }
     }

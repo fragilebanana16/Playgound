@@ -11,6 +11,8 @@ namespace SimpleTrader.WPF.ViewModels
 {
     public class BuyViewModel : ViewModelBase, ISearchSymbolViewModel
     {
+        public bool CanSearchSymbol => !string.IsNullOrEmpty(Symbol);
+        public bool CanBuyStock => SharesToBuy > 0;
         private string _symbol;
         public string Symbol
         {
@@ -22,6 +24,7 @@ namespace SimpleTrader.WPF.ViewModels
             {
                 _symbol = value;
                 OnPropertyChanged(nameof(Symbol));
+                OnPropertyChanged(nameof(CanSearchSymbol));
             }
         }
 
@@ -66,6 +69,7 @@ namespace SimpleTrader.WPF.ViewModels
                 _sharesToBuy = value;
                 OnPropertyChanged(nameof(TotalPrice));
                 OnPropertyChanged(nameof(SharesToBuy));
+                OnPropertyChanged(nameof(CanBuyStock));
             }
         }
 

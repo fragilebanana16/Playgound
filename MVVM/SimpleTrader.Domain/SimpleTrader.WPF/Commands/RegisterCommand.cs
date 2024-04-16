@@ -4,6 +4,7 @@ using SimpleTrader.WPF.State.Navigators;
 using SimpleTrader.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace SimpleTrader.WPF.Commands
             _registerViewModel = registerViewModel;
             _authenticator = authenticator;
             _registerRenavigator = registerRenavigator; // to login(dpendency container)
+
+            _registerViewModel.PropertyChanged += RegisterViewModel_PropertyChanged;
         }
 
         public override async Task ExecuteAsync(object parameter)
@@ -56,6 +59,14 @@ namespace SimpleTrader.WPF.Commands
             catch (Exception)
             {
                 _registerViewModel.ErrorMessage = "Registration failed.";
+            }
+        }
+
+        private void RegisterViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(RegisterViewModel.CanRegister))
+            {
+                OnCanExecuteChanged();
             }
         }
     }
