@@ -1,9 +1,11 @@
 ﻿using SimpleTrader.Domain.Models;
 using SimpleTrader.Domain.Services;
+using SimpleTrader.WPF.Commands;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace SimpleTrader.WPF.ViewModels
 {
@@ -15,9 +17,18 @@ namespace SimpleTrader.WPF.ViewModels
 
         private readonly IMajorIndexService _majorIndexService;
 
-        public MajorIndexListingViewModel(IMajorIndexService majorIndexService)
+        private bool _isLoading;
+        public bool IsLoading
         {
-            _majorIndexService = majorIndexService;
+            get
+            {
+                return _isLoading;
+            }
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged(nameof(IsLoading));
+            }
         }
 
         public MajorIndex DowJones
@@ -58,44 +69,26 @@ namespace SimpleTrader.WPF.ViewModels
                 OnPropertyChanged(nameof(SP500));
             }
         }
+        public ICommand LoadMajorIndexesCommand { get; }
 
         /// <summary>
         /// only the model wanted, model async data, otherwise we need to wait, where the caller needs to wait, the root caller might be the main ui
         /// </summary>
         /// <param name="majorIndexService"></param>
         /// <returns></returns>
+        public MajorIndexListingViewModel(IMajorIndexService majorIndexService)
+        {
+            LoadMajorIndexesCommand = new LoadMajorIndexesCommand(this, majorIndexService);
+        }
+
         public static MajorIndexListingViewModel LoadMajorIndexViewModel(IMajorIndexService majorIndexService)
         {
             MajorIndexListingViewModel majorIndexViewModel = new MajorIndexListingViewModel(majorIndexService);
-            majorIndexViewModel.LoadMajorIndexViewModel(); // no wait
+
+            majorIndexViewModel.LoadMajorIndexesCommand.Execute(null);
+
             return majorIndexViewModel;
         }
 
-        private void LoadMajorIndexViewModel()
-        {
-            _majorIndexService.GetMajorIndex(MajorIndexType.DowJones).ContinueWith(task =>
-            {
-                if (task.Exception == null)
-                {
-                    this.DowJones = task.Result;
-                }
-            });
-
-            _majorIndexService.GetMajorIndex(MajorIndexType.Nasdaq).ContinueWith(task =>
-            {
-                if (task.Exception == null)
-                {
-                    this.Nasdaq = task.Result;
-                }
-            }); ;
-
-            _majorIndexService.GetMajorIndex(MajorIndexType.SP500).ContinueWith(task =>
-            {
-                if (task.Exception == null)
-                {
-                    this.SP500 = task.Result;
-                }
-            }); ;
-        }
     }
 }

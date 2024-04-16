@@ -9,6 +9,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/Common.xaml" />
                 <ResourceDictionary Source="/Styles/NavigationBar.xaml" />
+                <!--handy control-->
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <!--if <ContentControl Content="{Binding Navigator.CurrentViewModel}"/> changed Content, show view depends on Datatype-->
             <DataTemplate DataType="{x:Type viewmodels:HomeViewModel}">
