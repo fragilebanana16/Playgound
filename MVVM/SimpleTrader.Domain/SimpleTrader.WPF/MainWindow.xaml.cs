@@ -25,5 +25,10 @@ namespace SimpleTrader.WPF
             InitializeComponent();
             DataContext = dataContext;
         }
+
+        private void btnExit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }
