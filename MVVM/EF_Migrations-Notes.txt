@@ -1,0 +1,41 @@
+https://www.youtube.com/watch?v=qkJ9keBmQWo
+
+#### 迁移命令切换工程为EF所在工程
+- 在使用VS的Package Manager做迁移时，通常需要切换工程，但VS习惯上认为UI和EF是同一个工程，所以会提示无法做迁移，而现代的框架结构往往要求DAL层需要和UI层分离，所以这也算是VS不太好的一个鼓励做法
+
+#### 迁移自动生成的脚本不是最佳
+- 若实体类为string，生成的命令可能映射类型为varchar(max)，可能产生性能问题，且太大的列可能有不能作为索引的限制，因为实体未明确可能会存储多大的数据，所以要覆盖所有情况，默认给最大
+- 优化：实体类Attribute可添加[Required]、[MaxLength(200)]、[Column(TypeName = "varchar(10)")]
+
+#### 数据丢失不可逆
+- varchar(200) => varchar(10)
+
+#### MSSMS的XEvent Profiler监视数据库事件
+- PeopleContext : DbContext的实例peopleDb.Count()执行后XEvent Profiler会记录一条Select Count(*)
+在执行AddRange()或SaveScope()时会生成sp_executesql的插入sql语句
+
+#### 有三个表，People、Address、Email，People包含多个Address、Email，
+```
+    peopleDb.People
+   .Include(a => a.Addesses)
+   .Include(a => a.Email)
+```
+在做什么
+- left join，等价类似于
+```
+select p.name, p.id from People 
+left join Address a on p.id = a.id
+left join Email e on e.owner = p.id
+```
+若People有100人，每个人有3个Address和4个Email，则该句将产生1200行数据，因为left join总是返回左表所有的行，则在一对多的场景下，一个有三个Adress的People将有三行才能满足这个要求，同理三行再left join得到1200行
+- 实体类不应该有太多一对多关系，EF会生成1200个除Address和Email的冗余数据，不建议多表join也是出于性能考虑
+而
+```
+    peopleDb.People
+```
+则只会返回空Adress、Email的People
+
+#### c#查询应接近sql语法
+- where(t => t.age > 10) 不等价于 写一个函数AboveTen(int age)，然后where(t => AboveTen(t))
+使用函数，EF会将where前的所有都返回，而接近sql的则会生成类似where age > '10'的sql语句
+区别在于使用函数其执行在c#中，返回的行数更多，性能更差
