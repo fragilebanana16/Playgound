@@ -1,4 +1,4 @@
-package tech.getarrays.employeemanager.model;
+package com.yolotech.employee.model;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
