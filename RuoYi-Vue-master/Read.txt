@@ -1,0 +1,6 @@
+SQL:
+
+\connect root@localhost
+\use ry-vue
+source H:\RuoYi-Vue-master\sql\quartz.sql
+source H:\RuoYi-Vue-master\sql\ry_20240629.sql
