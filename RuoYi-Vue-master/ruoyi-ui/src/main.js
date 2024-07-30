@@ -37,7 +37,9 @@ import DictTag from '@/components/DictTag'
 import VueMeta from 'vue-meta'
 // 字典数据组件
 import DictData from '@/components/DictData'
-
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
+Vue.use(Vuetify)
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
 Vue.prototype.getConfigKey = getConfigKey
@@ -77,10 +79,11 @@ Vue.use(Element, {
 })
 
 Vue.config.productionTip = false
-
 new Vue({
+  vuetify : new Vuetify(), // 写法固定否则无法识别vuetify的css
   el: '#app',
   router,
   store,
   render: h => h(App)
-})
+});
+

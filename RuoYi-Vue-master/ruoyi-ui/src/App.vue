@@ -1,8 +1,11 @@
 <template>
-  <div id="app">
+  <v-app>
+   <div id="app">
     <router-view />
     <theme-picker />
   </div>
+  </v-app>
+
 </template>
 
 <script>
