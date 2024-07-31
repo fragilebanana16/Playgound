@@ -1,7 +1,7 @@
 <template>
     <v-card
       class="content-bg card mx-auto"
-      :max-width="400"
+      :max-width="300"
       flat
       tile
       router
