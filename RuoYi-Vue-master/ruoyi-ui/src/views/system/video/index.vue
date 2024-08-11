@@ -16,6 +16,13 @@
       </v-alert>
 
       <main v-else>
+        <div> <video-player :playsinline="true" :options="playerOptions">
+          </video-player></div>
+
+        <img src="/dev-api/profile/avatar/2024/08/03/无标题_20240803094337A001.png" width="200" />
+        <video width="300" controls>
+          <source src="/dev-api/profile/avatar/2024/08/03/video/test.mp4">
+        </video>
         <h3 class="headline font-weight-medium">Recommended</h3>
         <v-btn @click="getVideos">Take action</v-btn>
         <v-row>
@@ -33,16 +40,31 @@
 <script>
 import VideoCard from './components/VideoCard'
 import { getVideos } from "@/api/system/video";
+import 'video.js/dist/video-js.css'
+import { videoPlayer } from 'vue-video-player'
 export default {
   name: "newmmwmw",
   components: {
     VideoCard,
+    videoPlayer
   },
   data: () => ({
     videos: [],
     loading: false,
     loaded: false,
     errored: false,
+    playerOptions: {
+      height: 620,
+      width: 1120,
+      muted: false,
+      language: 'en',
+      playbackRates: [0.7, 1.0, 1.5, 2.0],
+      sources: [{
+        type: "video/mp4",
+        src: "/dev-api/profile/avatar/2024/08/03/video/test.mp4"
+      }],
+      // poster: "/static/images/author.jpg",
+    }
   }),
   methods: {
     async getVideos() {
@@ -72,5 +94,12 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style >
+.video-js .vjs-big-play-button {
+  top: 50%;
+  left: 50%;
+  margin-left: -1.5em;
+  margin-top: -1em
+}
+</style>
   
