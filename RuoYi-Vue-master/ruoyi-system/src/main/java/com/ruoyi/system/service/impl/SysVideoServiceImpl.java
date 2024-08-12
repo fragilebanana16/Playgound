@@ -20,6 +20,11 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.common.core.domain.entity.SysVideo;
 import com.ruoyi.system.service.ISysVideoService;
 import static com.ruoyi.common.constant.VideoConstants.*;
+import java.io.FileNotFoundException;
+import java.io.RandomAccessFile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 /**
  * 用户 业务层处理
  * 
@@ -33,7 +38,7 @@ public class SysVideoServiceImpl implements ISysVideoService
     @Override
     public List<SysVideo> getVideos()
     {
-    	ArrayList<SysVideo> videos = new ArrayList<SysVideo>();
+    	ArrayList<SysVideo> videos = new ArrayList<SysVideo>(); 
     	SysVideo sysVideo = new SysVideo();
     	sysVideo.setTitle("Someone’s bound to get burned");
     	sysVideo.setDescription("BBC news");
@@ -49,129 +54,219 @@ public class SysVideoServiceImpl implements ISysVideoService
         return videos;
     }
     
-    /**
-     * Prepare the content.
-     *
-     * @param fileName String.
-     * @param fileType String.
-     * @param range    String.
-     * @return ResponseEntity.
-     */
-    public ResponseEntity<byte[]> prepareContent(final String fileName, final String fileType, final String range) {
+    
+    @Override
+    public ResponseEntity<StreamingResponseBody> loadPartialMediaFile
+                         (String localMediaFilePath, String rangeValues)
+          throws IOException
+    {
+       if (!StringUtils.hasText(rangeValues))
+       {
+          System.out.println("Read all media file content.");
+          return loadEntireMediaFile(localMediaFilePath);
+       }
+       else
+       {
+          long rangeStart = 0L;
+          long rangeEnd = 0L;
+          
+          if (!StringUtils.hasText(localMediaFilePath))
+          {
+             throw new IllegalArgumentException
+                   ("The full path to the media file is NULL or empty.");
+          }
+             
+          Path filePath = Paths.get(localMediaFilePath);      
+          if (!filePath.toFile().exists())
+          {
+             throw new FileNotFoundException("The media file does not exist.");
+          }
 
-        try {
-            final String fileKey = fileName + "." + fileType;
-            long rangeStart = 0;
-            long rangeEnd = CHUNK_SIZE;
-            final Long fileSize = getFileSize(fileKey);
-            if (range == null) {
-                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                        .header(CONTENT_TYPE, VIDEO_CONTENT + fileType)
-                        .header(ACCEPT_RANGES, BYTES)
-                        .header(CONTENT_LENGTH, String.valueOf(rangeEnd))
-                        .header(CONTENT_RANGE, BYTES + " " + rangeStart + "-" + rangeEnd + "/" + fileSize)
-                        .header(CONTENT_LENGTH, String.valueOf(fileSize))
-                        .body(readByteRangeNew(fileKey, rangeStart, rangeEnd)); // Read the object and convert it as bytes
-            }
-            String[] ranges = range.split("-");
-            rangeStart = Long.parseLong(ranges[0].substring(6));
-            if (ranges.length > 1) {
-                rangeEnd = Long.parseLong(ranges[1]);
-            } else {
-                rangeEnd = rangeStart + CHUNK_SIZE;
-            }
+          long fileSize = Files.size(filePath);
 
-            rangeEnd = Math.min(rangeEnd, fileSize - 1);
-            final byte[] data = readByteRangeNew(fileKey, rangeStart, rangeEnd);
-            final String contentLength = String.valueOf((rangeEnd - rangeStart) + 1);
-            HttpStatus httpStatus = HttpStatus.PARTIAL_CONTENT;
-            if (rangeEnd >= fileSize) {
-                httpStatus = HttpStatus.OK;
-            }
-            return ResponseEntity.status(httpStatus)
-                    .header(CONTENT_TYPE, VIDEO_CONTENT + fileType)
-                    .header(ACCEPT_RANGES, BYTES)
-                    .header(CONTENT_LENGTH, contentLength)
-                    .header(CONTENT_RANGE, BYTES + " " + rangeStart + "-" + rangeEnd + "/" + fileSize)
-                    .body(data);
-        } catch (IOException e) {
-            logger.error("Exception while reading the file {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+          System.out.println("Read rang seeking value.");
+          System.out.println("Rang values: [" + rangeValues + "]");
+          
+          int dashPos = rangeValues.indexOf("-");
+          if (dashPos > 0 && dashPos <= (rangeValues.length() - 1))
+          {
+             String[] rangesArr = rangeValues.split("-");
+             
+             if (rangesArr != null && rangesArr.length > 0)
+             {
+                System.out.println("ArraySize: " + rangesArr.length);
+                if (StringUtils.hasText(rangesArr[0]))
+                {
+                   System.out.println("Rang values[0]: [" + rangesArr[0] + "]");
+                   String valToParse = numericStringValue(rangesArr[0]);
+                   rangeStart = safeParseStringValuetoLong(valToParse, 0L);
+                }
+                else
+                {
+                   rangeStart = 0L;
+                }
+                
+                if (rangesArr.length > 1)
+                {
+                   System.out.println("Rang values[1]: [" + rangesArr[1] + "]");
+                   String valToParse = numericStringValue(rangesArr[1]);
+                   rangeEnd = safeParseStringValuetoLong(valToParse, 0L);
+                }
+                else
+                {
+                   if (fileSize > 0)
+                   {
+                      rangeEnd = fileSize - 1L;
+                   }
+                   else
+                   {
+                      rangeEnd = 0L;
+                   }
+                }
+             }
+          }
 
-
+          if (rangeEnd == 0L && fileSize > 0L)
+          {
+             rangeEnd = fileSize - 1;
+          }
+          if (fileSize < rangeEnd)
+          {
+             rangeEnd = fileSize - 1;
+          }
+          
+          System.out.println(String.format("Parsed Range Values: [%d] - [%d]", 
+                             rangeStart, rangeEnd));
+          
+          return loadPartialMediaFile(localMediaFilePath, rangeStart, rangeEnd);
+       }
     }
-
-    /**
-     * ready file byte by byte.
-     *
-     * @param filename String.
-     * @param start    long.
-     * @param end      long.
-     * @return byte array.
-     * @throws IOException exception.
-     */
-    public byte[] readByteRangeNew(String filename, long start, long end) throws IOException {
-        Path path = Paths.get(getFilePath(), filename);
-        byte[] data = Files.readAllBytes(path);
-        byte[] result = new byte[(int) (end - start) + 1];
-        System.arraycopy(data, (int) start, result, 0, (int) (end - start) + 1);
-        return result;
+    
+    private String numericStringValue(String origVal)
+    {
+       String retVal = "";
+       if (StringUtils.hasText(origVal))
+       {
+          retVal = origVal.replaceAll("[^0-9]", "");
+          System.out.println("Parsed Long Int Value: [" + retVal + "]");
+       }
+       
+       return retVal;
     }
-
-
-    public byte[] readByteRange(String filename, long start, long end) throws IOException {
-        Path path = Paths.get(getFilePath(), filename);
-        try (InputStream inputStream = (Files.newInputStream(path));
-             ByteArrayOutputStream bufferedOutputStream = new ByteArrayOutputStream()) {
-            byte[] data = new byte[BYTE_RANGE];
-            int nRead;
-            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                bufferedOutputStream.write(data, 0, nRead);
-            }
-            bufferedOutputStream.flush();
-            byte[] result = new byte[(int) (end - start) + 1];
-            System.arraycopy(bufferedOutputStream.toByteArray(), (int) start, result, 0, result.length);
-            return result;
-        }
+    
+    private long safeParseStringValuetoLong(String valToParse, long defaultVal)
+    {
+       long retVal = defaultVal;
+       if (StringUtils.hasText(valToParse))
+       {
+          try
+          {
+             retVal = Long.parseLong(valToParse);
+          }
+          catch (NumberFormatException ex)
+          {
+             // TODO: log the invalid long int val in text format.
+             retVal = defaultVal;
+          }
+       }
+       
+       return retVal;
     }
+    
+    @Override
+    public ResponseEntity<StreamingResponseBody> 
+           loadEntireMediaFile(String localMediaFilePath)
+          throws IOException
+    {
+       Path filePath = Paths.get(localMediaFilePath);      
+       if (!filePath.toFile().exists())
+       {
+          throw new FileNotFoundException("The media file does not exist.");
+       }
 
-    /**
-     * Get the filePath.
-     *
-     * @return String.
-     */
-    private String getFilePath() {
-        URL url = this.getClass().getResource(VIDEO);
-        assert url != null;
-        return new File(url.getFile()).getAbsolutePath();
+       long fileSize = Files.size(filePath);
+       long endPos = fileSize;
+       if (fileSize > 0L)
+       {
+          endPos = fileSize - 1;
+       }
+       else
+       {
+          endPos = 0L;
+       }
+       
+       ResponseEntity<StreamingResponseBody> retVal = 
+                          loadPartialMediaFile(localMediaFilePath, 0, endPos);
+       
+       return retVal;
     }
+          
+          @Override
+          public ResponseEntity<StreamingResponseBody> 
+            loadPartialMediaFile(String localMediaFilePath, long fileStartPos, long fileEndPos)
+                throws IOException
+          {
+             StreamingResponseBody responseStream;
+             Path filePath = Paths.get(localMediaFilePath); 
+             if (!filePath.toFile().exists())
+             {
+                throw new FileNotFoundException("The media file does not exist.");
+             }
+             
+             long fileSize = Files.size(filePath);
+             if (fileStartPos < 0L)
+             {
+                fileStartPos = 0L;
+             }
+             
+             if (fileSize > 0L)
+             {
+                if (fileStartPos >= fileSize)
+                {
+                   fileStartPos = fileSize - 1L;
+                }
+                
+                if (fileEndPos >= fileSize)
+                {
+                   fileEndPos = fileSize - 1L;
+                }
+             }
+             else
+             {
+                fileStartPos = 0L;
+                fileEndPos = 0L;
+             }
+             
+             byte[] buffer = new byte[4096];
+             String mimeType = Files.probeContentType(filePath);
 
-    /**
-     * Content length.
-     *
-     * @param fileName String.
-     * @return Long.
-     */
-    public Long getFileSize(String fileName) {
-        return Optional.ofNullable(fileName)
-                .map(file -> Paths.get(getFilePath(), file))
-                .map(this::sizeFromFile)
-                .orElse(0L);
-    }
+             final HttpHeaders responseHeaders = new HttpHeaders();
+             String contentLength = String.valueOf((fileEndPos - fileStartPos) + 1);
+             responseHeaders.add("Content-Type", mimeType);
+             responseHeaders.add("Content-Length", contentLength);
+             responseHeaders.add("Accept-Ranges", "bytes");
+             responseHeaders.add("Content-Range", 
+                     String.format("bytes %d-%d/%d", fileStartPos, fileEndPos, fileSize));
 
-    /**
-     * Getting the size from the path.
-     *
-     * @param path Path.
-     * @return Long.
-     */
-    private Long sizeFromFile(Path path) {
-        try {
-            return Files.size(path);
-        } catch (IOException ioException) {
-            logger.error("Error while getting the file size", ioException);
-        }
-        return 0L;
-    }
+             final long fileStartPos2 = fileStartPos;
+             final long fileEndPos2 = fileEndPos;
+             responseStream = os -> {
+                try (RandomAccessFile file = new RandomAccessFile(localMediaFilePath, "r")) {
+			
+					   long pos = fileStartPos2;
+					   file.seek(pos);
+					   while (pos < fileEndPos2)
+					   {
+					      file.read(buffer);
+					      os.write(buffer);
+					      pos += buffer.length;
+					   }
+					   os.flush();
+				}
+             };
+                
+             return new ResponseEntity<StreamingResponseBody>
+                    (responseStream, responseHeaders, HttpStatus.PARTIAL_CONTENT);
+          }
+ 
 }

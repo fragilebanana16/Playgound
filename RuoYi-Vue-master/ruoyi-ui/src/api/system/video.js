@@ -6,3 +6,10 @@ export function getVideos() {
     method: 'get'
   })
 }
+
+export function getTest() {
+  return request({
+    url: '/system/video/getTest/heihei.mp4',
+    method: 'get',
+  })
+}

@@ -20,9 +20,20 @@
           </video-player></div>
 
         <img src="/dev-api/profile/avatar/2024/08/03/无标题_20240803094337A001.png" width="200" />
+        <img src="/dev-api/videos/123.png" width="200" />
         <video width="300" controls>
-          <source src="/dev-api/profile/avatar/2024/08/03/video/test.mp4">
+          <source src="/dev-api/videos/test.mp4">
         </video>
+
+        <!-- <video width="300" controls>
+          <source src="/dev-api/system/video/stream/test.mp4">
+        </video> -->
+
+        <video width="600" controls>
+          <source src="/dev-api/system/video/play/media/v02/123">
+        </video>
+        
+        
         <h3 class="headline font-weight-medium">Recommended</h3>
         <v-btn @click="getVideos">Take action</v-btn>
         <v-row>
@@ -39,7 +50,7 @@
   
 <script>
 import VideoCard from './components/VideoCard'
-import { getVideos } from "@/api/system/video";
+import { getVideos, getTest } from "@/api/system/video";
 import 'video.js/dist/video-js.css'
 import { videoPlayer } from 'vue-video-player'
 export default {
@@ -71,22 +82,23 @@ export default {
       if (!this.loaded) {
         this.loading = true
       }
+      const rsp = await getTest()
+      console.log(rsp)
+      // const videos = await getVideos()
+      //   .catch((err) => {
+      //     console.log(err)
+      //     this.errored = true
+      //   })
+      //   .finally(() => {
+      //     this.loading = false
+      //   })
 
-      const videos = await getVideos()
-        .catch((err) => {
-          console.log(err)
-          this.errored = true
-        })
-        .finally(() => {
-          this.loading = false
-        })
+      // if (typeof videos === 'undefined') return
 
-      if (typeof videos === 'undefined') return
-
-      if (videos.data.length) {
-        this.videos.push(...videos.data)
-        this.loaded = true
-      }
+      // if (videos.data.length) {
+      //   this.videos.push(...videos.data)
+      //   this.loaded = true
+      // }
     },
     dateFormatter(date) {
       return moment(date).fromNow()

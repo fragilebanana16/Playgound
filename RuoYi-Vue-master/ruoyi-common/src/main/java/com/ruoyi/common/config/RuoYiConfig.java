@@ -24,6 +24,9 @@ public class RuoYiConfig
     /** 上传路径 */
     private static String profile;
 
+    /** 视频路径 */
+    private static String videos;
+    
     /** 获取地址开关 */
     private static boolean addressEnabled;
 
@@ -68,6 +71,16 @@ public class RuoYiConfig
     public void setProfile(String profile)
     {
         RuoYiConfig.profile = profile;
+    }
+    
+    public static String getVideos()
+    {
+        return videos;
+    }
+
+    public void setVideos(String videos)
+    {
+        RuoYiConfig.videos = videos;
     }
 
     public static boolean isAddressEnabled()
