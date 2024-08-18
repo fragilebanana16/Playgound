@@ -1,5 +1,6 @@
 <template>
-  <v-card class="content-bg card mx-auto" :max-width="500" flat tile router>
+  <v-card class="content-bg card mx-auto" :max-width="500" flat tile router 
+  :to="{ path: '/media/film/watch', query: { videoId: video.videoId} }">
     <v-img style="border-radius: 0.6rem" :src="require('../../../../assets/images/login-background.jpg')"></v-img>
     <v-row no-gutters>
       <v-col cols="2">

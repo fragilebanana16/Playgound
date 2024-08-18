@@ -47,18 +47,20 @@ public class MediaController
 //    }
     
     
-    @GetMapping(value = "/streaming/{vid_id}", produces = "video/mp4")
+    @GetMapping(value = "/streaming/{videoUrl}", produces = "video/mp4")
     @ResponseBody
     public ResponseEntity<StreamingResponseBody> playMediaV02(
-       @PathVariable("vid_id")
-       String video_id,
+       @PathVariable("videoUrl")
+       String videoUrl,
        @RequestHeader(value = "Range", required = false)
        String rangeHeader,
        HttpServletRequest req)
     {        
        try
        {         
-          String filePathString = "G:\\迅雷下载\\The Boys.黑袍纠察队.S02E06.720p.HDTV.x264.双语字幕初校版-深影字幕组.mp4";
+          // String filePathString = "G:\\迅雷下载\\The Boys.黑袍纠察队.S02E06.720p.HDTV.x264.双语字幕初校版-深影字幕组.mp4";
+          String filePathString = "D:\\ruoyi\\videos\\" + videoUrl;
+          
           ResponseEntity<StreamingResponseBody> retVal = sysVideoService.loadPartialMediaFile(filePathString, rangeHeader);
           
           return retVal;

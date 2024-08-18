@@ -16,7 +16,7 @@
       </v-alert>
 
       <main v-else>
-        <div> 
+        <!-- <div> 
           <video-player :playsinline="true" :options="playerOptions">
           </video-player>
         </div>
@@ -32,18 +32,14 @@
         <div>streaming way</div>
         <video width="600" controls>
           <source src="/dev-api/media/video/streaming/123">
-        </video>
-
-        <div>streaming way with REQUEST </div>
-        <video width="600" controls :src="videoSrc" >
-        </video>
+        </video> -->
 
         <h3 class="headline font-weight-medium">Recommended</h3>
-        <v-btn @click="getVideos">Take action</v-btn>
+        <v-btn @click="getAllVideos">Take action</v-btn>
         <v-row>
           <v-col cols="12" sm="6" md="4" lg="3" v-for="(video, i) in loading ? 12 : videos" :key="i" class="mx-xs-auto">
             <v-skeleton-loader type="card-avatar" :loading="loading">
-              <video-card :card="{ maxWidth: 350 }" :video="video" channel="video.userId"></video-card>
+              <video-card :card="{ maxWidth: 350 }" :video="video" channel="video.videoId"></video-card>
             </v-skeleton-loader>
           </v-col>
         </v-row>
@@ -60,13 +56,12 @@ import 'video.js/dist/video-js.css'
 import { videoPlayer } from 'vue-video-player'
 
 export default {
-  name: "newmmwmw",
+  name: "video",
   components: {
     VideoCard,
     videoPlayer
   },
   data: () => ({
-    testVideoUrl: '456',
     videos: [],
     loading: false,
     loaded: false,
@@ -85,46 +80,42 @@ export default {
     }
   }),
   created() {
-    this.getList();
+    this.getAllVideos();
   },
   computed: {
-  videoSrc() {
-    return '/dev-api/videos/' + this.testVideoUrl;
-  }
-},
+
+  },
   methods: {
 
     getList() {
       this.loading = true;
       listVideo(this.queryParams).then(response => {
         this.loading = false;
-        this.testVideoUrl = 'test.mp4'
         console.log(response.rows)
         console.log(response.total)
       });
     },
 
-    async getVideos() {
+    async getAllVideos() {
       if (!this.loaded) {
         this.loading = true
       }
-      const rsp = await getTest()
-      console.log(rsp)
-      // const videos = await getVideos()
-      //   .catch((err) => {
-      //     console.log(err)
-      //     this.errored = true
-      //   })
-      //   .finally(() => {
-      //     this.loading = false
-      //   })
 
-      // if (typeof videos === 'undefined') return
+      const videos = await listVideo()
+        .catch((err) => {
+          console.log(err)
+          this.errored = true
+        })
+        .finally(() => {
+          this.loading = false
+        })
 
-      // if (videos.data.length) {
-      //   this.videos.push(...videos.data)
-      //   this.loaded = true
-      // }
+      if (typeof videos === 'undefined') return
+
+      if (videos.rows) {
+        this.videos.push(...videos.rows)
+        this.loaded = true
+      }
     },
     dateFormatter(date) {
       return moment(date).fromNow()
