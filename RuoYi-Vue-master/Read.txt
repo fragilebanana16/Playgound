@@ -8,3 +8,13 @@ source H:\RuoYi-Vue-master\sql\ry_20240629.sql
 KILL PORT
 netstat -ano | findstr :8081
 任务管理器pid结束
+
+- 动态设置video的source标签无法获取数据
+<!-- https://stackoverflow.com/questions/44746718/html-5-video-and-src-value-with-vue -->
+无法获取
+        <video width="600" controls>
+          <source :src="videoSrc">
+        </video> 
+正常获取
+        <video width="600" controls :src="videoSrc" >
+        </video>

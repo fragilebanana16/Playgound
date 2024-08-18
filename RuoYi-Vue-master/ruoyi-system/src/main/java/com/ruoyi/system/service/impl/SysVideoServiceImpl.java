@@ -17,13 +17,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.core.domain.entity.SysVideo;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.domain.SysVideo;
+import com.ruoyi.system.domain.SysVideoCategory;
+import com.ruoyi.system.mapper.SysVideoMapper;
 import com.ruoyi.system.service.ISysVideoService;
-import static com.ruoyi.common.constant.VideoConstants.*;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 /**
  * 用户 业务层处理
@@ -33,6 +38,10 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 public class SysVideoServiceImpl implements ISysVideoService
 {
 	private final Logger logger = LoggerFactory.getLogger(SysVideoServiceImpl.class);
+	
+    @Autowired
+    private SysVideoMapper sysVideoMapper;
+    
     /**
      */
     @Override
@@ -52,6 +61,15 @@ public class SysVideoServiceImpl implements ISysVideoService
     	videos.add(sysVideo2);
     
         return videos;
+    }
+    
+ // 重新生成封面、配置，若有配置则使用配置，若文件已更新，则ui通知更新封面及配置
+    @Override
+    public boolean reafreshVideoInfo()
+    {
+    	
+    
+        return true;
     }
     
     
@@ -267,6 +285,112 @@ public class SysVideoServiceImpl implements ISysVideoService
                 
              return new ResponseEntity<StreamingResponseBody>
                     (responseStream, responseHeaders, HttpStatus.PARTIAL_CONTENT);
+          }
+          
+          /**
+           * 查询影视
+           * 
+           * @param videoId 影视主键
+           * @return 影视
+           */
+          @Override
+          public SysVideo selectSysVideoByVideoId(Long videoId)
+          {
+              return sysVideoMapper.selectSysVideoByVideoId(videoId);
+          }
+
+          /**
+           * 查询影视列表
+           * 
+           * @param sysVideo 影视
+           * @return 影视
+           */
+          @Override
+          public List<SysVideo> selectSysVideoList(SysVideo sysVideo)
+          {
+              return sysVideoMapper.selectSysVideoList(sysVideo);
+          }
+
+          /**
+           * 新增影视
+           * 
+           * @param sysVideo 影视
+           * @return 结果
+           */
+          @Transactional
+          @Override
+          public int insertSysVideo(SysVideo sysVideo)
+          {
+              int rows = sysVideoMapper.insertSysVideo(sysVideo);
+              insertSysVideoCategory(sysVideo);
+              return rows;
+          }
+
+          /**
+           * 修改影视
+           * 
+           * @param sysVideo 影视
+           * @return 结果
+           */
+          @Transactional
+          @Override
+          public int updateSysVideo(SysVideo sysVideo)
+          {
+              sysVideoMapper.deleteSysVideoCategoryByCategoryId(sysVideo.getVideoId());
+              insertSysVideoCategory(sysVideo);
+              return sysVideoMapper.updateSysVideo(sysVideo);
+          }
+
+          /**
+           * 批量删除影视
+           * 
+           * @param videoIds 需要删除的影视主键
+           * @return 结果
+           */
+          @Transactional
+          @Override
+          public int deleteSysVideoByVideoIds(Long[] videoIds)
+          {
+              sysVideoMapper.deleteSysVideoCategoryByCategoryIds(videoIds);
+              return sysVideoMapper.deleteSysVideoByVideoIds(videoIds);
+          }
+
+          /**
+           * 删除影视信息
+           * 
+           * @param videoId 影视主键
+           * @return 结果
+           */
+          @Transactional
+          @Override
+          public int deleteSysVideoByVideoId(Long videoId)
+          {
+              sysVideoMapper.deleteSysVideoCategoryByCategoryId(videoId);
+              return sysVideoMapper.deleteSysVideoByVideoId(videoId);
+          }
+
+          /**
+           * 新增影视目录信息
+           * 
+           * @param sysVideo 影视对象
+           */
+          public void insertSysVideoCategory(SysVideo sysVideo)
+          {
+              List<SysVideoCategory> sysVideoCategoryList = sysVideo.getSysVideoCategoryList();
+              Long videoId = sysVideo.getVideoId();
+              if (StringUtils.isNotNull(sysVideoCategoryList))
+              {
+                  List<SysVideoCategory> list = new ArrayList<SysVideoCategory>();
+                  for (SysVideoCategory sysVideoCategory : sysVideoCategoryList)
+                  {
+                      sysVideoCategory.setCategoryId(videoId);
+                      list.add(sysVideoCategory);
+                  }
+                  if (list.size() > 0)
+                  {
+                      sysVideoMapper.batchSysVideoCategory(list);
+                  }
+              }
           }
  
 }

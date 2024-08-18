@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysVideoMapper">
+    
+    <resultMap type="SysVideo" id="SysVideoResult">
+        <result property="videoId"    column="video_id"    />
+        <result property="title"    column="title"    />
+        <result property="description"    column="description"    />
+        <result property="thumbnailUrl"    column="thumbnailUrl"    />
+        <result property="views"    column="views"    />
+        <result property="url"    column="url"    />
+        <result property="status"    column="status"    />
+        <result property="categoryId"    column="categoryId"    />
+    </resultMap>
+
+    <resultMap id="SysVideoSysVideoCategoryResult" type="SysVideo" extends="SysVideoResult">
+        <collection property="sysVideoCategoryList" ofType="SysVideoCategory" column="video_id" select="selectSysVideoCategoryList" />
+    </resultMap>
+
+    <resultMap type="SysVideoCategory" id="SysVideoCategoryResult">
+        <result property="categoryId"    column="category_id"    />
+        <result property="categoryName"    column="category_name"    />
+    </resultMap>
+
+    <sql id="selectSysVideoVo">
+        select video_id, title, description, thumbnailUrl, views, url, status, categoryId from sys_video
+    </sql>
+
+    <select id="selectSysVideoList" parameterType="SysVideo" resultMap="SysVideoResult">
+        <include refid="selectSysVideoVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="thumbnailUrl != null  and thumbnailUrl != ''"> and thumbnailUrl = #{thumbnailUrl}</if>
+            <if test="views != null "> and views = #{views}</if>
+            <if test="url != null  and url != ''"> and url = #{url}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="categoryId != null "> and categoryId = #{categoryId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysVideoByVideoId" parameterType="Long" resultMap="SysVideoSysVideoCategoryResult">
+        select video_id, title, description, thumbnailUrl, views, url, status, categoryId
+        from sys_video
+        where video_id = #{videoId}
+    </select>
+
+    <select id="selectSysVideoCategoryList" resultMap="SysVideoCategoryResult">
+        select category_id, category_name
+        from sys_video_category
+        where category_id = #{category_id}
+    </select>
+
+    <insert id="insertSysVideo" parameterType="SysVideo" useGeneratedKeys="true" keyProperty="videoId">
+        insert into sys_video
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="description != null">description,</if>
+            <if test="thumbnailUrl != null">thumbnailUrl,</if>
+            <if test="views != null">views,</if>
+            <if test="url != null and url != ''">url,</if>
+            <if test="status != null">status,</if>
+            <if test="categoryId != null">categoryId,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="description != null">#{description},</if>
+            <if test="thumbnailUrl != null">#{thumbnailUrl},</if>
+            <if test="views != null">#{views},</if>
+            <if test="url != null and url != ''">#{url},</if>
+            <if test="status != null">#{status},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysVideo" parameterType="SysVideo">
+        update sys_video
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="thumbnailUrl != null">thumbnailUrl = #{thumbnailUrl},</if>
+            <if test="views != null">views = #{views},</if>
+            <if test="url != null and url != ''">url = #{url},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="categoryId != null">categoryId = #{categoryId},</if>
+        </trim>
+        where video_id = #{videoId}
+    </update>
+
+    <delete id="deleteSysVideoByVideoId" parameterType="Long">
+        delete from sys_video where video_id = #{videoId}
+    </delete>
+
+    <delete id="deleteSysVideoByVideoIds" parameterType="String">
+        delete from sys_video where video_id in 
+        <foreach item="videoId" collection="array" open="(" separator="," close=")">
+            #{videoId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteSysVideoCategoryByCategoryIds" parameterType="String">
+        delete from sys_video_category where category_id in 
+        <foreach item="categoryId" collection="array" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSysVideoCategoryByCategoryId" parameterType="Long">
+        delete from sys_video_category where category_id = #{categoryId}
+    </delete>
+
+    <insert id="batchSysVideoCategory">
+        insert into sys_video_category( category_id, category_name) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.categoryId}, #{item.categoryName})
+        </foreach>
+    </insert>
+</mapper>

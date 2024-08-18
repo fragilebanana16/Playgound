@@ -1,84 +1,88 @@
 package com.ruoyi.web.controller.system;
 
-import java.io.RandomAccessFile;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.entity.SysVideo;
+import com.ruoyi.system.domain.SysVideo;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.system.service.ISysVideoService;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import reactor.core.publisher.Mono;
-
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.page.TableDataInfo;
 /**
  * Video
  * 
  */
 @RestController
 @RequestMapping("/system/video")
-public class SysVideoController
+public class SysVideoController  extends BaseController
 {
     @Autowired
-    private ISysVideoService  videoService;
+    private ISysVideoService  sysVideoService;
 
     /**
-     * 获取路由信息
-     * 
-     * @return 路由信息
+     * 查询影视列表
      */
-    @GetMapping("getVideos")
-    public AjaxResult getVideos()
+    @GetMapping("/list")
+    public TableDataInfo list(SysVideo sysVideo)
     {
-        List<SysVideo> menus = videoService.getVideos();
-        return AjaxResult.success(menus);
+        startPage();
+        List<SysVideo> list = sysVideoService.selectSysVideoList(sysVideo);
+        return getDataTable(list);
     }
-    
-//    @GetMapping("getTest/{fileName}")
-//    public AjaxResult getTest(@PathVariable("fileName") String fileName)
-//    {
-//        return AjaxResult.success("This is rsp:" +  fileName);
-//    }
-    
 
-    
-    @GetMapping(value = "/play/media/v02/{vid_id}", produces = "video/mp4")
-    @ResponseBody
-    public ResponseEntity<StreamingResponseBody> playMediaV02(
-       @PathVariable("vid_id")
-       String video_id,
-       @RequestHeader(value = "Range", required = false)
-       String rangeHeader,
-       HttpServletRequest req)
-    {        
-       try
-       {         
-          String filePathString = "G:\\迅雷下载\\The Boys.黑袍纠察队.S02E06.720p.HDTV.x264.双语字幕初校版-深影字幕组.mp4";
-          ResponseEntity<StreamingResponseBody> retVal = videoService.loadPartialMediaFile(filePathString, rangeHeader);
-          
-          return retVal;
-       }
-       catch (FileNotFoundException e)
-       {
-          return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-       }
-       catch (IOException e)
-       {
-          return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-       }
+    /**
+     * 导出影视列表
+     */
+    @PostMapping("/export")
+    public void export(HttpServletResponse response, SysVideo sysVideo)
+    {
+        List<SysVideo> list = sysVideoService.selectSysVideoList(sysVideo);
+        ExcelUtil<SysVideo> util = new ExcelUtil<SysVideo>(SysVideo.class);
+        util.exportExcel(response, list, "影视数据");
+    }
+
+    /**
+     * 获取影视详细信息
+     */
+    @GetMapping(value = "/{videoId}")
+    public AjaxResult getInfo(@PathVariable("videoId") Long videoId)
+    {
+        return success(sysVideoService.selectSysVideoByVideoId(videoId));
+    }
+
+    /**
+     * 新增影视
+     */
+    @PostMapping
+    public AjaxResult add(@RequestBody SysVideo sysVideo)
+    {
+        return toAjax(sysVideoService.insertSysVideo(sysVideo));
+    }
+
+    /**
+     * 修改影视
+     */
+    @PutMapping
+    public AjaxResult edit(@RequestBody SysVideo sysVideo)
+    {
+        return toAjax(sysVideoService.updateSysVideo(sysVideo));
+    }
+
+    /**
+     * 删除影视
+     */
+	@DeleteMapping("/{videoIds}")
+    public AjaxResult remove(@PathVariable Long[] videoIds)
+    {
+        return toAjax(sysVideoService.deleteSysVideoByVideoIds(videoIds));
     }
 }
