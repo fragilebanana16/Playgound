@@ -34,7 +34,7 @@ public class SysVideoController  extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(SysVideo sysVideo)
     {
-        startPage();
+    	startPage();
         List<SysVideo> list = sysVideoService.selectSysVideoList(sysVideo);
         return getDataTable(list);
     }

@@ -29,7 +29,7 @@ export default {
       playbackRates: [0.7, 1.0, 1.5, 2.0],
       sources: [{
         type: "video/mp4",
-        src: "" // /dev-api/media/video/streaming/恶搞之家.Family.Guy.S01E02.mp4
+        src: ""
       }],
       // poster: "/static/images/author.jpg",
     }
@@ -37,17 +37,19 @@ export default {
   created() {
 
   },
-  mounted: function () {
+
+  beforeMount: function () {
     const videoId = this.$route.query && this.$route.query.videoId;
-    debugger
     if (videoId) {
-      console.log(videoId)
       getVideo(videoId).then(response => {
         console.log("Watching:" + response.data.url)
         this.currentWatchingUrl = streamingPrefix + response.data.url
         this.playerOptions.sources[0].src = streamingPrefix + response.data.url
       });
     }
+  },
+  mounted: function () {
+
   },
   computed: {
 
