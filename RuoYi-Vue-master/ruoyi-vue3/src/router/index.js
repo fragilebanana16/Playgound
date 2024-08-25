@@ -157,7 +157,21 @@ export const dynamicRoutes = [
         meta: { title: '修改生成配置', activeMenu: '/tool/gen' }
       }
     ]
-  }
+  },
+  {
+    path: '/media/film',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:role:edit'],
+    children: [
+      {
+        path: 'watch',
+        component: () => import('@/views/media/video/watch'),
+        name: 'Watch',
+        meta: { noCache: true, title: '观看页面', activeMenu: '/media/video' }
+      }
+    ]
+  },
 ]
 
 const router = createRouter({
