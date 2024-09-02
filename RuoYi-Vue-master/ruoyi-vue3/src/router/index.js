@@ -172,6 +172,42 @@ export const dynamicRoutes = [
       }
     ]
   },
+  {
+    path: '/media/musicMan',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:role:edit'],
+    children: [
+      {
+        path: 'music_album',
+        component: () => import('@/views/media/music/music_album'),
+        name: 'MusicAlbum',
+        meta: { noCache: true, title: '专辑管理', activeMenu: '/media/music' }
+      }
+    ]
+  },
+  {
+    path: '/media',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:role:edit'],
+    children: [
+      {
+        path: 'home',
+        component: () => import('@/views/media/album'),
+        name: 'home',
+        meta: {  noCache: true, title: 'home', activeMenu: '/media/album' },
+        children: [
+          {
+            path: 'firstView',
+            component: () => import('@/views/media/album/firstView.vue'),
+            name: 'firstView',
+            meta: {  noCache: true, title: 'firstView', activeMenu: '/media/album' },
+          }
+        ]
+      }
+    ]
+  },
 ]
 
 const router = createRouter({

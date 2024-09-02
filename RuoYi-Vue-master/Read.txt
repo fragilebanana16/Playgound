@@ -18,3 +18,7 @@ netstat -ano | findstr :8081
 正常获取
         <video width="600" controls :src="videoSrc" >
         </video>
+
+
+ -  Cannot read properties of null (reading 'nextSibling') 
+通常需要将页面用div包裹
