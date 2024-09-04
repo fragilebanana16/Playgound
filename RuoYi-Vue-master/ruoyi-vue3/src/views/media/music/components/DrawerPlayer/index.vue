@@ -5,9 +5,6 @@ import { PlayMode } from '@/utils/enum'
 // import { Comment } from '@/api/interface'
 // import { commentMusic } from '@/api'
 
-import background from "@/assets/images/login-background.jpg"
-
-const coverImgUrl = "http://p1.music.126.net/WCgIIIid62Q3QSV8OrRNbw==/7953867116260442.jpg"
 const state = reactive({
   direction: 'ttb',
   drawer: false,
@@ -16,30 +13,23 @@ const state = reactive({
   commenTotal: 0,
 })
 
+import altCover from '@/assets/images/login-background.jpg'
+
 const { direction, drawer, commentListData, commenDrawer, commenTotal } = toRefs(state)
-
-// const {
-//   currentSong,
-//   togglePlayPause,
-//   isPlaying,
-//   playNext,
-//   playPrevious,
-//   currentTime,
-//   duration,
-//   changeCurrentTime,
-//   Loadlyrics,
-//   lyricsData,
-//   currentLyricIndex,
-//   scrollStyle,
-//   setPlayMode,
-// } = inject('MusicPlayer')
-
 const {
+  currentSong,
   togglePlayPause,
   isPlaying,
+  playNext,
+  playPrevious,
   currentTime,
+  duration,
   changeCurrentTime,
-  duration
+  // Loadlyrics,
+  // lyricsData,
+  // currentLyricIndex,
+  // scrollStyle,
+  setPlayMode,
 } = inject('MusicPlayer')
 
 // const SettingStore = useSettingStore()
@@ -69,10 +59,10 @@ function formatTime(seconds) {
 // 时间
 let LocalhostcurrentTime = ref(new Date().toLocaleTimeString())
 
-// // 更新时间的函数
-// function updateTime() {
-//   LocalhostcurrentTime.value = new Date().toLocaleTimeString()
-// }
+// 更新时间的函数
+function updateTime() {
+  LocalhostcurrentTime.value = new Date().toLocaleTimeString()
+}
 
 // 打开评论抽屉
 const showDrawer = () => {
@@ -108,19 +98,19 @@ function formatNumber(num) {
 function handlePlayNext() {
 //   state.commentListData = []
 //   state.commenTotal = 0
-//   playNext()
+  playNext()
 //   getCommentPlaylist(1)
 }
 
 function handlePlayPrevious() {
 //   state.commentListData = []
 //   state.commenTotal = 0
-//   playPrevious()
+  playPrevious()
 //   getCommentPlaylist(1)
 }
 
 onMounted(() => {
-//   setInterval(updateTime, 1000)
+  setInterval(updateTime, 1000)
 })
 
 defineExpose({
@@ -129,7 +119,7 @@ defineExpose({
 </script>
 <template>
   <el-drawer
-    :style="{ '--track-cover-url': `https://primefaces.org/cdn/primevue/images/avatar/asiyajavayant.png` }"
+    :style="{ '--track-cover-url':  currentSong.cover ? `url(${currentSong.cover})` :`thisShouldBeUserInfoOrWhat` }"
     v-model="drawer"
     :direction="direction"
     style="box-shadow: none"
@@ -163,14 +153,14 @@ defineExpose({
 
           <el-avatar
             v-if="true"
-            :src="background"
+            :src="altCover"
             class="mr-2"
             shape="circle"
             :size="32"
           />
           <el-avatar
             v-else
-            src="https://primefaces.org/cdn/primevue/images/avatar/asiyajavayant.png"
+            :src="altCover"
             class="mr-2"
             shape="circle"
             :size="32"
@@ -191,13 +181,13 @@ defineExpose({
                 <div
                   class="album-art rounded-md"
                   :style="{
-                    '--track-cover-url': `url(${coverImgUrl})`,
+                    '--track-cover-url': currentSong.cover ? `url(${currentSong.cover})` :`url(${altCover})`,
                   }"
                 ></div>
                 <div
                   class="vinyl"
                   :style="{
-                    '--track-cover-url': `url(${coverImgUrl})`,
+                    '--track-cover-url': currentSong.cover ? `url(${currentSong.cover})` :`url(${altCover})`,
                     animationPlayState: isPlaying ? 'running' : 'paused',
                   }"
                 ></div>

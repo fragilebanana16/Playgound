@@ -12,6 +12,10 @@ selenium-debug.log
 src/assets/**/*.mp3
 src/assets/**/*.mp4
 src/assets/**/*.mkv
+src/assets/**/*.jpg
+src/assets/**/*.jpeg
+src/assets/**/*.lrc
+src/assets/**/*.png
 # Editor directories and files
 .idea
 .vscode

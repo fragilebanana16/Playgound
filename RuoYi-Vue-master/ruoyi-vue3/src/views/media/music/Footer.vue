@@ -1,28 +1,23 @@
 <script setup>
 import { Icon } from '@iconify/vue'
-// import localhostSong from './components/localhostSong.vue'
 import RecentPlayList from './components/RecentPlayList'
 import Volume from './Volume.vue'
-// import { MusicPlayer } from '@/hooks/interface'
 import { PlayMode } from '@/utils/enum'
-// const isPlaying = ref(false)
+const altCover =
+  'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 const {
+  currentSong,
   togglePlayPause,
   isPlaying,
+  playNext,
+  playPrevious,
   currentTime,
   changeCurrentTime,
-  duration
+  duration,
+  setPlayMode
 } = inject('MusicPlayer')
 
 const Emit = defineEmits(['show'])
-
-// const Emit = defineEmits(['show'])
-const url =
-  'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-
-function playClickHandler() {
-  togglePlayPause()
-}
 
 const currentMode = ref(PlayMode.Sequence)
 const currentModeIcon = ref("fe:list-order")
@@ -46,7 +41,6 @@ function updatePlayModeIcon() {
     case PlayMode.Single:
       curMode = PlayMode.Sequence
       curModeIcon = "fe:list-order"
-
       break
     case PlayMode.Loop:
       curMode = PlayMode.Single
@@ -56,6 +50,7 @@ function updatePlayModeIcon() {
       break
   }
 
+  setPlayMode(curMode)
   currentMode.value = curMode
   currentModeIcon.value = curModeIcon
 }
@@ -74,29 +69,29 @@ function formatTime(seconds) {
     <div class="mx-auto flex items-center justify-between px-4 py-2">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 w-[240px]">
-          <el-image :src="url" alt="Album cover" class="rounded-md w-9 h-9"
+          <el-image :src="currentSong.cover ? currentSong.cover :altCover" alt="Album cover" class="rounded-md w-9 h-9"
             style="aspect-ratio: 40 / 40; object-fit: cover" @click="Emit('show')"/>
           <div>
-            <div class="text-sm font-medium line-clamp-1 dark:text-gray-200" title="currentSong.title">
-              currentSong.title
+            <div class="text-sm font-medium line-clamp-1 dark:text-gray-200" :title="currentSong.title">
+              {{currentSong.title}}
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400">
-              currentSong.singer
+              {{currentSong.singer}}
             </div>
           </div>
         </div>
         <div class="flex items-center gap-2">
           <el-button text circle class="!p-3">
-            <Icon class="text-lg" icon="mage:previous-fill" />
+            <Icon class="text-lg" icon="mage:previous-fill" @click="playPrevious"/>
           </el-button>
-          <el-button text circle class="!p-3" @click="playClickHandler">
+          <el-button text circle class="!p-3" @click="togglePlayPause">
             <Icon :icon="isPlaying
                 ? 'ic:round-pause-circle'
                 : 'material-symbols:play-circle'
               " class="text-3xl" />
           </el-button>
           <el-button text circle class="!p-3">
-            <Icon class="text-lg" icon="mage:next-fill" />
+            <Icon class="text-lg" icon="mage:next-fill" @click="playNext"/>
           </el-button>
           <el-button text circle class="!p-3">
             <Icon :icon="true ? 'mdi:cards-heart' : 'mdi:cards-heart-outline'" class="text-lg"
