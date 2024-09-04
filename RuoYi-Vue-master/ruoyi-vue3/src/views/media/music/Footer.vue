@@ -1,6 +1,7 @@
 <script setup>
 import { Icon } from '@iconify/vue'
 // import localhostSong from './components/localhostSong.vue'
+import RecentPlayList from './components/RecentPlayList'
 import Volume from './Volume.vue'
 // import { MusicPlayer } from '@/hooks/interface'
 import { PlayMode } from '@/utils/enum'
@@ -117,7 +118,7 @@ function formatTime(seconds) {
           <Icon :icon="currentModeIcon" class="text-lg" />
         </el-button>
         <Volume />
-        <!-- <localhostSong /> -->
+        <RecentPlayList />
       </div>
     </div>
   </footer>
