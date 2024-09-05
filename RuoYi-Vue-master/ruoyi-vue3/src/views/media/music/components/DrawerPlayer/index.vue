@@ -1,5 +1,4 @@
 <script setup>
-import { useMusicPlayer } from '../../useMusicPlayer'
 import { Icon } from '@iconify/vue'
 import { PlayMode } from '@/utils/enum'
 // import { Comment } from '@/api/interface'

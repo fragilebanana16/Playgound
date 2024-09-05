@@ -1,11 +1,11 @@
 <template>
   <section class="app-main">
     <router-view v-slot="{ Component, route }">
-      <transition name="fade-transform" mode="out-in">
+      <!-- <transition name="fade-transform" mode="out-in"> -->
         <keep-alive :include="tagsViewStore.cachedViews">
           <component v-if="!route.meta.link" :is="Component" :key="route.path"/>
         </keep-alive>
-      </transition>
+      <!-- </transition> -->
     </router-view>
     <iframe-toggle />
   </section>
@@ -14,7 +14,8 @@
 <script setup>
 import iframeToggle from "./IframeToggle/index"
 import useTagsViewStore from '@/store/modules/tagsView'
-
+import { useMusicPlayer } from '@/hooks/useMusicPlayer'
+provide('MusicPlayer', useMusicPlayer())
 const tagsViewStore = useTagsViewStore()
 </script>
 
