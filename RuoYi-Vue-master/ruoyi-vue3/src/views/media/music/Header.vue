@@ -8,7 +8,7 @@ const toSearch = () => {
 </script>
 <template>
   <header
-    class="flex justify-between p-2 mr-4 items-center border-b dark:border-gray-600"
+    class="flex justify-between p-2  items-center border-b dark:border-gray-600 dark:bg-[#141414]"
   >
   <div/>
           <el-input

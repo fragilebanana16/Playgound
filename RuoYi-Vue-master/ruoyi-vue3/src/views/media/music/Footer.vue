@@ -65,7 +65,7 @@ function formatTime(seconds) {
 }
 </script>
 <template>
-  <footer class="footer-player border-t shadow-sm dark:border-gray-600">
+  <footer class="footer-player border-t shadow-sm dark:bg-[#141414]">
     <div class="mx-auto flex items-center justify-between px-4 py-2">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 w-[240px]">

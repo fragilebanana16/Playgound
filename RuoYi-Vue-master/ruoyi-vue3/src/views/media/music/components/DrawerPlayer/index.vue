@@ -224,7 +224,7 @@ defineExpose({
                 </el-button>
               </div>
               <div class="flex gap-2 w-full items-center pt-2">
-                <span class="text-xs w-10 text-foreground/50">
+                <span class="text-xs w-10 text-foreground/50 dark:text-white">
                   {{formatTime(currentTime)}}
                 </span>
                 <el-slider
@@ -235,7 +235,7 @@ defineExpose({
                   class="w-full"
                   size="small"
                 />
-                <span class="text-xs w-10 text-foreground/50">{{
+                <span class="text-xs w-10 text-foreground/50 dark:text-white">{{
                   formatTime(duration)
                 }}</span>
               </div>

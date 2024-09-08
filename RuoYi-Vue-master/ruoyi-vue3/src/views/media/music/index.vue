@@ -52,7 +52,7 @@ export default {
 </script>
 <template>
   <div
-    class="h-[calc(100vh-84px)] flex backdrop-blur-lg flex-col justify-center shadow-xl  w-full overflow-hidden bg-white dark:bg-[--el-bg-color]">
+    class="h-[calc(100vh-84px)] flex backdrop-blur-lg flex-col justify-center shadow-xl  w-full overflow-hidden bg-white dark:bg-[#141414]">
     <Header />
     <Main/>
     <Footer @show="handleShow" />

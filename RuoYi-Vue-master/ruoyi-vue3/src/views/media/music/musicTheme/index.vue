@@ -66,7 +66,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="w-full">
+  <div class="w-full  dark:bg-[#141414]">
     <div class="p-4">
       <h2 class="text-lg font-semibold mb-2 dark:text-white">黑暗模式</h2>
       <el-switch
@@ -105,7 +105,7 @@ onMounted(() => {
           show-alpha
           @change="changePrimarys"
         />
-        <el-button color="#000" @click="reset">重置默认</el-button>
+        <el-button color="dark:text-white" @click="reset">重置默认</el-button>
       </div>
     </div>
   </div>

@@ -182,3 +182,11 @@ aside {
     margin-bottom: 10px;
   }
 }
+
+:root.dark .navbar {
+  background-color: #141414;
+}
+
+:root.dark .tags-view-container {
+  background-color: #141414;
+}
