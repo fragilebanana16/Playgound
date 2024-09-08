@@ -1,82 +1,114 @@
 <script setup>
-// import MusicList from '../MusicList.vue'
-import Footer from '../Footer.vue'
-import Header from '../Header.vue'
-import MusicList from '../MusicList.vue'
-import DrawerPlayer from '../components/DrawerPlayer'
-const PlayerDrawerRef = ref()
+// import { topPlaylist } from '@/api'
+// interface Playlist {
+//   id: number
+//   name: string
+//   description: string
+//   coverImgUrl: string
+// }
+
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
+import altCover from '@/assets/images/profile.jpg'
+
 const state = reactive({
-  tableData: {},
-  SongList: { playlists: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5] },
+  Playlist: [],
 })
-const url =
-  'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-const { tableData, SongList } = toRefs(state)
 
-const handleShow = () => {
-  if (PlayerDrawerRef.value) {
-    PlayerDrawerRef.value.show()
-  }
-}
+const { Playlist } = toRefs(state)
+const router = useRouter()
+// 使用hook并传入必要的参数
+const observedElement = ref([])
 
-</script>
-<script>
-export default {
-  name: 'MusicCollection',
+const mockData = Array.from({ length: 300 }, (_, index) => ({
+    id: 1 + index,
+    name: `namePrefix${1 + index}`,
+    description: `descPrefix${1 + index}`,
+    coverImgUrl: altCover
+  }))
+useIntersectionObserver(
+  observedElement,
+  {
+    initialPageNum: 1, // 初始页码
+    pageSize: 10, // 页面大小
+    threshold: 0.1, // 可选阈值参数
+  },
+  handleIntersect
+)
+
+function handleIntersect(PageNum) {
+  console.log(`PageNum:`, PageNum)
+    const startIndex = (PageNum - 1) * 10
+    const endIndex = startIndex + 10
+
+  state.Playlist = state.Playlist.concat(mockData.slice(startIndex, endIndex))
+  // topPlaylist({ offset: PageNum + 1 }).then(({ playlists }) => {
+  //   state.Playlist = state.Playlist.concat(playlists)
+  // })
 }
+onMounted(() => {
+  state.Playlist = mockData.slice(0, 20)
+  // topPlaylist({ offset: 1, limit: 20 }).then(({ playlists }) => {
+  //   state.Playlist = playlists
+  // })
+})
 </script>
 <template>
-   <section class="px-6 pt-6">
-        <div class="banner rounded-lg flex">
-          <div class="flex flex-col p-8">
-            <h2 class="text-lg font-semibold text-white">MusicCollection Page</h2>
-            <p class="mt-2 text-sm text-white md:line-clamp-3">
-              MusicCollection。
+  <div class="px-6 pt-6">
+    <section class="bg-gradient rounded-lg text-white py-5">
+      <div class="container mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="flex flex-col justify-center">
+            <h1
+              class="text-xl md:text-xl lg:text-xl font-bold text-white mb-4"
+            >
+              Discover the Latest Trends in Urban Fashion
+            </h1>
+            <p class="text-gray-400 mb-6">
+              Delve into our stylish and accessible collection of musical
+              exploration, instruments, and creative inspiration
+            </p>
+            <div class="flex gap-3">
+              <el-button type="primary">View</el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="py-8">
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8">
+        <div
+          class="group relative rounded-lg overflow-hidden cursor-pointer"
+          v-for="item in Playlist"
+          :key="item.id"
+          @click="router.push({ path: '/media/musicMan/collectionDetail', query: { id: item.id } })"
+          ref="observedElement"
+        >
+          <img
+            :src="item.coverImgUrl" 
+            :alt="item.name"
+            class="w-full h-auto rounded-lg object-cover transition-all duration-300 group-hover:opacity-80"
+          />
+          <div
+            class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-lg"
+          >
+            <h3 class="text-white text-sm font-semibold line-clamp-1">
+              {{ item.name }}
+            </h3>
+            <p class="text-white text-xs line-clamp-2">
+              {{ item.description }}
             </p>
           </div>
-          <!-- <img
-        src="@/assets/images/login-background.jpg"
-        class="w-full max-w-[350px] mt-[-50px] h-auto hidden md:flex"
-      /> -->
         </div>
-      </section>
-      <div class="flex flex-col overflow-hidden px-6">
-        <el-scrollbar class="relative" ref="songListRef">
-          <div class="flex mt-6 space-x-4 rounded-xl pb-6">
-            <router-link class="flex flex-col gap-2" v-for="item in SongList.playlists" :key="item.id"
-              to="/media/musicMan/music_album">
-              <el-image :src="url" alt="item.name" class="w-28 h-28 rounded-lg" />
-              <span class="text-xs text-center line-clamp-1" :title="item.name">{{
-                item.name
-              }}</span>
-            </router-link>
-            <button
-              class="absolute top-1/2 -translate-y-1/2 rounded-full bg-background/50 p-2 text-muted-foreground transition-colors duration-300 hover:bg-background/75"
-              @click="progress('back')" v-if="SongList.playlists && SongList.playlists.length > 0">
-              <svg data-id="13" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
-                <path d="m15 18-6-6 6-6"></path>
-              </svg>
-            </button>
-            <button
-              class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-background/50 p-2 text-muted-foreground transition-colors duration-300 hover:bg-background/75"
-              @click="progress('forward')" v-if="SongList.playlists && SongList.playlists.length > 0">
-              <svg data-id="15" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
-                <path d="m9 18 6-6-6-6"></path>
-              </svg>
-            </button>
-          </div>
-        </el-scrollbar>
       </div>
-      <div class="rounded-xl overflow-hidden flex-1 px-6">
-          <MusicList />
-        </div>
+    </div>
+  </div>
 </template>
-
-<style scoped>
-.banner {
-  background-image: url('@/assets/images/login-background.jpg'),
-    linear-gradient(to right, #fd31a2, #ff3a8b, #ff4b78, #cf4af3, #e73bd7);
+<style lang="scss" scoped>
+.bg-gradient {
+  background: linear-gradient(to right, #1f2937, rgba(31, 41, 55, 0.7)),
+    url('@/assets/images/login-background.jpg');
+  background-size: cover; /* 确保背景图片按比例缩放，并能完整显示 */
+  background-repeat: no-repeat; /* 禁止背景图片重复 */
+  background-position: center; /* 将背景图片放置在容器中央 */
 }
 </style>

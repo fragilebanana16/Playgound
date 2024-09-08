@@ -2,8 +2,8 @@ import { PlayMode } from '@/utils/enum'
 import useMusicStore from '@/store/modules/music'
 import { ElNotification } from 'element-plus'
 export function useMusicPlayer() {
-  const audioStore = useMusicStore();
-  const currentSong = computed(() => audioStore.trackList[audioStore.currentSongIndex]);
+  const musicStore = useMusicStore();
+  const currentSong = computed(() => musicStore.trackList[musicStore.currentSongIndex]);
   const playMode = ref(PlayMode.Sequence);
 
   // 创建一个新的audio元素
@@ -98,11 +98,11 @@ export function useMusicPlayer() {
         play();
         break;
       default: // 对于顺序播放和列表循环模式，播放列表中的下一首歌
-        let nextIndex = audioStore.currentSongIndex + 1;
-        if (nextIndex >= audioStore.trackList.length) {
+        let nextIndex = musicStore.currentSongIndex + 1;
+        if (nextIndex >= musicStore.trackList.length) {
           nextIndex = 0; // 如果是最后一首歌，则回到列表的开始
         }
-        audioStore.setCurrentSong(nextIndex);
+        musicStore.setCurrentSong(nextIndex);
         audio.src = currentSong.value.source; // 更新audio元素的资源地址
         play();
         break;
@@ -111,11 +111,11 @@ export function useMusicPlayer() {
 
   // 播放上一首歌曲
   function playPrevious() {
-    let previousIndex = audioStore.currentSongIndex - 1;
+    let previousIndex = musicStore.currentSongIndex - 1;
     if (previousIndex < 0) {
-      previousIndex = audioStore.trackList.length - 1; // 如果是第一首歌，则跳到列表的最后
+      previousIndex = musicStore.trackList.length - 1; // 如果是第一首歌，则跳到列表的最后
     }
-    audioStore.setCurrentSong(previousIndex);
+    musicStore.setCurrentSong(previousIndex);
     audio.src = currentSong.value.source; // 更新audio元素的资源地址
     // Loadlyrics()
     play();
@@ -123,8 +123,8 @@ export function useMusicPlayer() {
 
   // 随机播放一首歌曲
   function playRandomSong() {
-    const randomIndex = Math.floor(Math.random() * audioStore.trackList.length);
-    audioStore.setCurrentSong(randomIndex); // 设置当前歌曲为随机选择的歌曲
+    const randomIndex = Math.floor(Math.random() * musicStore.trackList.length);
+    musicStore.setCurrentSong(randomIndex); // 设置当前歌曲为随机选择的歌曲
     audio.src = currentSong.value.source; // 更新audio元素的资源地址
     play();
   }

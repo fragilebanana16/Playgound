@@ -6,7 +6,7 @@ import Footer from './Footer.vue'
 import Header from './Header.vue'
 import MusicList from './MusicList.vue'
 import DrawerPlayer from './components/DrawerPlayer'
-
+import Main from './Main.vue'
 const PlayerDrawerRef = ref()
 const state = reactive({
   tableData: {},
@@ -54,13 +54,7 @@ export default {
   <div
     class="h-[calc(100vh-84px)] flex backdrop-blur-lg flex-col justify-center shadow-xl  w-full overflow-hidden bg-white dark:bg-[--el-bg-color]">
     <Header />
-    <keep-alive>
-
-    <router-view v-slot="{ Component, route }">
-        <component :is="Component" :key="route.fullPath" />
-    </router-view>
-  </keep-alive>
-
+    <Main/>
     <Footer @show="handleShow" />
     <DrawerPlayer ref="PlayerDrawerRef" />
   </div>

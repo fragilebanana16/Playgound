@@ -208,6 +208,35 @@ export const dynamicRoutes = [
       }
     ]
   },
+  {
+    path: '/media/musicMan',
+    component: Layout,
+    hidden: true,
+    permissions: ['system:role:edit'],
+    children: [
+      {
+        path: 'collectionDetail/:id?',
+        component: () => import('@/views/media/music'),
+        name: 'CollectionDetail',
+        children: [
+          {
+            path: '',
+            props: route => ({ id: route.params.id }),
+            component: () => import('@/views/media/music/collectionDetail'),
+            name: 'CollectionDetail',
+            meta: { noCache: true, title: '专辑详情', activeMenu: '/media/music' }
+          },
+          // {
+          //   path: 'list',
+          //   component: () => import('@/views/media/music/collectionDetail'),
+          //   name: 'MusicList',
+          //   props: route => ({ id: null }),
+          //   meta: { noCache: true, title: '其他专辑', activeMenu: '/media/music' }
+          // }
+        ]
+      }
+    ]
+  }
 ]
 
 const router = createRouter({

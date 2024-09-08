@@ -1,17 +1,10 @@
 <script setup>
 import { ref } from "vue"
 import { Icon } from '@iconify/vue'
+const tableData = ref(Array.from({ length: 100 }, (_, index) => ({
+    al: { name: 'JJ', }, name: index, ar: [{ name: 'JJ', }],
+  })))
 
-const tableData = ref([
-    { al: { name: 'JJ', }, name: 'Jay', ar: [{ name: 'JJ', }],  },
-    { al: { name: 'DD', }, name: 'Dee', ar: [{ name: 'Bro', }], },
-    { al: { name: 'Wew', }, name: 'Rt', ar: [{ name: 'Chamisnsmoo', }], },
-    { al: { name: 'Wew', }, name: 'Rt', ar: [{ name: 'Chamisnsmoo', }], },
-    { al: { name: 'Wew', }, name: 'Rt', ar: [{ name: 'Chamisnsmoo', }], },
-    { al: { name: 'Wew', }, name: 'Rt', ar: [{ name: 'Chamisnsmoo', }], },
-    { al: { name: 'Wew', }, name: 'Rt', ar: [{ name: 'Chamisnsmoo', }], },
-    { al: { name: 'Wew', }, name: 'Rt', ar: [{ name: 'Chamisnsmoo', }], },
-])
 const router = useRouter()
 const playMusic = () => {}
 const { playSong } = ref()
