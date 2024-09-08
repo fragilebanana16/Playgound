@@ -55,15 +55,15 @@ onMounted(() => {
 <template>
   <div class="px-6 pt-6">
     <section class="bg-gradient rounded-lg text-white py-5">
-      <div class="container mx-auto">
+      <div class="container mx-3">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div class="flex flex-col justify-center">
             <h1
-              class="text-xl md:text-xl lg:text-xl font-bold text-white mb-4"
+              class="text-xl md:text-xl lg:text-xl font-bold text-white mb-4 line-clamp-1"
             >
               Discover the Latest Trends in Urban Fashion
             </h1>
-            <p class="text-gray-400 mb-6">
+            <p class="text-gray-400 mb-6 line-clamp-2 text-sm">
               Delve into our stylish and accessible collection of musical
               exploration, instruments, and creative inspiration
             </p>
@@ -75,7 +75,7 @@ onMounted(() => {
       </div>
     </section>
     <div class="py-8">
-      <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8">
+      <div class="grid lg:grid-cols-[repeat(auto-fill,minmax(180px,1fr))] grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-8">
         <div
           class="group relative rounded-lg overflow-hidden cursor-pointer"
           v-for="item in Playlist"

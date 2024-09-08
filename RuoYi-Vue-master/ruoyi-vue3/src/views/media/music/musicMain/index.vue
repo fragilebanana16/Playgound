@@ -26,11 +26,12 @@ export default {
 }
 </script>
 <template>
-   <section class="px-6 pt-6">
+  <div class="flex flex-col h-[calc(100vh-53px-84px-62px)]">
+      <section class="px-6 pt-6">
         <div class="banner rounded-lg flex">
           <div class="flex flex-col p-8">
-            <h2 class="text-lg font-semibold text-white">《黑神话：悟空》将来会写进历史。</h2>
-            <p class="mt-2 text-sm text-white md:line-clamp-3">
+            <h2 class="text-lg font-semibold text-white line-clamp-1">《黑神话：悟空》将来会写进历史。</h2>
+            <p class="mt-2 text-sm text-white line-clamp-2">
               不是因为游戏本身，而是因为它是一个起点，可能会带动中国游戏产业，向着大型化、剧情化、史诗级游戏的道路发展。
               中国早就是世界最大的游戏市场，也制作了很多非常赚钱的明星游戏，比如《原神》。但是，那些游戏都是网络游戏，需要通过网络，多人在线游玩。中国从来没有出现过国产的单机 3A 游戏大作，直到这一次。
             </p>
@@ -41,7 +42,7 @@ export default {
       /> -->
         </div>
       </section>
-      <div class="flex flex-col overflow-hidden px-6">
+      <section class="flex flex-col overflow-hidden px-6">
         <el-scrollbar class="relative" ref="songListRef">
           <div class="flex mt-6 space-x-4 rounded-xl pb-6">
             <router-link class="flex flex-col gap-2" v-for="item in SongList.playlists" :key="item.id"
@@ -69,10 +70,11 @@ export default {
             </button>
           </div>
         </el-scrollbar>
-      </div>
-      <div class="rounded-xl overflow-hidden flex-1 px-6">
-          <MusicList />
-        </div>
+      </section>
+      <section class="rounded-xl overflow-hidden px-6 flex-1">
+        <MusicList/>
+      </section>
+  </div>
 </template>
 
 <style scoped>

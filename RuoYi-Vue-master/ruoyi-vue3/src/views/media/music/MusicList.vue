@@ -12,7 +12,7 @@ const url =
     'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 </script>
 <template>
-    <div class="h-full w-full box-border flex flex-1 flex-col overflow-x-hidden overflow-auto">
+    <div class="w-full h-full box-border flex flex-1 flex-col overflow-x-hidden overflow-auto" >
         <el-table :data="tableData" style="
         width: 100%;
         --el-table-border: none;
