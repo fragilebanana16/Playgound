@@ -66,7 +66,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="w-full  dark:bg-[#141414]">
+  <div class="w-full  dark:bg-[#636463]">
     <div class="p-4">
       <h2 class="text-lg font-semibold mb-2 dark:text-white">黑暗模式</h2>
       <el-switch

@@ -63,9 +63,9 @@ function formatTime(seconds) {
   // 返回格式化的字符串，确保分钟和秒数都至少有两位数
   return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
 }
-</script>
+</script> 
 <template>
-  <footer class="footer-player border-t shadow-sm dark:bg-[#141414]">
+  <footer class="footer-player border-2 border-x-0 border-b-0 shadow-sm dark:border-t-gray-500 dark:bg-[#636463]">
     <div class="mx-auto flex items-center justify-between px-4 py-2">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 w-[240px]">

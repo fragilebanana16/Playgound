@@ -184,9 +184,20 @@ aside {
 }
 
 :root.dark .navbar {
-  background-color: #141414;
+  background-color: #636463;
 }
 
 :root.dark .tags-view-container {
-  background-color: #141414;
+  background-color: #636463;
 }
+
+:root.dark  {
+  --el-bg-color: #636463;
+  --el-fill-color-light: #434343;
+}
+
+.dark .el-table .el-table__header-wrapper th, .el-table .el-table__fixed-header-wrapper th{
+  background-color: #636463 !important;
+  color: #ffffff !important;
+}
+
