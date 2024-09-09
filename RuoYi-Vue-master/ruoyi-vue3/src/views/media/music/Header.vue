@@ -1,8 +1,9 @@
 <script setup>
 import { Icon } from '@iconify/vue'
-
+const router = useRouter()
 const keyWord = ref('')
 const toSearch = () => {
+  router.push({ path: '/media/musicMan/musicSearch', query: { kw: keyWord.value } })
 }
 
 </script>
