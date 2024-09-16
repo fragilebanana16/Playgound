@@ -47,7 +47,7 @@ public class MediaController
 //    }
     
     
-    @GetMapping(value = "/streaming/{videoUrl}", produces = "video/mp4")
+    @GetMapping(value = "/streaming/{videoUrl}")
     @ResponseBody
     public ResponseEntity<StreamingResponseBody> playMediaV02(
        @PathVariable("videoUrl")

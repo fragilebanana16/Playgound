@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysMusicMapper">
+    
+    <resultMap type="SysMusic" id="SysMusicResult">
+        <result property="musicId"    column="music_id"    />
+        <result property="title"    column="title"    />
+        <result property="duration"    column="duration"    />
+        <result property="description"    column="description"    />
+        <result property="thumbnailUrl"    column="thumbnailUrl"    />
+        <result property="url"    column="url"    />
+        <result property="lyrUrl"    column="lyrUrl"    />
+        <result property="artistId"    column="artistId"    />
+    </resultMap>
+
+    <sql id="selectSysMusicVo">
+        select music_id, title, duration, description, thumbnailUrl, url, lyrUrl, artistId from sys_music
+    </sql>
+
+    <select id="selectSysMusicList" parameterType="SysMusic" resultMap="SysMusicResult">
+        <include refid="selectSysMusicVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="duration != null  and duration != ''"> and duration = #{duration}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="thumbnailUrl != null  and thumbnailUrl != ''"> and thumbnailUrl = #{thumbnailUrl}</if>
+            <if test="url != null  and url != ''"> and url = #{url}</if>
+            <if test="lyrUrl != null  and lyrUrl != ''"> and lyrUrl = #{lyrUrl}</if>
+            <if test="artistId != null "> and artistId = #{artistId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysMusicByMusicId" parameterType="Long" resultMap="SysMusicResult">
+        <include refid="selectSysMusicVo"/>
+        where music_id = #{musicId}
+    </select>
+
+    <insert id="insertSysMusic" parameterType="SysMusic" useGeneratedKeys="true" keyProperty="musicId">
+        insert into sys_music
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="duration != null">duration,</if>
+            <if test="description != null">description,</if>
+            <if test="thumbnailUrl != null">thumbnailUrl,</if>
+            <if test="url != null and url != ''">url,</if>
+            <if test="lyrUrl != null">lyrUrl,</if>
+            <if test="artistId != null">artistId,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="duration != null">#{duration},</if>
+            <if test="description != null">#{description},</if>
+            <if test="thumbnailUrl != null">#{thumbnailUrl},</if>
+            <if test="url != null and url != ''">#{url},</if>
+            <if test="lyrUrl != null">#{lyrUrl},</if>
+            <if test="artistId != null">#{artistId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysMusic" parameterType="SysMusic">
+        update sys_music
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="thumbnailUrl != null">thumbnailUrl = #{thumbnailUrl},</if>
+            <if test="url != null and url != ''">url = #{url},</if>
+            <if test="lyrUrl != null">lyrUrl = #{lyrUrl},</if>
+            <if test="artistId != null">artistId = #{artistId},</if>
+        </trim>
+        where music_id = #{musicId}
+    </update>
+
+    <delete id="deleteSysMusicByMusicId" parameterType="Long">
+        delete from sys_music where music_id = #{musicId}
+    </delete>
+
+    <delete id="deleteSysMusicByMusicIds" parameterType="String">
+        delete from sys_music where music_id in 
+        <foreach item="musicId" collection="array" open="(" separator="," close=")">
+            #{musicId}
+        </foreach>
+    </delete>
+</mapper>

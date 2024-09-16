@@ -5,6 +5,7 @@
     </div> -->
     <video-player controls :src="currentWatchingUrl">
     </video-player>
+    <audio controls :src="baseUrl + streamingPrefix + 'Anson Seabra - Kryptonite.mp3'"></audio>
   </div>
 </template>
   
