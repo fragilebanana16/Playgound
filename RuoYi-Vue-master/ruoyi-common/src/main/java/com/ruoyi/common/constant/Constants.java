@@ -146,6 +146,11 @@ public class Constants
     public static final String RESOURCE_VIDEO_PREFIX = "/videos";
     
     /**
+     * music资源映射路径 前缀
+     */
+    public static final String RESOURCE_MUSIC_PREFIX = "/music";
+    
+    /**
      * RMI 远程方法调用
      */
     public static final String LOOKUP_RMI = "rmi:";

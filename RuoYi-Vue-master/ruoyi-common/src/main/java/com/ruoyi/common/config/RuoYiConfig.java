@@ -27,6 +27,9 @@ public class RuoYiConfig
     /** 视频路径 */
     private static String videos;
     
+    /** 音乐路径 */
+    private static String music;
+    
     /** 获取地址开关 */
     private static boolean addressEnabled;
 
@@ -81,6 +84,16 @@ public class RuoYiConfig
     public void setVideos(String videos)
     {
         RuoYiConfig.videos = videos;
+    }
+    
+    public static String getMusic()
+    {
+        return music;
+    }
+
+    public void setMusic(String music)
+    {
+    	RuoYiConfig.music = music;
     }
 
     public static boolean isAddressEnabled()

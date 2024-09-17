@@ -4,6 +4,8 @@ import Footer from '../Footer.vue'
 import Header from '../Header.vue'
 import MusicList from '../MusicList.vue'
 import DrawerPlayer from '../components/DrawerPlayer'
+import { listMusic } from "@/api/system/music";
+
 const PlayerDrawerRef = ref()
 const state = reactive({
   tableData: {},
@@ -12,12 +14,45 @@ const state = reactive({
 const url =
   'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 const { tableData, SongList } = toRefs(state)
-
 const handleShow = () => {
   if (PlayerDrawerRef.value) {
     PlayerDrawerRef.value.show()
   }
 }
+
+const data = reactive({
+  form: {},
+  queryParams: {
+    pageNum: 1,
+    pageSize: 10,
+    title: null,
+    duration: null,
+    description: null,
+    thumbnailUrl: null,
+    url: null,
+    lyrUrl: null,
+    artistId: null
+  },
+  rules: {
+    title: [
+      { required: true, message: "标题不能为空", trigger: "blur" }
+    ],
+    url: [
+      { required: true, message: "地址不能为空", trigger: "blur" }
+    ],
+  }
+});
+const { queryParams, form, rules } = toRefs(data);
+
+onMounted(() => {
+  listMusic(queryParams.value).then(response => {
+    tableData.value = response
+    console.log(`response:`,response)
+  })
+  .catch((error) => {
+      console.error('Error occurred:', error)
+  });
+})
 
 </script>
 <script>
@@ -71,8 +106,8 @@ export default {
           </div>
         </el-scrollbar>
       </section>
-      <section class="rounded-xl overflow-hidden px-6 flex-1">
-        <MusicList/>
+      <section v-if="tableData?.total > 0" class="rounded-xl overflow-hidden px-6 flex-1">
+        <MusicList v-model="tableData.rows" />
       </section>
   </div>
 </template>

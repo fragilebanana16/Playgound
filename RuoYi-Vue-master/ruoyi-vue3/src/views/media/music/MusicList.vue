@@ -1,13 +1,45 @@
 <script setup>
 import { ref } from "vue"
 import { Icon } from '@iconify/vue'
-const tableData = ref(Array.from({ length: 100 }, (_, index) => ({
-    al: { name: 'JJ', }, name: index, ar: [{ name: 'JJ', }],
-  })))
-
+import useMusicStore from '@/store/modules/music'
+const { playSong } = inject('MusicPlayer')
+// const tableData = ref(Array.from({ length: 100 }, (_, index) => ({
+//     al: { name: 'JJ', }, name: index, ar: [{ name: 'JJ', }],
+//   })))
+const streamingPrefix = '/media/streaming/'
+const baseUrl = import.meta.env.VITE_APP_BASE_API;
+const tableData = defineModel()
+const musicStore = useMusicStore()
 const router = useRouter()
-const playMusic = () => {}
-const { playSong } = ref()
+
+const playMusic = async (row) => {
+  const existingIndex = musicStore.trackList.findIndex(
+    (existingTrack) => existingTrack.id === row.id
+  )
+
+  if (existingIndex === -1) {
+    try {
+      const param = {
+        id: 'row.id',
+        title: row.title,
+        singer: 'row.ar.map((ar: any) => ar.name).join(' / ')',
+        album: 'row.artistName',
+        cover: baseUrl + 'music/covers/' + row.thumbnailUrl,
+        time: 'row.dt',
+        source: baseUrl + streamingPrefix + 'music/' + row.url,
+      }
+
+      musicStore.addTrackAndPlay(param)
+      playSong(param) // 自动播放新添加的歌曲
+    } catch (error) {
+      console.error('Error fetching music URL:', error)
+    }
+  } else {
+    const existingTrack = musicStore.trackList[existingIndex]
+    musicStore.addTrackAndPlay(existingTrack)
+    playSong(existingTrack) // 自动播放已存在的歌曲
+  }
+}
 const url =
     'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 </script>
@@ -18,34 +50,25 @@ const url =
         --el-table-border: none;
         --el-table-border-color: none;
       " @row-dblclick="playMusic" class="!text-xs !flex-1">
-            <el-table-column prop="name" label="歌名">
+            <el-table-column prop="title" label="歌名">
                 <template #default="{ row }">
                     <div class="flex items-center gap-1">
                         <div class="min-w-10 h-10">
-                            <el-image class="w-full h-full rounded-lg" lazy :src=url :alt="row.al.name" />
+                            <el-image class="w-full h-full rounded-lg" lazy :src=url :alt="row.title" />
                         </div>
-                        <span class="line-clamp-1" :title="row.name">{{ row.name }}</span>
+                        <span class="line-clamp-1" :title="row.title">{{ row.title }}</span>
                     </div>
                 </template>
             </el-table-column>
             <el-table-column label="歌手">
                 <template #default="{ row }">
-                    <span class="line-clamp-1" :title="row.ar.map((ar) => ar.name).join(' / ')">
-                        {{ row.ar.map((ar) => ar.name).join(' / ') }}
-                    </span>
+                    <span class="line-clamp-1" :title="row.title">{{ row.artistName }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="al.name" label="专辑">
-                <template #default="{ row }">
-                    <span class="line-clamp-1" :title="row.al.name">
-                        row.al.name
-                    </span>
-                </template>
-            </el-table-column>
-            <el-table-column label="时间">
+            <el-table-column label="收录时间">
                 <template #default="{ row }">
                     <span>
-                        {{ row.dt }}
+                        {{ row.createTime }}
                     </span>
                 </template>
             </el-table-column>
