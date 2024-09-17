@@ -58,4 +58,12 @@ public interface SysMusicMapper
      * @return 结果
      */
     public int deleteSysMusicByMusicIds(Long[] musicIds);
+    
+
+    /**
+     * 重置曲库
+     * 
+     * @return 结果
+     */
+    public void deleteSysMusic();
 }

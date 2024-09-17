@@ -6,7 +6,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.ruoyi.system.mapper.SysArtistsMapper;
 import com.ruoyi.system.mapper.SysMusicMapper;
+import com.ruoyi.system.domain.SysArtists;
 import com.ruoyi.system.domain.SysMusic;
 import com.ruoyi.system.service.ISysMusicService;
 import java.io.IOException;
@@ -26,7 +29,10 @@ public class SysMusicServiceImpl implements ISysMusicService
 {
     @Autowired
     private SysMusicMapper sysMusicMapper;
-
+    
+    @Autowired
+    private SysArtistsMapper sysArtistsMapper;
+    
     private static final String SONGS_FOLDER = "songs";
     private static final String LYRICS_FOLDER = "lyrics";
     private static final String COVERS_FOLDER = "covers";
@@ -37,19 +43,46 @@ public class SysMusicServiceImpl implements ISysMusicService
      * @param sysMusic 歌曲
      * @return 歌曲集合
      */
-    public List<SysMusic> selectLocalSysMusicList(SysMusic sysMusic){
+    public int resetDbByLocalMusic(){
         try {
-            Path songsFolder = Paths.get(BASE_FOLDER , SONGS_FOLDER);
-            return Files.list(songsFolder)
-                    .map(t -> {
-						try {
-							return getSingleMusic(t);
-						} catch (IOException e) {
-							e.printStackTrace();
-							return null;
-						}
-					})
-                    .collect(Collectors.toList());
+	        Path songsFolder = Paths.get(BASE_FOLDER , SONGS_FOLDER);
+	        
+	        // get local music
+	        List<SysMusic> sysMusicList =  Files.list(songsFolder).map(t -> {
+				try {
+					return getSingleMusic(t);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}).collect(Collectors.toList());
+	        
+	        // truncate DB
+	       sysMusicMapper.deleteSysMusic();
+	       
+	        // insert new data    
+	       int insertCount = 0;
+	       for (int index = 0; index < sysMusicList.size(); index++) {
+	    	   SysMusic temp = sysMusicList.get(index);
+	    	   String tempName = temp.getArtistName();
+	    	   if(!tempName.isBlank()) {
+	    		   SysArtists artist = sysArtistsMapper.selectSysArtistsByName(tempName);
+	    		   if(artist == null) {
+	    			   SysArtists newArtist = new SysArtists();
+	    			   newArtist.setName(tempName);
+	    			   int artistId = sysArtistsMapper.insertSysArtists(newArtist);
+	    			   temp.setArtistId((long)artistId);
+	    		   } else {
+	    			   temp.setArtistId(artist.getId());
+	    		   }
+	    	   }
+	    	   
+	    	   if(sysMusicMapper.insertSysMusic(temp) > 0 ) {
+	    		   insertCount++;
+	    	   }
+	    	}
+	       
+	       return insertCount;
         } catch (IOException e) {
             throw new RuntimeException("Error reading music directory", e);
         }

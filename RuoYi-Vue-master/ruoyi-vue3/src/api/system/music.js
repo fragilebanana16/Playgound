@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 查询歌曲列表(本地文件)
-export function listLocalMusic(query) {
+export function resetToLocalMusic(query) {
   return request({
     url: '/system/music/localMusic',
     method: 'get',

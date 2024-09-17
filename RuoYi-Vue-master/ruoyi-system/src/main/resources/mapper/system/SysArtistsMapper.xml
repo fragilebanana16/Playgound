@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysArtistsMapper">
+    
+    <resultMap type="SysArtists" id="SysArtistsResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="createDate"    column="createDate"    />
+    </resultMap>
+
+    <sql id="selectSysArtistsVo">
+        select artist_id, artist_name from sys_artist
+    </sql>
+
+    <select id="selectSysArtistsList" parameterType="SysArtists" resultMap="SysArtistsResult">
+        <include refid="selectSysArtistsVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="createDate != null "> and createDate = #{createDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysArtistsById" parameterType="Long" resultMap="SysArtistsResult">
+        <include refid="selectSysArtistsVo"/>
+        where artist_id = #{id}
+    </select>
+    
+    <select id="selectSysArtistsByName" parameterType="String" resultMap="SysArtistsResult">
+        <include refid="selectSysArtistsVo"/>
+        where artist_name = #{name}
+    </select>
+ 
+    <insert id="insertSysArtists" parameterType="SysArtists" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_artist
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="artist_name != null and artist_name != ''">artist_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysArtists" parameterType="SysArtists">
+        update sys_artists
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="createDate != null">createDate = #{createDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysArtistsById" parameterType="Long">
+        delete from sys_artists where id = #{id}
+    </delete>
+
+    <delete id="deleteSysArtistsByIds" parameterType="String">
+        delete from sys_artists where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

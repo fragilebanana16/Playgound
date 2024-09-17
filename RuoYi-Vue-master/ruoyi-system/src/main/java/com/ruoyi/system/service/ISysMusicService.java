@@ -19,12 +19,11 @@ public interface ISysMusicService
      */
     public SysMusic selectSysMusicByMusicId(Long musicId);
     /**
-     * 查询歌曲列表(本地目录)
+     * 重置查询歌曲列表(本地目录)
      * 
-     * @param sysMusic 歌曲
      * @return 歌曲集合
      */
-    public List<SysMusic> selectLocalSysMusicList(SysMusic sysMusic);
+    public int resetDbByLocalMusic();
     
     /**
      * 查询歌曲列表(数据库)

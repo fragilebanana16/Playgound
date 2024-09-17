@@ -52,6 +52,7 @@
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重新查询</el-button>
+        <el-button type="danger" @click="resetDB">重置数据库</el-button>
       </el-form-item>
     </el-form>
 
@@ -160,7 +161,7 @@
 </template>
 
 <script setup name="Music">
-import { listLocalMusic, listMusic, getMusic, delMusic, addMusic, updateMusic } from "@/api/system/music";
+import { resetToLocalMusic, listMusic, getMusic, delMusic, addMusic, updateMusic } from "@/api/system/music";
 
 const { proxy } = getCurrentInstance();
 
@@ -199,20 +200,23 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
+function resetDB(){
+  loading.value = true;
+  resetToLocalMusic(queryParams.value).then(response => {
+    proxy.$modal.msgSuccess(`重置${response}首歌曲`);
+    loading.value = false;
+  });
+}
+
 /** 查询歌曲列表 */
 function getList() {
   loading.value = true;
-  
-  listLocalMusic(queryParams.value).then(response => {
+
+  listMusic(queryParams.value).then(response => {
     musicList.value = response.rows;
     total.value = response.total;
     loading.value = false;
   });
-  // listMusic(queryParams.value).then(response => {
-  //   musicList.value = response.rows;
-  //   total.value = response.total;
-  //   loading.value = false;
-  // });
 }
 
 // 取消按钮

@@ -38,10 +38,8 @@ public class SysMusicController extends BaseController
      * 查询歌曲列表(本地目录)
      */
     @GetMapping("/localMusic")
-    public TableDataInfo getLocalMusicInfo(SysMusic sysMusic) {
-        startPage();
-        List<SysMusic> list = sysMusicService.selectLocalSysMusicList(sysMusic);
-        return getDataTable(list);
+    public int reset() {
+        return sysMusicService.resetDbByLocalMusic();
     }
     
     /**

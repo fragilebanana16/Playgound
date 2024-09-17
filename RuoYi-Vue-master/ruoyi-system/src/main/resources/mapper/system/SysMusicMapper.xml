@@ -83,4 +83,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{musicId}
         </foreach>
     </delete>
+    
+    <delete id="deleteSysMusic">
+        truncate sys_music
+    </delete>
 </mapper>
