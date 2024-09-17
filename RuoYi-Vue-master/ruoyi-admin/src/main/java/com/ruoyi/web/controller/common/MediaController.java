@@ -22,7 +22,7 @@ import java.io.IOException;
  * 
  */
 @RestController
-@RequestMapping("/media/video")
+@RequestMapping("/media")
 public class MediaController
 {
     @Autowired
@@ -47,22 +47,26 @@ public class MediaController
 //    }
     
     
-    @GetMapping(value = "/streaming/{videoUrl}")
+    @GetMapping(value = "/streaming/{mediaType}/{url}")
     @ResponseBody
     public ResponseEntity<StreamingResponseBody> playMediaV02(
-       @PathVariable("videoUrl")
-       String videoUrl,
+       @PathVariable("url")
+       String url,
+       @PathVariable("mediaType")
+       String mediaType,
        @RequestHeader(value = "Range", required = false)
        String rangeHeader,
        HttpServletRequest req)
     {        
        try
        {         
-          // String filePathString = "G:\\迅雷下载\\The Boys.黑袍纠察队.S02E06.720p.HDTV.x264.双语字幕初校版-深影字幕组.mp4";
-          String filePathString = "D:\\ruoyi\\videos\\" + videoUrl;
-          
+    	  String midFix = mediaType;
+    	  if(midFix.equals("music")) {
+    		  midFix += "\\songs";
+    	  }
+    	  
+          String filePathString = "D:\\ruoyi\\" + midFix + "\\" + url;
           ResponseEntity<StreamingResponseBody> retVal = sysVideoService.loadPartialMediaFile(filePathString, rangeHeader);
-          
           return retVal;
        }
        catch (FileNotFoundException e)

@@ -47,7 +47,7 @@ const handleShow = () => {
 </script>
 <script>
 export default {
-  name: 'Music',
+  name: 'Music', // 菜单配置的是musicLayout，不要配成music
 }
 </script>
 <template>

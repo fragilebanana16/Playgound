@@ -3,9 +3,8 @@
     <!-- <div>
       <video width="600" controls :src="currentWatchingUrl"></video>
     </div> -->
-    <video-player controls :src="currentWatchingUrl">
-    </video-player>
-    <audio controls :src="baseUrl + streamingPrefix + 'Anson Seabra - Kryptonite.mp3'"></audio>
+    <video-player controls :src="currentWatchingUrl"/>
+    <audio controls :src="baseUrl + streamingPrefix + 'music/A Sky Full of Stars - Coldplay.mp3'"></audio>
   </div>
 </template>
   
@@ -13,7 +12,7 @@
 import { getVideo } from "@/api/system/video";
 import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
-const streamingPrefix = '/media/video/streaming/'
+const streamingPrefix = '/media/streaming/'
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
 const route = useRoute();
 
@@ -24,7 +23,7 @@ function initVideoFromRoute() {
   if (videoId) {
     getVideo(videoId).then(response => {
       console.log("Watching:" + response.data.url)
-      currentWatchingUrl.value = baseUrl + streamingPrefix + response.data.url
+      currentWatchingUrl.value = baseUrl + streamingPrefix + 'videos/' + response.data.url
     });
   }
 }

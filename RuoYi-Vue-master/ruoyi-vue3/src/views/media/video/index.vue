@@ -25,7 +25,7 @@
   
           <div>streaming way</div>
           <video width="600" controls>
-            <source :src="`${baseUrl}/media/video/streaming/test1.mp4`">
+            <source :src="`${baseUrl}/media/streaming/video/test1.mp4`">
           </video> -->
                 <v-row>
                     <v-col cols="12" sm="6" md="4" lg="3" v-for="(video, i) in loading ? 12 : videos" :key="i"
@@ -59,7 +59,7 @@ import { getVideos, getTest } from "@/api/media/video";
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
-const streamingPrefix = '/media/video/streaming/'
+const streamingPrefix = '/media/streaming/videos'
 const videos = ref([]);
 const loading = ref(false)
 const loaded = ref(false)
