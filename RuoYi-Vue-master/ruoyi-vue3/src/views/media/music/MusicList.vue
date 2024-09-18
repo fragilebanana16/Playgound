@@ -20,11 +20,10 @@ const playMusic = async (row) => {
   if (existingIndex === -1) {
     try {
       const param = {
-        id: 'row.id',
+        id: row.musicId,
         title: row.title,
-        singer: 'row.ar.map((ar: any) => ar.name).join(' / ')',
-        album: 'row.artistName',
-        cover: baseUrl + 'music/covers/' + row.thumbnailUrl,
+        singer: row.artistName,
+        cover: baseUrl + '/music/covers/' + row.thumbnailUrl,
         time: 'row.dt',
         source: baseUrl + streamingPrefix + 'music/' + row.url,
       }

@@ -143,6 +143,7 @@ public class SysMusic extends BaseEntity
             .append("url", getUrl())
             .append("lyrUrl", getLyrUrl())
             .append("artistId", getArtistId())
+            .append("artistName", getArtistName())
             .toString();
     }
 }

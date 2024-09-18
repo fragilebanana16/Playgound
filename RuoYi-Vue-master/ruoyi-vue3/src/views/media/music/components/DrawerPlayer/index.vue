@@ -118,7 +118,7 @@ defineExpose({
 </script>
 <template>
   <el-drawer
-    :style="{ '--track-cover-url':  currentSong.cover ? `url(${currentSong.cover})` :`thisShouldBeUserInfoOrWhat` }"
+    :style="{ '--track-cover-url':  currentSong.cover ? `url('${currentSong.cover}')` :`thisShouldBeUserInfoOrWhat` }"
     v-model="drawer"
     :direction="direction"
     style="box-shadow: none"
@@ -180,13 +180,13 @@ defineExpose({
                 <div
                   class="album-art rounded-md"
                   :style="{
-                    '--track-cover-url': currentSong.cover ? `url(${currentSong.cover})` :`url(${altCover})`,
+                    '--track-cover-url': currentSong.cover ? `url('${currentSong.cover}')` :`url(${altCover})`,
                   }"
                 ></div>
                 <div
                   class="vinyl"
                   :style="{
-                    '--track-cover-url': currentSong.cover ? `url(${currentSong.cover})` :`url(${altCover})`,
+                    '--track-cover-url': currentSong.cover ? `url('${currentSong.cover}')` :`url(${altCover})`,
                     animationPlayState: isPlaying ? 'running' : 'paused',
                   }"
                 ></div>
