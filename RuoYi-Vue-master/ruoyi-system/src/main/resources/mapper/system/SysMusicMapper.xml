@@ -13,10 +13,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="url"    column="url"    />
         <result property="lyrUrl"    column="lyrUrl"    />
         <result property="artistId"    column="artistId"    />
+        <result property="artistName"    column="artist_name"    />
     </resultMap>
 
     <sql id="selectSysMusicVo">
-        select music_id, title, duration, description, thumbnailUrl, url, lyrUrl, artistId from sys_music
+        select music_id, title, duration, description, thumbnailUrl, url, lyrUrl, artistId, a.artist_name from sys_music
     </sql>
 
     <select id="selectSysMusicList" parameterType="SysMusic" resultMap="SysMusicResult">
@@ -30,6 +31,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="lyrUrl != null  and lyrUrl != ''"> and lyrUrl = #{lyrUrl}</if>
             <if test="artistId != null "> and artistId = #{artistId}</if>
         </where>
+         left  join sys_artist a on artistId=artist_id
+         
     </select>
     
     <select id="selectSysMusicByMusicId" parameterType="Long" resultMap="SysMusicResult">
@@ -47,6 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="url != null and url != ''">url,</if>
             <if test="lyrUrl != null">lyrUrl,</if>
             <if test="artistId != null">artistId,</if>
+            <if test="artistName != null">artistName,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="title != null and title != ''">#{title},</if>
@@ -56,6 +60,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="url != null and url != ''">#{url},</if>
             <if test="lyrUrl != null">#{lyrUrl},</if>
             <if test="artistId != null">#{artistId},</if>
+            <if test="artistName != null">#{artistName},</if>
          </trim>
     </insert>
 

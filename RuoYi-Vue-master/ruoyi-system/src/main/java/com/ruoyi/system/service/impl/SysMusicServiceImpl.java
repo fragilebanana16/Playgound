@@ -72,9 +72,11 @@ public class SysMusicServiceImpl implements ISysMusicService
 	    			   newArtist.setName(tempName);
 	    			   int artistId = sysArtistsMapper.insertSysArtists(newArtist);
 	    			   temp.setArtistId((long)artistId);
-	    		   } else {
+	    			   }
+	    		   else {
 	    			   temp.setArtistId(artist.getId());
-	    		   }
+	    			   }
+	    		   temp.setArtistName(tempName);
 	    	   }
 	    	   
 	    	   if(sysMusicMapper.insertSysMusic(temp) > 0 ) {

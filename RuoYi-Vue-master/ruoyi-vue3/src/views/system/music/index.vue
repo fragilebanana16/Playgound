@@ -99,16 +99,16 @@
     </el-row>
 
     <el-table v-loading="loading" :data="musicList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+      <el-table-column type="selection" width="30" align="center" />
       <el-table-column label="音乐ID" align="center" prop="musicId"/>
-      <el-table-column label="歌名" align="center" prop="title" show-overflow-tooltip width="150"/>
-      <el-table-column label="歌手名" align="center" prop="artistName" show-overflow-tooltip width="150"/>
+      <el-table-column label="歌名" align="center" prop="title" show-overflow-tooltip width="170"/>
+      <el-table-column label="歌手名" align="center" prop="artistName" show-overflow-tooltip width="170"/>
+      <el-table-column label="歌曲地址" align="center" prop="url" show-overflow-tooltip width="170"/>
+      <el-table-column label="封面地址" align="center" prop="thumbnailUrl" show-overflow-tooltip width="170"/>
+      <el-table-column label="歌词URL" align="center" prop="lyrUrl" show-overflow-tooltip width="170"/>
+      <el-table-column label="歌手ID" align="center" prop="artistId" />
       <el-table-column label="时长" align="center" prop="duration" />
       <el-table-column label="描述" align="center" prop="description" />
-      <el-table-column label="歌曲地址" align="center" prop="url" show-overflow-tooltip width="200"/>
-      <el-table-column label="封面地址" align="center" prop="thumbnailUrl" show-overflow-tooltip width="200"/>
-      <el-table-column label="歌词URL" align="center" prop="lyrUrl" show-overflow-tooltip width="200"/>
-      <el-table-column label="歌手ID" align="center" prop="artistId" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" width="200">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:music:edit']">修改</el-button>
