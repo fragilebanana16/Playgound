@@ -37,7 +37,7 @@ const useMusicStore = defineStore({
                 time: 260675,
             },
             {
-                id: "123124124",
+                id: "2",
                 title: "我记得",
                 singer: "赵雷",
                 album: "==x",
@@ -46,7 +46,7 @@ const useMusicStore = defineStore({
                 time: 260675,
             },
             {
-                id: "123124124",
+                id: "3",
                 title: "Diviners & Azertion - Feelings Mp3 Download by NCS",
                 singer: "Files Garage",
                 album: "==x",
@@ -55,7 +55,7 @@ const useMusicStore = defineStore({
                 time: 260675,
             },
             {
-                id: "123124124",
+                id: "4",
                 title: "Slow Down",
                 singer: "Madnap,Pauline Herr",
                 album: "==x",
@@ -64,7 +64,7 @@ const useMusicStore = defineStore({
                 time: 260675,
             },
             {
-                id: "123124124",
+                id: "5",
                 title: "sun and moon",
                 singer: "Anees",
                 album: "==x",
@@ -73,11 +73,11 @@ const useMusicStore = defineStore({
                 time: 260675,
             },
             {
-                id: "123124124",
+                id: "6",
                 title: "Anson Seabra",
                 singer: "Kryptonite",
                 album: "==x",
-                cover: "",
+                cover: cover4,
                 source: sound5,
                 time: 260675,
             }

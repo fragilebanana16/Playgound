@@ -61,7 +61,7 @@ export default {
 }
 </script>
 <template>
-  <div class="flex flex-col h-[calc(100vh-53px-84px-62px)]">
+  <div class="flex flex-col h-[calc(100vh-53px-84px-63px)]">
       <section class="px-6 pt-6">
         <div class="banner rounded-lg flex">
           <div class="flex flex-col p-8">

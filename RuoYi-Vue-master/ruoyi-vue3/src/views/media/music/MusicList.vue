@@ -2,6 +2,8 @@
 import { ref } from "vue"
 import { Icon } from '@iconify/vue'
 import useMusicStore from '@/store/modules/music'
+import altCover from '@/assets/images/defaultAlbum.jpg'
+
 const { playSong } = inject('MusicPlayer')
 // const tableData = ref(Array.from({ length: 100 }, (_, index) => ({
 //     al: { name: 'JJ', }, name: index, ar: [{ name: 'JJ', }],
@@ -23,9 +25,9 @@ const playMusic = async (row) => {
         id: row.musicId,
         title: row.title,
         singer: row.artistName,
-        cover: baseUrl + '/music/covers/' + row.thumbnailUrl,
+        cover: row.thumbnailUrl ? baseUrl + '/music/covers/' + row.thumbnailUrl : '',
         time: 'row.dt',
-        source: baseUrl + streamingPrefix + 'music/' + row.url,
+        source: row.url ? baseUrl + streamingPrefix + 'music/' + row.url : '',
       }
 
       musicStore.addTrackAndPlay(param)
@@ -39,8 +41,7 @@ const playMusic = async (row) => {
     playSong(existingTrack) // 自动播放已存在的歌曲
   }
 }
-const url =
-    'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+
 </script>
 <template>
     <div class="w-full h-full box-border flex flex-1 flex-col overflow-x-hidden overflow-auto" >
@@ -51,9 +52,9 @@ const url =
       " @row-dblclick="playMusic" class="!text-xs !flex-1">
             <el-table-column prop="title" label="歌名">
                 <template #default="{ row }">
-                    <div class="flex items-center gap-1">
-                        <div class="min-w-10 h-10">
-                            <el-image class="w-full h-full rounded-lg" lazy :src=url :alt="row.title" />
+                    <div class="flex items-center gap-3">
+                        <div class="min-w-10 h-10 ml-1">
+                            <el-image class="w-full h-full rounded-lg" lazy :src="row.thumbnailUrl ? baseUrl + '/music/covers/' + row.thumbnailUrl : altCover" :alt="row.title" />
                         </div>
                         <span class="line-clamp-1" :title="row.title">{{ row.title }}</span>
                     </div>

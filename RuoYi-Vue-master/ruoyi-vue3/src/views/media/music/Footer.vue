@@ -3,8 +3,8 @@ import { Icon } from '@iconify/vue'
 import RecentPlayList from './components/RecentPlayList'
 import Volume from './Volume.vue'
 import { PlayMode } from '@/utils/enum'
-const altCover =
-  'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+import altCover from '@/assets/images/defaultAlbum.jpg'
+
 const {
   currentSong,
   togglePlayPause,
@@ -69,7 +69,7 @@ function formatTime(seconds) {
     <div class="mx-auto flex items-center justify-between px-4 py-2">
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2 w-[240px]">
-          <el-image :src="currentSong.cover ? currentSong.cover :altCover" alt="Album cover" class="rounded-md w-9 h-9"
+          <el-image :src="currentSong.cover ? currentSong.cover : altCover" alt="Album cover" class="rounded-md w-9 h-9"
             style="aspect-ratio: 40 / 40; object-fit: cover" @click="Emit('show')"/>
           <div>
             <div class="text-sm font-medium line-clamp-1 dark:text-gray-200" :title="currentSong.title">
