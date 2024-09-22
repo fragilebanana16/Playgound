@@ -28,6 +28,7 @@ const playMusic = async (row) => {
         cover: row.thumbnailUrl ? baseUrl + '/music/covers/' + row.thumbnailUrl : '',
         time: 'row.dt',
         source: row.url ? baseUrl + streamingPrefix + 'music/' + row.url : '',
+        lyricName: row.lyrUrl,
       }
 
       musicStore.addTrackAndPlay(param)

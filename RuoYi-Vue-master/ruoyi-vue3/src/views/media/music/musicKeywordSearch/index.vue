@@ -89,7 +89,6 @@ const cloudsearch = () => {
 // 封装一个公共的搜索函数
 const performSearch = async (kw, type, offset, limit = 20) => {
   const { result } = await cloudsearch({ kw, type, limit, offset })
-  debugger
   switch (state.activeName) {
     case '1':
       state.tableData = state.tableData = result

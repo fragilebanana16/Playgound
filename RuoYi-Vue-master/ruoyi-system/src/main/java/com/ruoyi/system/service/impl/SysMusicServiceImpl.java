@@ -179,7 +179,7 @@ public class SysMusicServiceImpl implements ISysMusicService
 		if (Files.exists(lrcPath)) {
 			singleMusic.setLyrUrl(fileNameWithOutExt + ".lrc");
 		} else {
-			singleMusic.setLyrUrl("defaultLyrUrl");
+			singleMusic.setLyrUrl("");
 		}
 		
        // get cover
@@ -191,7 +191,7 @@ public class SysMusicServiceImpl implements ISysMusicService
 		}
 		
 		if(StringUtils.isBlank(singleMusic.getThumbnailUrl())) {
-			singleMusic.setThumbnailUrl("defaultCoverUrl");
+			singleMusic.setThumbnailUrl("");
 		}
 
 		// get names

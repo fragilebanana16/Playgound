@@ -50,7 +50,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="url != null and url != ''">url,</if>
             <if test="lyrUrl != null">lyrUrl,</if>
             <if test="artistId != null">artistId,</if>
-            <if test="artistName != null">artistName,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="title != null and title != ''">#{title},</if>
@@ -60,7 +59,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="url != null and url != ''">#{url},</if>
             <if test="lyrUrl != null">#{lyrUrl},</if>
             <if test="artistId != null">#{artistId},</if>
-            <if test="artistName != null">#{artistName},</if>
          </trim>
     </insert>
 

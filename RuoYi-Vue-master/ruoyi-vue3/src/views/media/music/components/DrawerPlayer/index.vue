@@ -24,10 +24,10 @@ const {
   currentTime,
   duration,
   changeCurrentTime,
-  // Loadlyrics,
-  // lyricsData,
-  // currentLyricIndex,
-  // scrollStyle,
+  Loadlyrics,
+  lyricsData,
+  currentLyricIndex,
+  scrollStyle,
   setPlayMode,
 } = inject('MusicPlayer')
 
@@ -35,7 +35,7 @@ const {
 
 const show = () => {
   state.drawer = true
-//   Loadlyrics()
+  Loadlyrics()
 //   getCommentPlaylist()
 }
 
@@ -49,11 +49,11 @@ function formatTime(seconds) {
   return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
 }
 
-// function parseLyricInfo(lyricString) {
-//   return lyricString
-//     .replace(/\n/g, '<br />') // 将换行符替换为 <br />
-//     .replace(/^\s*|\s*$/g, '') // 去除前后空格
-// }
+function parseLyricInfo(lyricString) {
+  return lyricString
+    .replace(/\n/g, '<br />') // 将换行符替换为 <br />
+    .replace(/^\s*|\s*$/g, '') // 去除前后空格
+}
 
 // 时间
 let LocalhostcurrentTime = ref(new Date().toLocaleTimeString())
@@ -242,8 +242,57 @@ defineExpose({
             </div>
           </div>
         </div>
-      </div>
+      <div
+          class="flex-[50%] max-w-[50%] md:flex hidden h-full items-center justify-center"
+        >
+          <template v-if="lyricsData.lines.length > 0">
+            <div class="items-center justify-center flex h-full">
+              <el-scrollbar
+                class="flex items-center justify-center w-full"
+                wrap-class="mask-gradient w-full text-center !h-[600px]"
+                style="--scroll-shadow-size: 40px"
+              >
+                <ul :style="scrollStyle">
+                  <li
+                    v-for="(item, index) in lyricsData.lines"
+                    :key="index"
+                    :class="[
+                      'text-sm py-1 transition-all duration-300 ease-in-out font-body',
+                      {
+                        'text-[--el-color-primary] text-xl':
+                          currentLyricIndex === index,
+                        'text-gray-500 dark:text-gray-400':
+                          currentLyricIndex !== index,
+                      },
+                    ]"
+                  >
+                    <p v-if="item.text">
+                      {{ item.text }}
+                    </p>
+                    <p
+                      v-if="item.translation"
+                    >
+                      {{ item.translation }}
+                    </p>
+                    <p v-if="item.romaLrc">
+                      {{ item.romaLrc }}
+                    </p>
+                  </li>
+                </ul>
+              </el-scrollbar>
+            </div>
+          </template>
+          <template v-else>
+            <div
+              class="h-full flex items-center justify-center w-full text-[--el-color-primary-light-2] dark:text-gray-500 text-sm"
+              v-html="parseLyricInfo(lyricsData.remark ?? '')"
+              v-if="false"
+            ></div>
+          </template>
+        </div>
     </div>
+  </div>
+
   </el-drawer>
 </template>
 <style lang="scss" scoped>

@@ -75,7 +75,7 @@ function formatTime(seconds) {
             <div class="text-sm font-medium line-clamp-1 dark:text-gray-200" :title="currentSong.title">
               {{currentSong.title}}
             </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400">
+            <div class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1" :title="currentSong.singer">
               {{currentSong.singer}}
             </div>
           </div>
