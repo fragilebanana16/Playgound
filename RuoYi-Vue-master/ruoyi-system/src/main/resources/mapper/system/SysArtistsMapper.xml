@@ -5,21 +5,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.system.mapper.SysArtistsMapper">
     
     <resultMap type="SysArtists" id="SysArtistsResult">
-        <result property="id"    column="id"    />
-        <result property="name"    column="name"    />
-        <result property="createDate"    column="createDate"    />
+        <id property="artist_id"    column="artist_id"    />
+        <result property="artist_name"    column="artist_name"    />
+        <result property="artist_avatar"    column="artist_avatar"    />
     </resultMap>
 
     <sql id="selectSysArtistsVo">
-        select artist_id, artist_name from sys_artist
+        select artist_id, artist_name, artist_avatar from sys_artist
     </sql>
 
     <select id="selectSysArtistsList" parameterType="SysArtists" resultMap="SysArtistsResult">
         <include refid="selectSysArtistsVo"/>
-        <where>  
-            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="createDate != null "> and createDate = #{createDate}</if>
-        </where>
+
     </select>
     
     <select id="selectSysArtistsById" parameterType="Long" resultMap="SysArtistsResult">
@@ -32,18 +29,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where artist_name = #{name}
     </select>
  
-    <insert id="insertSysArtists" parameterType="SysArtists" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSysArtists" parameterType="SysArtists" useGeneratedKeys="true">
         insert into sys_artist
-        <trim prefix="(" suffix=")" suffixOverrides=",">
+         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="artist_name != null and artist_name != ''">artist_name,</if>
+            <if test="artist_avatar != null and artist_avatar != ''">artist_avatar,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="name != null and name != ''">#{name},</if>
+            <if test="artist_name != null and artist_name != ''">#{artist_name},</if>
+            <if test="artist_avatar != null">#{artist_avatar},</if>
          </trim>
     </insert>
 
     <update id="updateSysArtists" parameterType="SysArtists">
-        update sys_artists
+        update sys_artist
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null and name != ''">name = #{name},</if>
             <if test="createDate != null">createDate = #{createDate},</if>
@@ -52,13 +51,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteSysArtistsById" parameterType="Long">
-        delete from sys_artists where id = #{id}
+        delete from sys_artist where id = #{id}
     </delete>
 
     <delete id="deleteSysArtistsByIds" parameterType="String">
-        delete from sys_artists where id in 
+        delete from sys_artist where id in 
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
+    </delete>
+
+    <delete id="deleteSysArtists">
+        set FOREIGN_KEY_CHECKS=0;
+        truncate sys_artist;
+        set FOREIGN_KEY_CHECKS=1;
     </delete>
 </mapper>

@@ -11,6 +11,7 @@ import com.ruoyi.system.mapper.SysArtistsMapper;
 import com.ruoyi.system.mapper.SysMusicMapper;
 import com.ruoyi.system.domain.SysArtists;
 import com.ruoyi.system.domain.SysMusic;
+import com.ruoyi.system.service.ISysArtistsService;
 import com.ruoyi.system.service.ISysMusicService;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,7 +37,9 @@ public class SysMusicServiceImpl implements ISysMusicService
     private static final String SONGS_FOLDER = "songs";
     private static final String LYRICS_FOLDER = "lyrics";
     private static final String COVERS_FOLDER = "covers";
+    private static final String ARTIST_AVATAR_FOLDER = "artists";
     private static final String BASE_FOLDER = "D:\\ruoyi\\music";
+    private static String[] imageExtensions = {".png", ".jpg", ".jpeg"};
     /**
      * 查询歌曲列表(本地目录)
      * 
@@ -57,7 +60,8 @@ public class SysMusicServiceImpl implements ISysMusicService
 				}
 			}).collect(Collectors.toList());
 	        
-	        // truncate DB
+	        // truncate DB: make sure foreign key constraint master table delete first
+//	       sysArtistsMapper.deleteSysArtists();
 	       sysMusicMapper.deleteSysMusic();
 	       
 	        // insert new data    
@@ -70,8 +74,17 @@ public class SysMusicServiceImpl implements ISysMusicService
 	    		   if(artist == null) {
 	    			   SysArtists newArtist = new SysArtists();
 	    			   newArtist.setName(tempName);
-	    			   int artistId = sysArtistsMapper.insertSysArtists(newArtist);
-	    			   temp.setArtistId((long)artistId);
+	    			   
+	    			   // set artist cover
+	    	    		for (String extension : imageExtensions) {
+	    	    		    Path artistAvatar = Paths.get(BASE_FOLDER, ARTIST_AVATAR_FOLDER,  tempName + extension);
+	    	    		    if (Files.exists(artistAvatar)) {
+	    	    		    	newArtist.setArtistAvatar(tempName + extension);
+	    	    		    }
+	    	    		}
+	    	    		
+		    			 int artistId = sysArtistsMapper.insertSysArtists(newArtist);
+		    			 temp.setArtistId((long)artistId);
 	    			   }
 	    		   else {
 	    			   temp.setArtistId(artist.getId());
@@ -169,7 +182,6 @@ public class SysMusicServiceImpl implements ISysMusicService
      * @return 结果
      */
     private SysMusic getSingleMusic(Path songFilePath) throws IOException {      
-    	String[] imageExtensions = {".png", ".jpg", ".jpeg"};
     	Path fileName = songFilePath.getFileName();
 		String fileNameWithOutExt = fileName.toString().replaceFirst("[.][^.]+$", "");
 		SysMusic singleMusic = new SysMusic();

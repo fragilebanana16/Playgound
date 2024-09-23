@@ -20,9 +20,11 @@ public class SysArtists extends BaseEntity
     /** 歌手ID */
     private Long artist_id;
 
-    /** 歌手名 */
     @Excel(name = "歌手名")
     private String artist_name;
+
+    @Excel(name = "歌手封面")
+    private String artist_avatar;
 
     public void setId(Long id) 
     {
@@ -42,13 +44,22 @@ public class SysArtists extends BaseEntity
     {
         return artist_name;
     }
-
-
+    
+    public void setArtistAvatar(String artistAvatar) 
+    {
+        this.artist_avatar = artistAvatar;
+    }
+    public String getArtistAvatar() 
+    {
+        return artist_avatar;
+    }
+    
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("artist_id", getId())
             .append("artist_name", getName())
+            .append("artist_avatar", getArtistAvatar())
             .toString();
     }
 }
