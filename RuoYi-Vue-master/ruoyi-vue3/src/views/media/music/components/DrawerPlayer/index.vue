@@ -5,7 +5,7 @@ import { PlayMode } from '@/utils/enum'
 // import { commentMusic } from '@/api'
 
 const state = reactive({
-  direction: 'ttb',
+  direction: 'btt',
   drawer: false,
   commentListData: [],
   commenDrawer: false,
@@ -139,31 +139,6 @@ defineExpose({
               {{ LocalhostcurrentTime }}
             </span>
           </div>
-          <div class="flex items-center gap-1">
-            <Icon icon="fluent:weather-hail-day-20-regular" />
-            27°
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-2">
-            <Icon class="text-lg" icon="material-symbols:wifi" />
-          </div>
-
-          <el-avatar
-            v-if="true"
-            :src="altCover"
-            class="mr-2"
-            shape="circle"
-            :size="32"
-          />
-          <el-avatar
-            v-else
-            :src="altCover"
-            class="mr-2"
-            shape="circle"
-            :size="32"
-          />
         </div>
       </div>
     </template>
