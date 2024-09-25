@@ -147,3 +147,46 @@ values('歌手导出', @parentId, '5',  '#', '', 1, 0, 'F', '0', '0', 'system:ar
 
 --  add singer avatar url
 ALTER TABLE `ry-vue`.sys_artist ADD artist_avatar VARCHAR(255);
+
+-- add playlist
+CREATE TABLE `sys_music_playlist` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '专辑ID',
+  `title` varchar(30) NOT NULL COMMENT '标题',
+  `description` varchar(500) COMMENT '描述',
+  `thumbnailUrl` varchar(128) COMMENT '封面地址'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='专辑';
+
+drop table sys_music_playlist;
+-- list to songs
+CREATE TABLE `sys_music_playlist_music_mapping` (
+    `music_playlist_id` bigint(20),
+    `music_id` bigint(20),
+    PRIMARY KEY (music_playlist_id, music_id),
+    FOREIGN KEY (`music_playlist_id`) REFERENCES `sys_music_playlist`(id) ON DELETE CASCADE,
+    FOREIGN KEY (`music_id`) REFERENCES `sys_music`(music_id) ON DELETE CASCADE
+);
+
+-- 菜单 SQL
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('专辑', '3', '1', 'playlist', 'system/playlist/index', 1, 0, 'C', '0', '0', 'system:playlist:list', '#', 'admin', sysdate(), '', null, '专辑菜单');
+
+-- 按钮父菜单ID
+SELECT @parentId := LAST_INSERT_ID();
+
+-- 按钮 SQL
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('专辑查询', @parentId, '1',  '#', '', 1, 0, 'F', '0', '0', 'system:playlist:query',        '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('专辑新增', @parentId, '2',  '#', '', 1, 0, 'F', '0', '0', 'system:playlist:add',          '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('专辑修改', @parentId, '3',  '#', '', 1, 0, 'F', '0', '0', 'system:playlist:edit',         '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('专辑删除', @parentId, '4',  '#', '', 1, 0, 'F', '0', '0', 'system:playlist:remove',       '#', 'admin', sysdate(), '', null, '');
+
+insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, update_by, update_time, remark)
+values('专辑导出', @parentId, '5',  '#', '', 1, 0, 'F', '0', '0', 'system:playlist:export',       '#', 'admin', sysdate(), '', null, '');
+
+select id, title, description, thumbnailUrl, musicId, artistId from sys_music_playlist;

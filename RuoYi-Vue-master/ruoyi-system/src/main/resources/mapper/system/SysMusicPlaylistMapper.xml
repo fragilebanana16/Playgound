@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysMusicPlaylistMapper">
+    
+    <resultMap type="SysMusicPlaylist" id="SysMusicPlaylistResult">
+        <result property="id"    column="id"    />
+        <result property="title"    column="title"    />
+        <result property="description"    column="description"    />
+        <result property="thumbnailUrl"    column="thumbnailUrl"    />
+        <result property="musicId"    column="musicId"    />
+        <result property="artistId"    column="artistId"    />
+    </resultMap>
+
+    <sql id="selectSysMusicPlaylistVo">
+        select id, title, description, thumbnailUrl, musicId, artistId from sys_music_playlist
+    </sql>
+
+    <select id="selectSysMusicPlaylistList" parameterType="SysMusicPlaylist" resultMap="SysMusicPlaylistResult">
+        <include refid="selectSysMusicPlaylistVo"/>
+        <where>  
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="thumbnailUrl != null  and thumbnailUrl != ''"> and thumbnailUrl = #{thumbnailUrl}</if>
+            <if test="musicId != null "> and musicId = #{musicId}</if>
+            <if test="artistId != null "> and artistId = #{artistId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysMusicPlaylistById" parameterType="Long" resultMap="SysMusicPlaylistResult">
+        <include refid="selectSysMusicPlaylistVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysMusicPlaylist" parameterType="SysMusicPlaylist" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_music_playlist
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="description != null">description,</if>
+            <if test="thumbnailUrl != null">thumbnailUrl,</if>
+            <if test="musicId != null">musicId,</if>
+            <if test="artistId != null">artistId,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="description != null">#{description},</if>
+            <if test="thumbnailUrl != null">#{thumbnailUrl},</if>
+            <if test="musicId != null">#{musicId},</if>
+            <if test="artistId != null">#{artistId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysMusicPlaylist" parameterType="SysMusicPlaylist">
+        update sys_music_playlist
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="thumbnailUrl != null">thumbnailUrl = #{thumbnailUrl},</if>
+            <if test="musicId != null">musicId = #{musicId},</if>
+            <if test="artistId != null">artistId = #{artistId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysMusicPlaylistById" parameterType="Long">
+        delete from sys_music_playlist where id = #{id}
+    </delete>
+
+    <delete id="deleteSysMusicPlaylistByIds" parameterType="String">
+        delete from sys_music_playlist where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
