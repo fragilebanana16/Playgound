@@ -30,14 +30,6 @@ public class SysMusicPlaylist extends BaseEntity
     @Excel(name = "封面地址")
     private String thumbnailUrl;
 
-    /** 歌曲ID */
-    @Excel(name = "歌曲ID")
-    private Long musicId;
-
-    /** 歌手ID */
-    @Excel(name = "歌手ID")
-    private Long artistId;
-
     public void setId(Long id) 
     {
         this.id = id;
@@ -74,24 +66,6 @@ public class SysMusicPlaylist extends BaseEntity
     {
         return thumbnailUrl;
     }
-    public void setMusicId(Long musicId) 
-    {
-        this.musicId = musicId;
-    }
-
-    public Long getMusicId() 
-    {
-        return musicId;
-    }
-    public void setArtistId(Long artistId) 
-    {
-        this.artistId = artistId;
-    }
-
-    public Long getArtistId() 
-    {
-        return artistId;
-    }
 
     @Override
     public String toString() {
@@ -100,8 +74,6 @@ public class SysMusicPlaylist extends BaseEntity
             .append("title", getTitle())
             .append("description", getDescription())
             .append("thumbnailUrl", getThumbnailUrl())
-            .append("musicId", getMusicId())
-            .append("artistId", getArtistId())
             .toString();
     }
 }

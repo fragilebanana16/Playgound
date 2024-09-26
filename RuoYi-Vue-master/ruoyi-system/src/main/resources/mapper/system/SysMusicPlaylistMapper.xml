@@ -14,7 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectSysMusicPlaylistVo">
-        select id, title, description, thumbnailUrl, musicId, artistId from sys_music_playlist
+        select id, title, description, thumbnailUrl from sys_music_playlist
     </sql>
 
     <select id="selectSysMusicPlaylistList" parameterType="SysMusicPlaylist" resultMap="SysMusicPlaylistResult">
@@ -23,8 +23,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="title != null  and title != ''"> and title = #{title}</if>
             <if test="description != null  and description != ''"> and description = #{description}</if>
             <if test="thumbnailUrl != null  and thumbnailUrl != ''"> and thumbnailUrl = #{thumbnailUrl}</if>
-            <if test="musicId != null "> and musicId = #{musicId}</if>
-            <if test="artistId != null "> and artistId = #{artistId}</if>
         </where>
     </select>
     

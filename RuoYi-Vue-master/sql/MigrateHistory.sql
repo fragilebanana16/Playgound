@@ -190,3 +190,7 @@ insert into sys_menu (menu_name, parent_id, order_num, path, component, is_frame
 values('专辑导出', @parentId, '5',  '#', '', 1, 0, 'F', '0', '0', 'system:playlist:export',       '#', 'admin', sysdate(), '', null, '');
 
 select id, title, description, thumbnailUrl, musicId, artistId from sys_music_playlist;
+
+INSERT INTO `ry-vue`.`sys_music_playlist` (`title`, `description`, `thumbnailUrl`) 
+VALUES ('Personal Album', 'My Personal Music Collection', 'A Sky Full of Stars - Coldplay.jpg');
+

@@ -5,13 +5,14 @@ import Header from '../Header.vue'
 import MusicList from '../MusicList.vue'
 import DrawerPlayer from '../components/DrawerPlayer'
 import { listMusic } from "@/api/system/music";
-
+import { listMusicPlaylist } from "@/api/system/musicPlaylist";
+const baseUrl = import.meta.env.VITE_APP_BASE_API;
 const PlayerDrawerRef = ref()
 const state = reactive({
   tableData: {},
   SongList: { playlists: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5] },
 })
-const url =
+const altCover =
   'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
 const { tableData, SongList } = toRefs(state)
 const handleShow = () => {
@@ -24,7 +25,7 @@ const data = reactive({
   form: {},
   queryParams: {
     pageNum: 1,
-    pageSize: 100,
+    pageSize: 10,
     title: null,
     duration: null,
     description: null,
@@ -45,13 +46,26 @@ const data = reactive({
 const { queryParams, form, rules } = toRefs(data);
 
 onMounted(() => {
-  listMusic(queryParams.value).then(response => {
-    tableData.value = response
-    console.log(`response:`,response)
+  Promise.all([
+    listMusic(queryParams.value),
+    listMusicPlaylist({pageNum: 1, pageSize: 10})
+  ])
+  .then(([tableRsp, albumRsp]) => {
+    debugger
+    state.tableData = tableRsp
+    state.SongList = albumRsp.rows
   })
   .catch((error) => {
-      console.error('Error occurred:', error)
-  });
+    console.error('Error occurred:', error)
+  })
+
+  // listMusic(queryParams.value).then(response => {
+  //   tableData.value = response
+  //   console.log(`response:`,response)
+  // })
+  // .catch((error) => {
+  //     console.error('Error occurred:', error)
+  // });
 })
 
 </script>
@@ -80,16 +94,19 @@ export default {
       <section class="flex flex-col overflow-hidden px-6">
         <el-scrollbar class="relative" ref="songListRef">
           <div class="flex mt-6 space-x-4 rounded-xl pb-6">
-            <router-link class="flex flex-col gap-2" v-for="item in SongList.playlists" :key="item.id"
+            <router-link class="flex flex-col gap-0.5 items-start w-28" v-for="item in SongList" :key="item.id"
               to="/media/musicMan/music_album">
-              <el-image :src="url" alt="item.name" class="w-28 h-28 rounded-lg" />
-              <span class="text-xs text-center line-clamp-1" :title="item.name">{{
-                item.name
+              <el-image :src="item.thumbnailUrl ? baseUrl + '/music/covers/' + item.thumbnailUrl : altCover" alt="item.title" class="h-28 rounded-lg" />
+              <span class="text-xs text-left line-clamp-1 opacity-100 mt-1 ml-1" :title="item.title">{{
+                item.title
+              }}</span>
+                <span class="text-xs text-left line-clamp-1 opacity-50 ml-1" :title="item.description">{{
+                item.description
               }}</span>
             </router-link>
             <button
               class="absolute top-1/2 -translate-y-1/2 rounded-full bg-background/50 p-2 text-muted-foreground transition-colors duration-300 hover:bg-background/75"
-              @click="progress('back')" v-if="SongList.playlists && SongList.playlists.length > 0">
+              @click="progress('back')" v-if="SongList && SongList.length > 0">
               <svg data-id="13" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
                 <path d="m15 18-6-6 6-6"></path>
@@ -97,7 +114,7 @@ export default {
             </button>
             <button
               class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-background/50 p-2 text-muted-foreground transition-colors duration-300 hover:bg-background/75"
-              @click="progress('forward')" v-if="SongList.playlists && SongList.playlists.length > 0">
+              @click="progress('forward')" v-if="SongList && SongList.length > 0">
               <svg data-id="15" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
                 <path d="m9 18 6-6-6-6"></path>
