@@ -1,5 +1,34 @@
 <template>
     <div id="home" class="pa-4">
+        <v-carousel height="100vh" cycle interval="20000" hide-delimiter-background>
+            <template v-slot:prev="{ props }">
+                <div @click="props.onClick" class="slider-arrow">
+                    <v-icon size="40" icon="mdi-chevron-left"></v-icon>
+                </div>
+            </template>
+            <template v-slot:next="{ props }">
+                <div @click="props.onClick" class="slider-arrow">
+                    <v-icon size="40" @click="props.onClick" icon="mdi-chevron-right"></v-icon>
+                </div>
+
+            </template>
+            <v-carousel-item v-for="(slide, i) in slides" :key="i">
+                <!-- <v-sheet
+        :color="colors[i]"
+        height="100%"
+      >
+        <div class="d-flex fill-height justify-center align-center">
+          <div class="text-h2">
+            {{ slide }} Slide
+          </div>
+        </div>
+      </v-sheet> -->
+                <!-- <img :src="`${baseUrl}/videos/123.png`" width="200" /> -->
+                <!-- <img src="@/assets/images/transformer-banner.jpg" alt="dark" /> -->
+                <v-img aspect-ratio="16/9" cover :src="`${baseUrl}/videos/${slide}`"></v-img>
+            </v-carousel-item>
+        </v-carousel>
+
         <v-container fluid>
             <v-alert prominent type="error" v-if="errored">
                 <v-row align="center">
@@ -65,7 +94,8 @@ const loading = ref(false)
 const loaded = ref(false)
 const errored = ref(false)
 const page = ref(1)
-
+const slides = ['transformer-banner.jpg', 'supergirl-banner.jpg', 'black-banner.png']
+const colors = ['#ADD8E6', '#98FB98', '#F08080', '#FFA07A']
 async function getAllVideos($state) {
     if (loading.value) {
         return
@@ -119,6 +149,17 @@ async function getAllVideos($state) {
     left: 50%;
     margin-left: -1.5em;
     margin-top: -1em
+}
+
+.slider-arrow {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
 }
 </style>
     
