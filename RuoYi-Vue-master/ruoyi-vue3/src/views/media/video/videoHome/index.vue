@@ -1,47 +1,50 @@
 <template>
     <div id="home">
-        <section>
-            <v-carousel height="90vh" cycle interval="200000" hide-delimiter-background>
-                <template v-slot:prev="{ props }">
-                    <div @click="props.onClick" class="slider-arrow">
-                        <v-icon size="40" icon="mdi-chevron-left" class="hover-icon"></v-icon>
-                    </div>
-                </template>
-                <template v-slot:next="{ props }">
-                    <div @click="props.onClick" class="slider-arrow">
-                        <v-icon size="40" @click="props.onClick" icon="mdi-chevron-right" class="hover-icon"></v-icon>
-                    </div>
-                </template>
-                <v-carousel-item v-for="(movie, i) in movies" :key="i">
-                    <v-img aspect-ratio="16/9" cover :src="`${baseUrl}/videos/${movie.image}`"
-                        style="mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0));"></v-img>
-                    <!-- <div class="overlay"></div> if is black mode, turn this on -->
-                    <div class="absolute inset-y-0 left-0 flex items-center p-5 ">
-                        <div class="pl-15 max-w-[70%] h-[30%]">
-                            <h2 class="text-white text-6xl font-bold mb-4 line-clamp-1">{{ movie.title }}</h2>
-                            <div class="flex  items-center mt-3 ">
-                                <div class="flex justify-between items-center">
-                                    <v-icon size="18" icon=" mdi-timer" color="white" class=" mr-3 "></v-icon>
-                                    <span class="text-gray-200">{{ movie.duration }}</span>
-                                </div>
-                                <span class="bg-red-600 text-white px-2 py-1 rounded-md text-sm ml-4">{{ movie.rating
-                                }}</span>
-                            </div>
-                            <p class="text-gray-300 mt-8">{{ movie.description }}</p>
-                            <v-btn class="mt-8" variant="elevated" size="x-large">
-                                <div class="flex justify-between items-center">
-                                    <v-icon size="28" icon="mdi-play" color="black" class="mr-4"></v-icon>
-                                    Play
-                                </div>
-
-                            </v-btn>
+        <section class="h-[90vh]">
+            <div v-if="trendingVideoList.length > 0">
+                <v-carousel height="100%" cycle interval="20000" hide-delimiter-background>
+                    <template v-slot:prev="{ props }">
+                        <div @click="props.onClick" class="slider-arrow">
+                            <v-icon size="40" icon="mdi-chevron-left" class="hover-icon"></v-icon>
                         </div>
-                    </div>
-                </v-carousel-item>
-            </v-carousel>
+                    </template>
+                    <template v-slot:next="{ props }">
+                        <div @click="props.onClick" class="slider-arrow">
+                            <v-icon size="40" icon="mdi-chevron-right" class="hover-icon"></v-icon>
+                        </div>
+                    </template>
+                    <v-carousel-item v-for="(movie, i) in trendingVideoList" :key="i">
+                        <v-img aspect-ratio="16/9" cover :src="`${baseUrl}/videos/covers/${movie.status}`"
+                            style="mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0));"></v-img>
+                        <!-- <div class="overlay"></div> if is black mode, turn this on -->
+                        <div class="absolute inset-y-0 left-0 flex items-center p-5 w-[30vw]">
+                            <div class="pl-15 max-w-[70%] h-[30%]">
+                                <div class="text-white text-6xl font-bold mb-4 ">{{ movie.title }}</div>
+                                <div class="flex  items-center mt-3 ">
+                                    <div class="flex justify-between items-center">
+                                        <v-icon size="18" icon=" mdi-timer" color="white" class=" mr-3 "></v-icon>
+                                        <span class="text-center text-gray-200  w-8">{{ movie.duration || "--:--" }} </span>
+                                    </div>
+                                    <span
+                                        class="text-center w-12 bg-red-600 text-white px-2 py-1 rounded-md text-sm ml-4">{{
+                                            movie.rating
+                                            || "- / -" }}</span>
+                                </div>
+                                <p class="text-gray-300 mt-8">{{ movie.description }}</p>
+                                <v-btn variant="elevated" size="x-large"
+                                    :to="{ path: '/media/film/watch', query: { videoId: movie.videoId } }">
+                                    <div class="flex justify-between items-center">
+                                        <v-icon size="28" icon="mdi-play" color="black" class="mr-4"></v-icon>
+                                        Play
+                                    </div>
 
+                                </v-btn>
+                            </div>
+                        </div>
+                    </v-carousel-item>
+                </v-carousel>
+            </div>
         </section>
-
         <section>
             <div class="ml-14 mt-14 mb-8 pl-5 uppercase text-xl font-bold border-l-4 border-red-500 flex items-center">
                 最新上传
@@ -83,7 +86,7 @@
             <div class="ml-14 mt-14 mb-8 pl-5 uppercase text-xl font-bold border-l-4 border-red-500 flex items-center">
                 随便看看
             </div>
-            <ThreeDMovieSlider  class="mx-14"/>
+            <ThreeDMovieSlider class="mx-14" />
         </section>
 
     </div>
@@ -91,7 +94,35 @@
     
 <script setup>
 import ThreeDMovieSlider from '../components/ThreeDMovieSlider'
+import { listTrendingVideo } from "@/api/system/video";
+const { proxy } = getCurrentInstance();
 
+const trendingVideoList = ref([]);
+const open = ref(false);
+const loading = ref(true);
+const showSearch = ref(true);
+const ids = ref([]);
+const single = ref(true);
+const multiple = ref(true);
+const total = ref(0);
+const title = ref("");
+const data = reactive({
+    form: {},
+    queryParams: {
+        pageNum: 1,
+        pageSize: 10,
+    },
+    rules: {
+        title: [
+            { required: true, message: "标题不能为空", trigger: "blur" }
+        ],
+        url: [
+            { required: true, message: "地址不能为空", trigger: "blur" }
+        ],
+    }
+});
+
+const { queryParams, form, rules } = toRefs(data);
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
 
 const streamingPrefix = '/media/streaming/videos'
@@ -204,6 +235,21 @@ const movies = [
         image: 'black-banner.png',
     },
 ]
+
+function trendingVideoClick(videoId) {
+
+}
+
+function getTrendingList() {
+    loading.value = true;
+    listTrendingVideo(queryParams.value).then(response => {
+        trendingVideoList.value = response.rows;
+        total.value = response.total;
+        loading.value = false;
+    });
+}
+
+getTrendingList();
 </script>
 <style >
 .video-js .vjs-big-play-button {

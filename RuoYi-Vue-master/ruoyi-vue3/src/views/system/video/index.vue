@@ -43,7 +43,8 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
-        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重新查询</el-button>
+        <el-button type="danger" @click="resetDB">重置数据库</el-button>
       </el-form-item>
     </el-form>
 
@@ -166,8 +167,7 @@
 </template>
 
 <script setup name="Video">
-import { listVideo, getVideo, delVideo, addVideo, updateVideo } from "@/api/system/video";
-
+import { resetToLocalMovies, listVideo, getVideo, delVideo, addVideo, updateVideo } from "@/api/system/video";
 const { proxy } = getCurrentInstance();
 
 const videoList = ref([]);
@@ -206,6 +206,15 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+function resetDB(){
+  loading.value = true;
+  resetToLocalMovies(queryParams.value).then(response => {
+    debugger
+    proxy.$modal.msgSuccess(`重置${response}个电影`);
+    loading.value = false;
+  });
+}
 
 /** 查询影视列表 */
 function getList() {

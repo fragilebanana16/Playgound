@@ -29,6 +29,25 @@ public class SysVideoController  extends BaseController
     private ISysVideoService  sysVideoService;
 
     /**
+     * 查询歌曲列表(本地目录)
+     */
+    @GetMapping("/localMovies")
+    public int reset() {
+        return sysVideoService.resetDbByLocalMovies();
+    }
+    
+    /**
+     * 查询影视列表
+     */
+    @GetMapping("/listTrending")
+    public TableDataInfo listTrending(SysVideo sysVideo)
+    {
+    	startPage();
+        List<SysVideo> list = sysVideoService.selectTrendingSysVideoList(sysVideo);
+        return getDataTable(list);
+    }
+    
+    /**
      * 查询影视列表
      */
     @GetMapping("/list")

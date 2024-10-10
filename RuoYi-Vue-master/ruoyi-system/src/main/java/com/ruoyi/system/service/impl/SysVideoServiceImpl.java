@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.domain.SysArtists;
+import com.ruoyi.system.domain.SysMusic;
 import com.ruoyi.system.domain.SysVideo;
 import com.ruoyi.system.domain.SysVideoCategory;
 import com.ruoyi.system.mapper.SysVideoMapper;
@@ -41,6 +44,71 @@ public class SysVideoServiceImpl implements ISysVideoService
 	
     @Autowired
     private SysVideoMapper sysVideoMapper;
+    
+    private static final String MOVIES_FOLDER = "movies";
+    private static final String MOVIES_COVERS_FOLDER = "covers";
+    private static final String BASE_FOLDER = "D:\\ruoyi\\videos";
+    private static final String TRENDING_STATUS = "trending-";
+    private static String[] imageExtensions = {".png", ".jpg", ".jpeg"};
+    
+    private SysVideo getSingleMovie(Path songFilePath) throws IOException {      
+    	Path fileName = songFilePath.getFileName();
+		String fileNameWithOutExt = fileName.toString().replaceFirst("[.][^.]+$", "");
+		SysVideo singleMovie = new SysVideo();
+	
+       // get cover 暂时只设置URL和封面，其他信息手工录入
+		for (String extension : imageExtensions) {
+		    Path coverPath = Paths.get(BASE_FOLDER, MOVIES_COVERS_FOLDER,  fileNameWithOutExt + extension);
+		    if (Files.exists(coverPath)) {
+		    	singleMovie.setThumbnailUrl(fileNameWithOutExt + extension);
+		    }
+		    
+		    Path trendingImgPath = Paths.get(BASE_FOLDER, MOVIES_COVERS_FOLDER, TRENDING_STATUS + fileNameWithOutExt + extension);
+		    if(Files.exists(trendingImgPath)) {
+		    	singleMovie.setStatus(TRENDING_STATUS + fileNameWithOutExt + extension);
+		    }
+		}
+		
+		if(StringUtils.isBlank(singleMovie.getThumbnailUrl())) {
+			singleMovie.setThumbnailUrl("");
+		}
+       
+        // get movie URL 标题不可null先填上全文件名，手工改
+        singleMovie.setUrl(fileName.toString());
+        singleMovie.setTitle(fileNameWithOutExt.toString());
+		return singleMovie;
+    }
+    
+    public int resetDbByLocalMovies(){
+        try {
+	        Path moviesFolder = Paths.get(BASE_FOLDER , MOVIES_FOLDER);
+	        List<SysVideo> sysMovieList =  Files.list(moviesFolder).map(t -> {
+				try {
+					return getSingleMovie(t);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}).collect(Collectors.toList());
+	        
+	        // truncate sysVideo table
+	        sysVideoMapper.deleteSysVideo();
+	       
+	        // insert new data    
+	       int insertCount = 0;
+	       for (int index = 0; index < sysMovieList.size(); index++) {
+	    	   SysVideo temp = sysMovieList.get(index);
+   	   
+	    	   if(sysVideoMapper.insertSysVideo(temp) > 0 ) {
+	    		   insertCount++;
+	    	   }
+	    	}
+	       
+	       return insertCount;
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading video directory", e);
+        }
+    }
     
     /**
      */
@@ -310,7 +378,15 @@ public class SysVideoServiceImpl implements ISysVideoService
           {
               return sysVideoMapper.selectSysVideoList(sysVideo);
           }
-
+          
+          @Override
+          public List<SysVideo> selectTrendingSysVideoList(SysVideo sysVideo)
+          {
+          	return sysVideoMapper.selectTrendingSysVideoList(sysVideo);
+          }
+          
+          
+          
           /**
            * 新增影视
            * 

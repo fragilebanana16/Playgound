@@ -14,6 +14,13 @@ import com.ruoyi.system.domain.SysVideo;
  */
 public interface ISysVideoService
 {
+    /**
+     * 重置(本地目录)
+     * 
+     * @return 
+     */
+    public int resetDbByLocalMovies();
+    
     public List<SysVideo> getVideos();
 
     // 重新生成封面、配置
@@ -45,6 +52,7 @@ public interface ISysVideoService
      */
     public List<SysVideo> selectSysVideoList(SysVideo sysVideo);
 
+    public List<SysVideo> selectTrendingSysVideoList(SysVideo sysVideo);
     /**
      * 新增影视
      * 

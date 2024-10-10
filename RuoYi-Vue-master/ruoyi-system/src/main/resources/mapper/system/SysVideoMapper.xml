@@ -41,6 +41,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
     
+    <select id="selectTrendingSysVideoList" parameterType="SysVideo" resultMap="SysVideoResult">
+        select video_id, title, description, thumbnailUrl, views, url, status, categoryId from sys_video
+        where status LIKE 'trending-%'
+    </select>
+            
     <select id="selectSysVideoByVideoId" parameterType="Long" resultMap="SysVideoSysVideoCategoryResult">
         select video_id, title, description, thumbnailUrl, views, url, status, categoryId
         from sys_video
@@ -117,4 +122,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             ( #{item.categoryId}, #{item.categoryName})
         </foreach>
     </insert>
+        
+    <delete id="deleteSysVideo">
+        set FOREIGN_KEY_CHECKS=0;
+        truncate sys_video;
+        set FOREIGN_KEY_CHECKS=1;
+    </delete>
 </mapper>

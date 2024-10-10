@@ -37,7 +37,7 @@ public class SysMusicController extends BaseController
     /**
      * 查询歌曲列表(本地目录)
      */
-    @GetMapping("/localMusic")
+    @GetMapping("/localMovies")
     public int reset() {
         return sysMusicService.resetDbByLocalMusic();
     }

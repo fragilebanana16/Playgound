@@ -27,6 +27,8 @@ public interface SysVideoMapper
      * @return 影视集合
      */
     public List<SysVideo> selectSysVideoList(SysVideo sysVideo);
+    
+    public List<SysVideo> selectTrendingSysVideoList(SysVideo sysVideo);
 
     /**
      * 新增影视
@@ -84,4 +86,12 @@ public interface SysVideoMapper
      * @return 结果
      */
     public int deleteSysVideoCategoryByCategoryId(Long videoId);
+    
+
+    /**
+     * 重置视频库
+     * 
+     * @return 结果
+     */
+    public void deleteSysVideo();
 }

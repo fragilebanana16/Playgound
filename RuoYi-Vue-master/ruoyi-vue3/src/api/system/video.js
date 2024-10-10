@@ -1,9 +1,26 @@
 import request from '@/utils/request'
 
+// 查询列表(本地文件)
+export function resetToLocalMovies(query) {
+  return request({
+    url: '/system/video/localMovies',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询影视列表
 export function listVideo(query) {
   return request({
     url: '/system/video/list',
+    method: 'get',
+    params: query
+  })
+}
+
+export function listTrendingVideo(query) {
+  return request({
+    url: '/system/video/listTrending',
     method: 'get',
     params: query
   })
