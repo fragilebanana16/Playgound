@@ -27,11 +27,14 @@ let mouseY = window.innerHeight / 2;
 //Keep the 3D object on a global variable so we can access it later
 let object;
 
+// for animation
+let mixer;
+
 //OrbitControls allow the camera to move around the scene
 let controls;
 
 //Set which object to render
-let objToRender = 'free_1972_datsun_240k_gt';
+let objToRender = 'ooo';
 
 const getMaterials = (scene) => {
   const data = {
@@ -73,6 +76,22 @@ if (model.scene) {
 }
 model.scene.rotation.set(0, -Math.PI / 2, 0);
 model.scene.scale.set(6, 6, 6);
+
+// // play animations
+// mixer = new THREE.AnimationMixer(model.scene);
+// const clips = model.animations;
+
+// // Play a certain animation
+// // const clip = THREE.AnimationClip.findByName(clips, 'HeadAction');
+// // const action = mixer.clipAction(clip);
+// // action.play();
+
+// // Play all animations at the same time
+// clips.forEach(function(clip) {
+//     const action = mixer.clipAction(clip);
+//     action.play();
+// });
+
 scene.add(model.scene);
 
 /**
@@ -121,12 +140,17 @@ const ambientLight = new THREE.AmbientLight(0x404040, 40);
 scene.add(ambientLight);
 
 controls = new OrbitControls(camera, renderer.domElement);
+const clock = new THREE.Clock();
 
 function animate() {
   requestAnimationFrame(animate);
   //Here we could add some code to update the scene, adding some automatic movement
   cube.rotation.x += 0.01;
   cube.rotation.y += 0.01;
+
+  // if(mixer){
+  //   mixer.update(clock.getDelta());
+  // }
 
   //Make the eye move
   if (object && objToRender === "lookAtCursor") {
