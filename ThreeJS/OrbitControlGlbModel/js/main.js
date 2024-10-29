@@ -10,10 +10,10 @@
  * localfile way, delete importmap part in index.html
  */
 import * as THREE from 'three';
-import { GLTFLoader } from "../utils/loaders/GLTFLoader.js";
-import { DRACOLoader } from "../utils/loaders/DRACOLoader.js";
-import { OrbitControls } from "../utils/controls/OrbitControls.js";
-import { Depth, LayerMaterial } from "../utils/vanilla/vanilla.js";
+import { GLTFLoader } from "../../utils/loaders/GLTFLoader.js";
+import { DRACOLoader } from "../../utils/loaders/DRACOLoader.js";
+import { OrbitControls } from "../../utils/controls/OrbitControls.js";
+import { Depth, LayerMaterial } from "../../utils/vanilla/vanilla.js";
 
 //Create a Three.JS Scene
 const scene = new THREE.Scene();
@@ -72,7 +72,7 @@ const getMaterials = (scene) => {
 /**
  * Format1: Load glb with gltfLoader
  */
-const dracoLoader = new DRACOLoader().setDecoderPath("../utils/draco/");
+const dracoLoader = new DRACOLoader().setDecoderPath("../../utils/draco/");
 const gltfLoader = new GLTFLoader().setDRACOLoader(dracoLoader);
 const model = await gltfLoader.loadAsync("models/911.glb");
 if (model.scene) {
