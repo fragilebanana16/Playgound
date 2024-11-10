@@ -54,7 +54,6 @@ function init() {
     }
 
     mixer = new THREE.AnimationMixer(gltf.scene);
-    debugger
     mixer.clipAction( gltf.animations[0]).play();
   });
   mesh.position.y = 0.9;
