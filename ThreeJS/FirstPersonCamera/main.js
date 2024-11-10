@@ -4,7 +4,6 @@ import * as THREE from 'three';
 // import {FirstPersonControls} from 'https://cdn.skypack.dev/three@0.136/examples/jsm/controls/FirstPersonControls.js';
 import { GLTFLoader } from "../utils/loaders/GLTFLoader.js";
 
-
 const KEYS = {
   'a': 65,
   's': 83,
@@ -384,7 +383,7 @@ class FirstPersonCameraDemo {
           // child.material.envMapIntensity = 1;
         }
       });
-      mesh.scale.set(2,2,2);
+      mesh.scale.set(0.02,0.02,0.02);
       this.scene_.add(mesh);
     });
   }
