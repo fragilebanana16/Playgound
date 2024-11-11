@@ -5,6 +5,31 @@ import { OrbitControls } from "../../utils/controls/OrbitControls.js";
 import { RGBELoader } from 'https://unpkg.com/three@0.149.0/examples/jsm/loaders/RGBELoader.js';
 const hdrTextureURL = new URL('../models/sunny_prairie_expanse_2k.hdr', import.meta.url) // sunny_prairie_expanse_2k berlin_riverside_4k
 let mixer;
+// ======================= loading progress ===================================
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onStart = function(url, item, total) {
+  console.log( 'Started loading file: ' + url + '.\nLoaded ' + item + ' of ' + total + ' files.' );
+}
+
+const progressBar = document.getElementById('progress-bar');
+
+loadingManager.onProgress = function(url, loaded, total) {
+    progressBar.value = (loaded / total) * 100;
+    console.log( 'Loading file: ' + url + '.\nLoaded ' + loaded + ' of ' + total + ' files.' );
+}
+
+const progressBarContainer = document.querySelector('.progress-bar-container');
+
+loadingManager.onLoad = function() {
+    progressBarContainer.style.display = 'none';
+}
+
+// loadingManager.onError = function(url) {
+//     console.error(`Got a problem loading: ${url}`);
+// }
+// ======================= loading progress ===================================
+
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -33,7 +58,7 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 
 // hdr environment set up
-const hdriLoader = new RGBELoader()
+const hdriLoader = new RGBELoader(loadingManager)
 hdriLoader.load(hdrTextureURL, function (texture) {
   texture.mapping = THREE.EquirectangularReflectionMapping;
   scene.background = texture; // just like background image, if not provided, it looks like a dark box
@@ -45,7 +70,7 @@ hdriLoader.load(hdrTextureURL, function (texture) {
 });
 
 // load model
-new GLTFLoader().load('models/girl.glb', (gltf) => {
+new GLTFLoader(loadingManager).load('models/girl.glb', (gltf) => {
   const mesh = gltf.scene;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
