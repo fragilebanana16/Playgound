@@ -39,13 +39,13 @@
             @touchmove="timelineTouch"
             @mouseleave="timelineLeave"
             @mousedown="timelineClick">
-            <span class="cursor"
+            <span class="cursor st"
                   v-bind:style="{ top: timelineCursorY + 'px' }"></span>
-            <span class="cursor"
-                  v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }"></span>
-
+            <span class="cursor hv"
+                  v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{ timelineHoverCursorText }}</span>
+                 
             <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick"
-                v-bind:style="{ top: Math.floor((index === 0 ? 10 : 0) + (tick['topS'] + tick['top']  * rowHeight) * timelineHeight / viewHeight) + 'px' }">
+                v-bind:style="{ top: Math.floor((index === 0 ? 10 : 0) + tick.topC) + 'px' }">
                 <span v-if="tick['text']">{{ tick['text'] }}</span>
                 <span v-else class="dash"></span>
             </div>
@@ -94,7 +94,8 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
             timelineCursorY: 0,
             /** Timeline hover cursor top */
             timelineHoverCursorY: -5,
-
+            /** Timeline hover cursor text */
+            timelineHoverCursorText: "",
             /** Current start index */
             currentStart: 0,
             /** Current end index */
@@ -145,6 +146,10 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
         handleViewSizeChange() {
             setTimeout(() => {
                 this.viewHeight = this.$refs.scroller.$refs.wrapper.clientHeight;
+                // Compute timeline tick positions
+                for (const tick of this.timelineTicks) {
+                    tick.topC = Math.floor((tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight);
+                }
             }, 0);
         },
  
@@ -156,6 +161,10 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
          scrollPositionChange(event) {
             if (event) {
                 this.timelineCursorY = event.target.scrollTop * this.timelineHeight / this.viewHeight;
+                console.log("scrolltop->", event.target.scrollTop)
+                console.log("timelineHeight->", this.timelineHeight)
+                console.log("viewHeight->", this.viewHeight)
+                this.timelineMoveHoverCursor(this.timelineCursorY);
             }
             if (this.scrollTimer) {
                 clearTimeout(this.scrollTimer);
@@ -209,7 +218,7 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 
         /** Fetch timeline main call */
         async fetchDays() {
-            const data = Array.from({length:12}, (_, index) => ({
+            const data = Array.from({length:4}, (_, index) => ({
                 id: '00' + index,
                 day_id: index,
                 count: 25,
@@ -219,8 +228,9 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
             // Ticks
             let currTopRow = 0;
             let currTopStatic = 0;
-            let prevYear = new Date().getUTCFullYear();
-            let prevMonth = new Date().getUTCMonth();
+            let prevYear = 9999;
+            let prevMonth = 0;
+            const thisYear = new Date().getFullYear();
 
             for (const [dayIdx, day] of data.entries()) {
                 day.count = Number(day.count);
@@ -232,6 +242,11 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 
                 // Make date string
                 const dateTaken = new Date(Number(day.day_id)*86400*1000);
+                // mock data
+                const tempYear = dateTaken.getUTCFullYear();
+                dateTaken.setUTCFullYear(tempYear + dayIdx * 10);
+                // mock data
+
                 let dateStr = dateTaken.toLocaleDateString("en-US", { dateStyle: 'full', timeZone: 'UTC' });
                 if (dateTaken.getUTCFullYear() === new Date().getUTCFullYear()) {
                     // hack: remove last 6 characters of date string
@@ -239,14 +254,20 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
                 }
 
                 // Create tick if month changed
-                const dtYear = dateTaken.getUTCFullYear();
+                const dtYear =  dateTaken.getUTCFullYear();
                 const dtMonth = dateTaken.getUTCMonth()
-                if (dtMonth !== prevMonth || dtYear !== prevYear) {
+                if (Number.isInteger(day.day_id) && (dtMonth !== prevMonth || dtYear !== prevYear)) {
+                    // Format dateTaken as MM YYYY
+                    const dateTimeFormat = new Intl.DateTimeFormat('en-US', { month: 'short' });
+                    const monthName = dateTimeFormat.formatToParts(dateTaken)[0].value;
+                    // Create tick
                     this.timelineTicks.push({
                         dayId: day.id,
                         top: currTopRow,
                         topS: currTopStatic,
-                        text: dtYear === prevYear ? undefined : dtYear,
+                        topC: 0,
+                        text: (dtYear === prevYear || dtYear === thisYear) ? undefined : dtYear,
+                        mText: `${monthName} ${dtYear}`,
                     });
                     prevMonth = dtMonth;
                     prevYear = dtYear;
@@ -351,9 +372,23 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
             if (event.buttons) {
                 this.timelineClick(event);
             }
-            this.timelineHoverCursorY = event.offsetY;
+            this.timelineMoveHoverCursor(event.offsetY);
         },
-        
+
+        timelineMoveHoverCursor(y) {
+            this.timelineHoverCursorY = y;
+            // Get index of previous tick
+            let idx = this.timelineTicks.findIndex(t => t.topC > y);
+            if (idx >= 1) {
+                idx = idx - 1;
+            } else if (idx === -1 && this.timelineTicks.length > 0) {
+                idx = this.timelineTicks.length - 1;
+            } else {
+                return;
+            }
+            this.timelineHoverCursorText = this.timelineTicks[idx].mText;
+        },
+
         /** Handle touch on right timeline */
         timelineTouch(event) {
             const rect = event.target.getBoundingClientRect();
@@ -363,7 +398,7 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 
         /** Handle mouse leave on right timeline */
         timelineLeave() {
-            this.timelineHoverCursorY = -5;
+            this.timelineMoveHoverCursor(this.timelineCursorY);
         },
 
         /** Handle mouse click on right timeline */
@@ -386,8 +421,6 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
             }
             this.$refs.scroller.scrollToPosition(1000);
         },
-
-     
     },
 }
 
@@ -452,10 +485,10 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
     height: 100%;
     width: 40px;
     top: 0; right: 0;
-    overflow: hidden;
     cursor: ns-resize;
     opacity: 0;
     transition: opacity .2s ease-in-out;
+    z-index: 1;
 }
 
 .timeline-scroll:hover, .timeline-scroll.scrolling {
@@ -483,9 +516,23 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
     position: absolute;
     pointer-events: none;
     right: 5px;
-    height: 2px;
     background-color: black;
-    border-radius: 4px;
-    width: 100%;
+    min-width: 100%;
+    min-height: 2px;
+}
+.timeline-scroll .cursor.st {
+    opacity: 0;
+}
+.timeline-scroll:hover .cursor.st {
+    opacity: 1;
+}
+.timeline-scroll .cursor.hv {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2px 5px;
+    border-top: 2px solid var(--color-primary);
+    border-radius: 2px;
+    width: auto;
+    white-space: nowrap;
+    z-index: 100;
 }
 </style>
