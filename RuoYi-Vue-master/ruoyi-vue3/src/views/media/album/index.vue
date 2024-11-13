@@ -11,6 +11,7 @@
             v-slot="{ item }"
             :emit-update="true"
             @update="scrollChange"
+            @resize="handleResize"
         >
             <h1 v-if="item.head" class="head-row">
                 {{ item.name }}
@@ -34,6 +35,7 @@
 
         <div ref="timelineScroll" class="timeline-scroll"
             @mousemove="timelineHover"
+            @touchmove="timelineTouch"
             @mouseleave="timelineLeave"
             @mousedown="timelineClick">
             <span class="cursor"
@@ -335,6 +337,13 @@ console.log(`output->this.nrows`,nrows)
             }
             this.timelineHoverCursorY = event.offsetY;
         },
+        
+        /** Handle touch on right timeline */
+        timelineTouch(event) {
+            const rect = event.target.getBoundingClientRect();
+            const y = event.targetTouches[0].pageY - rect.top;
+            this.$refs.scroller.scrollToPosition(this.getTimelinePosition(y));
+        },
 
         /** Handle mouse leave on right timeline */
         timelineLeave() {
@@ -343,14 +352,14 @@ console.log(`output->this.nrows`,nrows)
 
         /** Handle mouse click on right timeline */
         timelineClick(event) {
-            this.$refs.scroller.scrollToPosition(this.getTimelinePosition(event));
+            this.$refs.scroller.scrollToPosition(this.getTimelinePosition(event.offsetY));
         },
 
         /** Get scroller equivalent position from event */
-        getTimelinePosition(event) {
+        getTimelinePosition(y) {
             const tH = this.viewHeight;
             const maxH = this.timelineHeight;
-            return event.offsetY * tH / maxH;
+            return y * tH / maxH;
         },
 
         /** Scroll to given day Id */
