@@ -34,6 +34,7 @@
         </RecycleScroller>
 
         <div ref="timelineScroll" class="timeline-scroll"
+            v-bind:class="{ scrolling }"
             @mousemove="timelineHover"
             @touchmove="timelineTouch"
             @mouseleave="timelineLeave"
@@ -98,6 +99,10 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
             currentStart: 0,
             /** Current end index */
             currentEnd: 0,
+            /** Scrolling currently */
+            scrolling: false,
+            /** Scrolling timer */
+            scrollTimer: null,
         }
     },
 
@@ -110,25 +115,19 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
   //   this.handleResize();
   // }, 100);
 
-console.log(`output->this.timelineHeight`,this.timelineHeight)
-console.log(`output->this.viewHeight`,this.viewHeight)
         // Set scrollbar
-        this.$refs.scroller.$el.addEventListener('scroll', (event) => {
-            this.timelineCursorY = event.target.scrollTop * this.timelineHeight / this.viewHeight;
-          console.log(`this.timelineCursorY`, this.timelineCursorY)
-
-        }, false);
+        // Timeline scroller init
+        this.$refs.scroller.$el.addEventListener('scroll', this.scrollPositionChange, false);
+        this.scrollPositionChange();
     },
 
     methods: {
         /** Handle window resize and initialization */
         handleResize() {
             let height = this.$refs.container.clientHeight;
-            let width = this.$refs.container.clientWidth - 40;
+            let width = this.$refs.container.clientWidth - 40;  // 预留和时间线的间距
             this.timelineHeight = this.$refs.timelineScroll.clientHeight;
-            console.log(`handleResize->this.timelineHeight`,this.timelineHeight)
             this.$refs.scroller.$el.style.height = (height - 4) + 'px';
- debugger
             if (this.days.length === 0) {
                 // Don't change cols if already initialized
                 this.numCols = Math.max(4, Math.floor(width / 175));
@@ -147,6 +146,25 @@ console.log(`output->this.viewHeight`,this.viewHeight)
             setTimeout(() => {
                 this.viewHeight = this.$refs.scroller.$refs.wrapper.clientHeight;
             }, 0);
+        },
+ 
+        /**
+         * Triggered when position of scroll change.
+         * This does NOT indicate the items have changed, only that
+         * the pixel position of the scroller has changed.
+         */
+         scrollPositionChange(event) {
+            if (event) {
+                this.timelineCursorY = event.target.scrollTop * this.timelineHeight / this.viewHeight;
+            }
+            if (this.scrollTimer) {
+                clearTimeout(this.scrollTimer);
+            }
+            this.scrolling = true;
+            this.scrollTimer = setTimeout(() => {
+                this.scrolling = false;
+                this.scrollTimer = null;
+            }, 1500);
         },
 
         /** Trigger when recycler view changes */
@@ -176,7 +194,6 @@ console.log(`output->this.viewHeight`,this.viewHeight)
 
         /** Load image data for given view */
         loadScrollChanges(startIndex, endIndex) {
-            debugger
             for (let i = startIndex; i <= endIndex; i++) {
                 let item = this.list[i];
                 if (!item) {
@@ -192,10 +209,10 @@ console.log(`output->this.viewHeight`,this.viewHeight)
 
         /** Fetch timeline main call */
         async fetchDays() {
-            const data = Array.from({length:3}, (_, index) => ({
+            const data = Array.from({length:12}, (_, index) => ({
                 id: '00' + index,
                 day_id: index,
-                count: 3,
+                count: 25,
               }));
             this.days = data;
 
@@ -255,9 +272,8 @@ console.log(`output->this.viewHeight`,this.viewHeight)
                     this.list.push(row);
                     currTopRow++;
                 }
-console.log(`output->this.nrows`,nrows)
-
             }
+
             // Fix view height variable
             this.handleViewSizeChange();
             this.loading = false;
@@ -269,55 +285,55 @@ console.log(`output->this.nrows`,nrows)
             head.loadedImages = true;
 
             let data = [
-              {
-                file_id: '001',
-              },{ file_id: '003'},{ file_id: '003'},{ file_id: '003'},{ file_id: '003'},
-              {
-                file_id: '002',
-              },{ file_id: '003'},{ file_id: '003'},{ file_id: '003'},{ file_id: '003'},
-              {
-                file_id: '003',
-              },{ file_id: '003'},{ file_id: '003'},{ file_id: '003'},{ file_id: '003'},{ file_id: '003'}
-            ];
+                {file_id: '001', },{ file_id: '002'},{ file_id: '003'},{ file_id: '004'},{ file_id: '005'},
+                {file_id: '006',},{ file_id: '007'},{ file_id: '008'},{ file_id: '009'},{ file_id: '010'},
+                {file_id: '011',},{ file_id: '012'},{ file_id: '013'},{ file_id: '014'},{ file_id: '015'},{ file_id: '016'}
+            ]; // 单日16张
             // try {
             //     const res = await fetch(`/apps/betterphotos/api/days/${dayId}`);
             //     data = await res.json();
             //     this.days.find(d => d.day_id === dayId).detail = data;
+            //     this.processDay(dayId, data);
             // } catch (e) {
             //     console.error(e);
             //     head.loadedImages = false;
             // }
+            this.processDay(dayId, data);
+        },
+
+        /** Process items from day response */
+         processDay(dayId, data) {
+            const head = this.heads[dayId];
+            head.loadedImages = true;
+
             // Get index of header O(n)
             const headIdx = this.list.findIndex(item => item.id === head.id);
             let rowIdx = headIdx + 1;
-            debugger
+
             // Add all rows
             for (const p of data) {
                 // Check if we ran out of rows
                 if (rowIdx >= this.list.length || this.list[rowIdx].head) {
                     this.list.splice(rowIdx, 0, this.getBlankRow(dayId));
                 }
-   
-                // 超过一行再加一行添加图片
+
+                // Go to the next row
                 if (this.list[rowIdx].photos.length >= this.numCols) {
-                    this.list.splice(++rowIdx, 0, this.getBlankRow(dayId));
+                    rowIdx++;
                 }
- 
+
                 // Add the photo to the row
-                this.list[rowIdx].photos.push({
-                    id: p['file_id'],
-                    src: `notnow`,
-                });
+                this.list[rowIdx].photos.push(p);
             }
 
             // Get rid of any extra rows
-            // let spliceCount = 0;
-            // for (let i = rowIdx + 1; i < this.list.length && !this.list[i].head; i++) {
-            //     spliceCount++;
-            // }
-            // if (spliceCount > 0) {
-            //     this.list.splice(rowIdx + 1, spliceCount);
-            // }
+            let spliceCount = 0;
+            for (let i = rowIdx + 1; i < this.list.length && !this.list[i].head; i++) {
+                spliceCount++;
+            }
+            if (spliceCount > 0) {
+                this.list.splice(rowIdx + 1, spliceCount);
+            }
         },
 
         /** Get a new blank row */
@@ -438,21 +454,27 @@ console.log(`output->this.nrows`,nrows)
     top: 0; right: 0;
     overflow: hidden;
     cursor: ns-resize;
+    opacity: 0;
+    transition: opacity .2s ease-in-out;
+}
+
+.timeline-scroll:hover, .timeline-scroll.scrolling {
+    opacity: 1;
 }
 
 .timeline-scroll .tick {
     pointer-events: none;
     position: absolute;
     font-size: 0.8em;
-    color: grey;
+    color: black;
     right: 5px;
     transform: translateY(-50%);
 }
 
 .timeline-scroll .tick .dash {
     height: 1px;
-    width: 6px;
-    background-color: grey;
+    width: 8px;
+    background-color: black;
     opacity: 0.8;
     display: block;
 }
