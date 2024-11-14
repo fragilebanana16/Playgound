@@ -11,9 +11,9 @@
             v-slot="{ item }"
             :emit-update="true"
             @update="scrollChange"
-            @resize="handleResize"
+            @resize="handleResizeWithDelay"
         >
-            <h1 v-if="item.head" class="head-row">
+            <h1 v-if="item.head" class="head-row" v-bind:class="{ 'first': item.id === 1 }">
                 {{ item.name }}
             </h1>
 
@@ -39,15 +39,18 @@
             @touchmove="timelineTouch"
             @mouseleave="timelineLeave"
             @mousedown="timelineClick">
-            <span class="cursor st"
+            <span class="cursor st" ref="cursorSt"
                   v-bind:style="{ top: timelineCursorY + 'px' }"></span>
             <span class="cursor hv"
                   v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{ timelineHoverCursorText }}</span>
                  
             <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick"
-                v-bind:style="{ top: Math.floor((index === 0 ? 10 : 0) + tick.topC) + 'px' }">
-                <span v-if="tick['text']">{{ tick['text'] }}</span>
-                <span v-else class="dash"></span>
+                v-bind:class="{ 'dash': !tick['text'] }"
+                v-bind:style="{ top: Math.floor((index === 0 ? 10 : 0) + tick['topC']) + 'px' }">
+                <template v-if="tick['s']">
+                    <span v-if="tick['text']">{{ tick['text'] }}</span>
+                    <span v-else class="dash"></span>
+                </template>
             </div>
         </div>
     </div>
@@ -63,6 +66,8 @@ const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 
+const MAX_PHOTO_WIDTH = 175;
+const MIN_COLS = 3;
   export default {
     components: {
       RecycleScroller
@@ -104,6 +109,10 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
             scrolling: false,
             /** Scrolling timer */
             scrollTimer: null,
+            /** Resizing timer */
+            resizeTimer: null,
+            /** Is mobile layout */
+            isMobile: false,
         }
     },
 
@@ -123,15 +132,35 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
     },
 
     methods: {
+        /** Do resize after some time */
+        handleResizeWithDelay() {
+            if (this.resizeTimer) {
+                clearTimeout(this.resizeTimer);
+            }
+            this.resizeTimer = setTimeout(() => {
+                this.handleResize();
+                this.resizeTimer = null;
+            }, 300);
+        },
+
         /** Handle window resize and initialization */
         handleResize() {
             let height = this.$refs.container.clientHeight;
             let width = this.$refs.container.clientWidth - 40;  // 预留和时间线的间距
             this.timelineHeight = this.$refs.timelineScroll.clientHeight;
             this.$refs.scroller.$el.style.height = (height - 4) + 'px';
+            // Mobile devices
+            if (window.innerWidth <= 768) {
+                width += 10;
+                this.isMobile = true;
+            } else {
+                width -= 12;
+                this.isMobile = false;
+            }
+
             if (this.days.length === 0) {
                 // Don't change cols if already initialized
-                this.numCols = Math.max(4, Math.floor(width / 175));
+                this.numCols = Math.max(MIN_COLS, Math.floor(width / MAX_PHOTO_WIDTH));
             }
             this.rowHeight = Math.floor(width / this.numCols) - 4;
 
@@ -149,6 +178,46 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
                 // Compute timeline tick positions
                 for (const tick of this.timelineTicks) {
                     tick.topC = Math.floor((tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight);
+                }
+
+                // Do another pass to figure out which timeline points are visible
+                // This is not as bad as it looks, it's actually 12*O(n)
+                // because there are only 12 months in a year
+                const minGap = parseFloat(getComputedStyle(this.$refs.cursorSt).fontSize) + (this.isMobile ? 5 : 2);
+                let prevShow = -9999;
+                for (const [idx, tick] of this.timelineTicks.entries()) {
+                    // Will overlap with the previous tick. Skip anyway.
+                    if (tick.topC - prevShow < minGap) {
+                        tick.s = false;
+                        continue;
+                    }
+                    // This is a labelled tick then show it anyway for the sake of best effort
+                    if (tick.text) {
+                        tick.s = true;
+                        prevShow = tick.topC;
+                        continue;
+                    }
+                    // Lookahead for next labelled tick
+                    // If showing this tick would overlap the next one, don't show this one
+                    let i = idx + 1;
+                    while(i < this.timelineTicks.length) {
+                        if (this.timelineTicks[i].text) {
+                            break;
+                        }
+                        i++;
+                    }
+                    if (i < this.timelineTicks.length) {
+                        // A labelled tick was found
+                        const nextLabelledTick = this.timelineTicks[i];
+                        if (tick.topC + minGap > nextLabelledTick.topC &&
+                            nextLabelledTick.topC < this.timelineHeight - minGap) { // make sure this will be shown
+                            tick.s = false;
+                            continue;
+                        }
+                    }
+                    // Show this tick
+                    tick.s = true;
+                    prevShow = tick.topC;
                 }
             }, 0);
         },
@@ -218,7 +287,7 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 
         /** Fetch timeline main call */
         async fetchDays() {
-            const data = Array.from({length:4}, (_, index) => ({
+            const data = Array.from({length:13}, (_, index) => ({
                 id: '00' + index,
                 day_id: index,
                 count: 25,
@@ -307,8 +376,8 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 
             let data = [
                 {file_id: '001', },{ file_id: '002'},{ file_id: '003'},{ file_id: '004'},{ file_id: '005'},
-                {file_id: '006',},{ file_id: '007'},{ file_id: '008'},{ file_id: '009'},{ file_id: '010'},
-                {file_id: '011',},{ file_id: '012'},{ file_id: '013'},{ file_id: '014'},{ file_id: '015'},{ file_id: '016'}
+                // {file_id: '006',},{ file_id: '007'},{ file_id: '008'},{ file_id: '009'},{ file_id: '010'},
+                // {file_id: '011',},{ file_id: '012'},{ file_id: '013'},{ file_id: '014'},{ file_id: '015'},{ file_id: '016'}
             ]; // 单日16张
             // try {
             //     const res = await fetch(`/apps/betterphotos/api/days/${dayId}`);
@@ -394,6 +463,8 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
             const rect = event.target.getBoundingClientRect();
             const y = event.targetTouches[0].pageY - rect.top;
             this.$refs.scroller.scrollToPosition(this.getTimelinePosition(y));
+            event.preventDefault();
+            event.stopPropagation();
         },
 
         /** Handle mouse leave on right timeline */
@@ -430,8 +501,9 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 <style scoped>
 .album-container {
   height: calc(100vh - 84px);
-    width: 100vw;
+    width: 100%;
     overflow: hidden;
+    user-select: none;/* no text will be selected  */
 }
 
 .scroller {
@@ -474,13 +546,14 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 
 .head-row {
     height: 40px;
-    padding-top: 13px;
+    padding-top: 10px;
     padding-left: 3px;
     font-size: 0.9em;
     font-weight: bold;
 }
 
 .timeline-scroll {
+    overflow-y: clip;
     position: absolute;
     height: 100%;
     width: 40px;
@@ -505,10 +578,11 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 }
 
 .timeline-scroll .tick .dash {
-    height: 1px;
-    width: 8px;
-    background-color: black;
-    opacity: 0.8;
+    height: 4px;
+    width: 4px;
+    border-radius: 50%;
+    background-color: #444;
+    opacity: 0.5;
     display: block;
 }
 
@@ -521,6 +595,7 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
     min-height: 2px;
 }
 .timeline-scroll .cursor.st {
+    font-size: 0.8em;
     opacity: 0;
 }
 .timeline-scroll:hover .cursor.st {
@@ -534,5 +609,21 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
     width: auto;
     white-space: nowrap;
     z-index: 100;
+    font-size: 0.95em;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .timeline-scroll .tick {
+        background-color: var(--color-main-background);
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+    .timeline-scroll .tick.dash {
+        display: none;
+    }
+    .head-row.first {
+        padding-left: 34px;
+    }
 }
 </style>
