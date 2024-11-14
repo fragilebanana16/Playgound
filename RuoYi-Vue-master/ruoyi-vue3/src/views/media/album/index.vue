@@ -175,6 +175,7 @@ const MIN_COLS = 3;
         handleViewSizeChange() {
             setTimeout(() => {
                 this.viewHeight = this.$refs.scroller.$refs.wrapper.clientHeight;
+                console.log(this.viewHeight)
                 // Compute timeline tick positions
                 for (const tick of this.timelineTicks) {
                     tick.topC = Math.floor((tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight);
@@ -233,6 +234,7 @@ const MIN_COLS = 3;
                 console.log("scrolltop->", event.target.scrollTop)
                 console.log("timelineHeight->", this.timelineHeight)
                 console.log("viewHeight->", this.viewHeight)
+                console.log("timelineCursorY->", this.timelineCursorY)
                 this.timelineMoveHoverCursor(this.timelineCursorY);
             }
             if (this.scrollTimer) {
@@ -287,10 +289,10 @@ const MIN_COLS = 3;
 
         /** Fetch timeline main call */
         async fetchDays() {
-            const data = Array.from({length:13}, (_, index) => ({
+            const data = Array.from({length:5}, (_, index) => ({
                 id: '00' + index,
                 day_id: index,
-                count: 25,
+                count: 16, // 这里要和fetchDay的每天数量一致，否则recycle高度和timeline高度不匹配
               }));
             this.days = data;
 
@@ -376,8 +378,8 @@ const MIN_COLS = 3;
 
             let data = [
                 {file_id: '001', },{ file_id: '002'},{ file_id: '003'},{ file_id: '004'},{ file_id: '005'},
-                // {file_id: '006',},{ file_id: '007'},{ file_id: '008'},{ file_id: '009'},{ file_id: '010'},
-                // {file_id: '011',},{ file_id: '012'},{ file_id: '013'},{ file_id: '014'},{ file_id: '015'},{ file_id: '016'}
+                {file_id: '006',},{ file_id: '007'},{ file_id: '008'},{ file_id: '009'},{ file_id: '010'},
+                {file_id: '011',},{ file_id: '012'},{ file_id: '013'},{ file_id: '014'},{ file_id: '015'},{ file_id: '016'}
             ]; // 单日16张
             // try {
             //     const res = await fetch(`/apps/betterphotos/api/days/${dayId}`);
@@ -604,7 +606,7 @@ const MIN_COLS = 3;
 .timeline-scroll .cursor.hv {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 2px 5px;
-    border-top: 2px solid var(--color-primary);
+    border-top: 2px solid black;
     border-radius: 2px;
     width: auto;
     white-space: nowrap;
@@ -615,7 +617,7 @@ const MIN_COLS = 3;
 
 @media (max-width: 768px) {
     .timeline-scroll .tick {
-        background-color: var(--color-main-background);
+        background-color: black;
         padding: 1px 4px;
         border-radius: 4px;
     }
