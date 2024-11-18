@@ -51,6 +51,9 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import 'element-plus/theme-chalk/dark/css-vars.css'
 import '@mdi/font/css/materialdesignicons.css'
+import 'viewerjs/dist/viewer.css'
+import VueViewer from 'v-viewer'
+
 const vuetify = createVuetify({
   components,
   directives,
@@ -91,6 +94,7 @@ app.use(plugins)
 app.use(elementIcons)
 app.component('svg-icon', SvgIcon)
 app.use(vuetify)
+app.use(VueViewer)
 
 directive(app)
 

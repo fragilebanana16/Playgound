@@ -1,49 +1,30 @@
 <template>
-      <div class="album-container" ref="container"
-        :class="{ 'icon-loading': loading }">
+    <div class="album-container" ref="container" :class="{ 'icon-loading': loading }">
         <!-- size-field look for item, item-size="300"-->
-        <RecycleScroller
-            ref="scroller"
-            class="scroller"
-            :items="list"
-            size-field="size"
-            key-field="id"
-            v-slot="{ item }"
-            :emit-update="true"
-            @update="scrollChange"
-            @resize="handleResizeWithDelay"
-        >
+        <RecycleScroller ref="scroller" class="scroller" :items="list" size-field="size" key-field="id" v-slot="{ item }"
+            :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
             <h1 v-if="item.head" class="head-row" v-bind:class="{ 'first': item.id === 1 }">
                 {{ item.name }}
             </h1>
 
-            <div 
-                class="photo-row"
-                v-bind:style="{ height: rowHeight + 'px' }">
-
-                <div class="photo" v-for="img of item.photos" :key="img.l">
-                    <img
-                    src="@/assets/images/login-background.jpg" :key="img.l"
-          
-                        v-bind:style="{
+            <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
+                <viewer>
+                    <div class="photo" v-for="img of item.photos" :key="img.l">
+                        <img @click="show(item.photos, img.url)" :src="img.url" :key="img.l" v-bind:style="{
                             width: rowHeight + 'px',
                             height: rowHeight + 'px',
-                        }"/>
-                </div>
+                        }" />
+                    </div>
+                </viewer>
             </div>
         </RecycleScroller>
 
-        <div ref="timelineScroll" class="timeline-scroll"
-            v-bind:class="{ scrolling }"
-            @mousemove="timelineHover"
-            @touchmove="timelineTouch"
-            @mouseleave="timelineLeave"
-            @mousedown="timelineClick">
-            <span class="cursor st" ref="cursorSt"
-                  v-bind:style="{ top: timelineCursorY + 'px' }"></span>
-            <span class="cursor hv"
-                  v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{ timelineHoverCursorText }}</span>
-                 
+        <div ref="timelineScroll" class="timeline-scroll" v-bind:class="{ scrolling }" @mousemove="timelineHover"
+            @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
+            <span class="cursor st" ref="cursorSt" v-bind:style="{ top: timelineCursorY + 'px' }"></span>
+            <span class="cursor hv" v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
+                timelineHoverCursorText }}</span>
+
             <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick"
                 v-bind:class="{ 'dash': !tick['text'] }"
                 v-bind:style="{ top: Math.floor((index === 0 ? 10 : 0) + tick['topC']) + 'px' }">
@@ -65,15 +46,86 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
-
+const baseUrl = '/dev-api';
 const MAX_PHOTO_WIDTH = 175;
 const MIN_COLS = 3;
-  export default {
+const MOCK_IMG_DATA = [
+    "A Sky Full of Stars - Coldplay.jpg",
+    "After All - Elton John,Charlie Puth.jpg",
+    "Attention - Charlie Puth.jpg",
+    "Beautiful Mistakes - Maroon 5,Megan Thee Stallion.jpg",
+    "Bring Me Back (feat. Claire Ridgely) - Miles Away.jpg",
+    "Can We Kiss Forever-Kina,Adriana Proenza.jpg",
+    "Ceasefire - BEAUZ,Luke Anders,Ducka Shan,Becca Krueger,Eliason.jpg",
+    "Click - Jake Miller.jpg",
+    "Clsr (Aash Mehta Flip) - The Chainsmokers,Aash Mehta,Halsey.jpg",
+    "Dangerously - Charlie Puth.jpg",
+    "Daylight - Maroon 5.jpg",
+    "Deep End - William Black.jpg",
+    "Disenchanted - My Chemical Romance.jpg",
+    "Diviners & Azertion - Feelings Mp3 Download by NCS - Files Garage.jpeg",
+    "Don't Say (Felix Palmqvist & Severo Remix) - The Chainsmokers,Emily Warren,Felix Palmqvist,Severo.jpg",
+    "Empire Of Angels - Two Steps From Hell.jpg",
+    "Empty Cups - Charlie Puth.jpg",
+    "Everglow - Coldplay.jpg",
+    "Fix You - Coldplay.jpg",
+    "Free(From Disney's The One And Only Ivan) - Charlie Puth.jpg",
+    "Girls Like You - Maroon 5,Cardi B.jpg",
+    "Gotta Be You - One Direction.jpg",
+    "History - One Direction.jpg",
+    "How Long - Charlie Puth.jpg",
+    "Is It Just Me (feat. Charlie Puth) - Sasha Alex Sloan.jpg",
+    "Jealous - Faustix.jpg",
+    "Just A Feeling - Maroon 5.jpg",
+    "Keep You Mine - NOTD,SHY Martin.jpg",
+    "Left and Right (Feat. Jung Kook of BTS) - Charlie Puth,BTS (防弹少年团).jpg",
+    "Let Somebody Go - Coldplay,Selena Gomez.jpg",
+    "Like 1999 - Valley.jpg",
+    "Love You Like the Movies - Anthem Lights.jpg",
+    "Maps - Maroon 5.jpg",
+    "Memories - Maroon 5.jpg",
+    "Miracles - Coldplay.jpg",
+    "Night Changes - One Direction.jpg",
+    "No More Drama - Charlie Puth.jpg",
+    "Nobody Compares - One Direction.jpg",
+    "One Thing - One Direction.jpg",
+    "Oops - Little Mix,Charlie Puth.jpg",
+    "Overtime - Cash Cash.jpg",
+    "Paradise - Coldplay.jpg",
+    "Patient - Charlie Puth.jpg",
+    "Payphone - Maroon 5,Wiz Khalifa.jpg",
+    "Rum n Tequila - John K.jpg",
+    "Say Something - A Great Big World.jpg",
+    "See You Again - Wiz Khalifa,Charlie Puth.jpg",
+    "Slow Down - Madnap,Pauline Herr.jpg",
+    "Slow It Down - Charlie Puth.jpg",
+    "Something Just Like This - The Chainsmokers,Coldplay.jpg",
+    "Sugar - Maroon 5.jpg",
+    "sun and moon - Anees.jpg",
+    "Sunroof - Nicky Youre,Dazy.jpg",
+    "That's Hilarious - Charlie Puth.jpg",
+    "THATS WHAT I WANT - Lil Nas X.jpg",
+    "The Scientist - Coldplay.jpg",
+    "The Way I Am - Charlie Puth.jpg",
+    "Viva La Vida - Coldplay.jpg",
+    "Waiting For Love - Avicii,Martin Garrix,Simon Aldred.jpg",
+    "Waiting for You - Daniel Padim.jpg",
+    "We All Want the Same Thing - Push Baby.jpg",
+    "What Lovers Do - Maroon 5,SZA.jpg",
+    "What Makes You Beautiful - One Direction.jpg",
+];
+
+export default {
     components: {
-      RecycleScroller
+        RecycleScroller
     },
     data() {
         return {
+            images: [
+                "https://picsum.photos/200/200",
+                "https://picsum.photos/300/200",
+                "https://picsum.photos/250/200"
+            ],
             /** Loading days response */
             loading: true,
             /** Main list of rows */
@@ -120,10 +172,10 @@ const MIN_COLS = 3;
         this.handleResize();
         this.fetchDays();
 
-  //       setTimeout(() => {
-  //   console.log(`output->this.timelineHeight`, this.$refs.timelineScroll.clientHeight);
-  //   this.handleResize();
-  // }, 100);
+        //       setTimeout(() => {
+        //   console.log(`output->this.timelineHeight`, this.$refs.timelineScroll.clientHeight);
+        //   this.handleResize();
+        // }, 100);
 
         // Set scrollbar
         // Timeline scroller init
@@ -132,6 +184,22 @@ const MIN_COLS = 3;
     },
 
     methods: {
+        /**
+         * show v-viewer
+         * @param photos one row photos, todo: same day photos
+         * @param current current photo url
+         */
+        show(photos, current: String) {
+            const urls = photos.map(item => item.url)
+            const curIndex = urls.indexOf(current) ?? 0
+            console.log(`output->`,urls)
+            this.$viewerApi({
+                images: urls,
+                options: {
+                    initialViewIndex: curIndex
+                },
+            })
+        },
         /** Do resize after some time */
         handleResizeWithDelay() {
             if (this.resizeTimer) {
@@ -201,7 +269,7 @@ const MIN_COLS = 3;
                     // Lookahead for next labelled tick
                     // If showing this tick would overlap the next one, don't show this one
                     let i = idx + 1;
-                    while(i < this.timelineTicks.length) {
+                    while (i < this.timelineTicks.length) {
                         if (this.timelineTicks[i].text) {
                             break;
                         }
@@ -222,13 +290,13 @@ const MIN_COLS = 3;
                 }
             }, 0);
         },
- 
+
         /**
          * Triggered when position of scroll change.
          * This does NOT indicate the items have changed, only that
          * the pixel position of the scroller has changed.
          */
-         scrollPositionChange(event) {
+        scrollPositionChange(event) {
             if (event) {
                 this.timelineCursorY = event.target.scrollTop * this.timelineHeight / this.viewHeight;
                 console.log("scrolltop->", event.target.scrollTop)
@@ -278,7 +346,7 @@ const MIN_COLS = 3;
                 let item = this.list[i];
                 if (!item) {
                     continue;
-                }  
+                }
                 let head = this.heads[item.dayId];
                 if (head && !head.loadedImages) {
                     head.loadedImages = true;
@@ -289,11 +357,11 @@ const MIN_COLS = 3;
 
         /** Fetch timeline main call */
         async fetchDays() {
-            const data = Array.from({length:5}, (_, index) => ({
+            const data = Array.from({ length: 5 }, (_, index) => ({
                 id: '00' + index,
                 day_id: index,
                 count: 16, // 这里要和fetchDay的每天数量一致，否则recycle高度和timeline高度不匹配
-              }));
+            }));
             this.days = data;
 
             // Ticks
@@ -312,7 +380,7 @@ const MIN_COLS = 3;
                 }
 
                 // Make date string
-                const dateTaken = new Date(Number(day.day_id)*86400*1000);
+                const dateTaken = new Date(Number(day.day_id) * 86400 * 1000);
                 // mock data
                 const tempYear = dateTaken.getUTCFullYear();
                 dateTaken.setUTCFullYear(tempYear + dayIdx * 10);
@@ -325,7 +393,7 @@ const MIN_COLS = 3;
                 }
 
                 // Create tick if month changed
-                const dtYear =  dateTaken.getUTCFullYear();
+                const dtYear = dateTaken.getUTCFullYear();
                 const dtMonth = dateTaken.getUTCMonth()
                 if (Number.isInteger(day.day_id) && (dtMonth !== prevMonth || dtYear !== prevYear)) {
                     // Format dateTaken as MM YYYY
@@ -375,12 +443,24 @@ const MIN_COLS = 3;
         async fetchDay(dayId) {
             const head = this.heads[dayId];
             head.loadedImages = true;
+            const prefix = baseUrl + '/music/covers/'
+            let data: SongData[] = [];
+            type SongData = {
+                file_id: string;
+                url: string;
+            };
 
-            let data = [
-                {file_id: '001', },{ file_id: '002'},{ file_id: '003'},{ file_id: '004'},{ file_id: '005'},
-                {file_id: '006',},{ file_id: '007'},{ file_id: '008'},{ file_id: '009'},{ file_id: '010'},
-                {file_id: '011',},{ file_id: '012'},{ file_id: '013'},{ file_id: '014'},{ file_id: '015'},{ file_id: '016'}
-            ]; // 单日16张
+            function getRandomElements(arr, count) {
+                const shuffled = [...arr].sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, count);
+            }
+            const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
+            randomArray.forEach((img, index) => {
+                const file_id = `001${index + 1}`;
+                const url = `${prefix}${img}`;
+                data.push({ file_id, url });
+            });
+            
             // try {
             //     const res = await fetch(`/apps/betterphotos/api/days/${dayId}`);
             //     data = await res.json();
@@ -394,7 +474,7 @@ const MIN_COLS = 3;
         },
 
         /** Process items from day response */
-         processDay(dayId, data) {
+        processDay(dayId, data) {
             const head = this.heads[dayId];
             head.loadedImages = true;
 
@@ -432,7 +512,7 @@ const MIN_COLS = 3;
         getBlankRow(dayId) {
             return {
                 id: ++this.numRows,
-                photos:  [],
+                photos: [],
                 size: this.rowHeight,
                 dayId: dayId,
             };
@@ -502,10 +582,11 @@ const MIN_COLS = 3;
   
 <style scoped>
 .album-container {
-  height: calc(100vh - 84px);
+    height: calc(100vh - 84px);
     width: 100%;
     overflow: hidden;
-    user-select: none;/* no text will be selected  */
+    user-select: none;
+    /* no text will be selected  */
 }
 
 .scroller {
@@ -534,14 +615,16 @@ const MIN_COLS = 3;
     display: block;
     height: calc(100% - 4px);
     width: calc(100% - 4px);
-    top: 2px; left: 2px;
-    background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 95%);
+    top: 2px;
+    left: 2px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 95%);
     opacity: 0;
     border-radius: 3%;
     transition: opacity .1s ease-in-out;
     pointer-events: none;
     user-select: none;
 }
+
 .photo-row .photo:hover::before {
     opacity: 1;
 }
@@ -559,14 +642,16 @@ const MIN_COLS = 3;
     position: absolute;
     height: 100%;
     width: 40px;
-    top: 0; right: 0;
+    top: 0;
+    right: 0;
     cursor: ns-resize;
     opacity: 0;
     transition: opacity .2s ease-in-out;
     z-index: 1;
 }
 
-.timeline-scroll:hover, .timeline-scroll.scrolling {
+.timeline-scroll:hover,
+.timeline-scroll.scrolling {
     opacity: 1;
 }
 
@@ -596,13 +681,16 @@ const MIN_COLS = 3;
     min-width: 100%;
     min-height: 2px;
 }
+
 .timeline-scroll .cursor.st {
     font-size: 0.8em;
     opacity: 0;
 }
+
 .timeline-scroll:hover .cursor.st {
     opacity: 1;
 }
+
 .timeline-scroll .cursor.hv {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 2px 5px;
@@ -621,9 +709,11 @@ const MIN_COLS = 3;
         padding: 1px 4px;
         border-radius: 4px;
     }
+
     .timeline-scroll .tick.dash {
         display: none;
     }
+
     .head-row.first {
         padding-left: 34px;
     }
