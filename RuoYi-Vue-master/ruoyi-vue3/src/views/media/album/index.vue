@@ -8,14 +8,12 @@
             </h1>
 
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
-                <viewer>
                     <div class="photo" v-for="img of item.photos" :key="img.l">
                         <img @click="show(item.photos, img.url)" :src="img.url" :key="img.l" v-bind:style="{
                             width: rowHeight + 'px',
                             height: rowHeight + 'px',
                         }" />
                     </div>
-                </viewer>
             </div>
         </RecycleScroller>
 
