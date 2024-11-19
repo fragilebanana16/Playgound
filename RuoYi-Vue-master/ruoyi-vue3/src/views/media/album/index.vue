@@ -8,12 +8,13 @@
             </h1>
 
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
-                    <div class="photo" v-for="img of item.photos" :key="img.l">
-                        <img @click="show(item.photos, img.url)" :src="img.url" :key="img.l" v-bind:style="{
-                            width: rowHeight + 'px',
-                            height: rowHeight + 'px',
-                        }" />
-                    </div>
+                <div class="photo" v-for="img of item.photos" :key="img.l">
+                    <Icon v-if="img.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
+                    <img @click="show(item.photos, img.url)" :src="img.url" :key="img.l" v-bind:style="{
+                        width: rowHeight + 'px',
+                        height: rowHeight + 'px',
+                    }" />
+                </div>
             </div>
         </RecycleScroller>
 
@@ -41,6 +42,8 @@ import { useRoute } from 'vue-router'
 import { defineComponent } from "vue";
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import { Icon } from '@iconify/vue'
+
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
@@ -115,7 +118,8 @@ const MOCK_IMG_DATA = [
 
 export default {
     components: {
-        RecycleScroller
+        RecycleScroller,
+        Icon
     },
     data() {
         return {
@@ -446,6 +450,7 @@ export default {
             type SongData = {
                 file_id: string;
                 url: string;
+                is_video: boolean;
             };
 
             function getRandomElements(arr, count) {
@@ -456,7 +461,7 @@ export default {
             randomArray.forEach((img, index) => {
                 const file_id = `001${index + 1}`;
                 const url = `${prefix}${img}`;
-                data.push({ file_id, url });
+                data.push({ file_id, url, is_video: index % 3 === 0  });
             });
             
             // try {
@@ -625,6 +630,10 @@ export default {
 
 .photo-row .photo:hover::before {
     opacity: 1;
+}
+.photo-row .photo .icon-video-white {
+    position: absolute;
+    top: 8px; right: 8px;
 }
 
 .head-row {
