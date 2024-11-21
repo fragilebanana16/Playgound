@@ -9,11 +9,20 @@
 
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="img of item.photos" :key="img.l">
-                    <Icon v-if="img.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-                    <img @click="show(item.photos, img.url)" :src="img.url" :key="img.l" v-bind:style="{
-                        width: rowHeight + 'px',
-                        height: rowHeight + 'px',
-                    }" />
+                    <div v-if="img.is_folder" class="folder" @click="openFolder(img.file_id)" v-bind:style="{
+                            width: rowHeight + 'px',
+                            height: rowHeight + 'px',
+                        }">
+                        <Icon icon='entypo:folder' class="text-xl text-black icon-folder"></Icon>
+                        <div class="name">{{ img.name }}</div>
+                    </div>
+                    <div v-else>
+                        <Icon v-if="img.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
+                        <img @click="show(item.photos, img.url)" :src="img.url" :key="img.l" v-bind:style="{
+                            width: rowHeight + 'px',
+                            height: rowHeight + 'px',
+                        }" />
+                    </div>
                 </div>
             </div>
         </RecycleScroller>
@@ -43,7 +52,7 @@ import { defineComponent } from "vue";
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { Icon } from '@iconify/vue'
-
+const router = useRoute()
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
@@ -159,6 +168,8 @@ export default {
             currentStart: 0,
             /** Current end index */
             currentEnd: 0,
+            /** State for request cancellations */
+            state: Math.random(),
             /** Scrolling currently */
             scrolling: false,
             /** Scrolling timer */
@@ -186,6 +197,10 @@ export default {
     },
 
     methods: {
+        /** Open album folder */
+        openFolder(id) {
+            this.$router.push({ path: `/media/album/folder/${id}` });
+        },
         /**
          * show v-viewer
          * @param photos one row photos, todo: same day photos
@@ -451,6 +466,8 @@ export default {
                 file_id: string;
                 url: string;
                 is_video: boolean;
+                is_folder: boolean;
+                name: string;
             };
 
             function getRandomElements(arr, count) {
@@ -461,7 +478,7 @@ export default {
             randomArray.forEach((img, index) => {
                 const file_id = `001${index + 1}`;
                 const url = `${prefix}${img}`;
-                data.push({ file_id, url, is_video: index % 3 === 0  });
+                data.push({ file_id, url, is_video: index % 3 === 0, is_folder: index % 5 === 0, name: 'folder' + index / 5  });
             });
             
             // try {
@@ -635,7 +652,27 @@ export default {
     position: absolute;
     top: 8px; right: 8px;
 }
-
+.photo-row .photo .icon-folder {
+    position: absolute;
+    top: 50%;
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    cursor: pointer;
+    background-size: 40%;
+    height: 60%; width: 100%;
+    background-position: bottom;
+    opacity: 0.3;
+}
+.photo-row .photo .folder {
+    cursor: pointer;
+}
+.photo-row .photo .folder .name {
+    cursor: pointer;
+    position: absolute;
+    width: 100%;
+    top: 80%;
+    text-align: center;
+}
 .head-row {
     height: 40px;
     padding-top: 10px;

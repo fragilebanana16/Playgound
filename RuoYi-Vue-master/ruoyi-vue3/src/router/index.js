@@ -193,16 +193,17 @@ export const dynamicRoutes = [
     permissions: ['system:role:edit'],
     children: [
       {
-        path: 'home',
+        path: 'album',
         component: () => import('@/views/media/album'),
-        name: 'home',
-        meta: {  noCache: true, title: 'home', activeMenu: '/media/album' },
+        name: 'album',
+        meta: {  noCache: true, title: 'album', activeMenu: '/media/album' },
         children: [
           {
-            path: 'firstView',
-            component: () => import('@/views/media/album/firstView.vue'),
-            name: 'firstView',
-            meta: {  noCache: true, title: 'firstView', activeMenu: '/media/album' },
+            
+            path: 'folder/:id',
+            component: () => import('@/views/media/album'),
+            name: 'folder',
+            meta: {  noCache: true, title: 'folder', activeMenu: '/media/album' },
           }
         ]
       }
