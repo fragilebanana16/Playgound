@@ -9,17 +9,17 @@
 
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="img of item.photos" :key="img.l">
-                    <div v-if="img.is_folder" class="folder" @click="openFolder(img.file_id)" v-bind:style="{
+                    <div v-if="img.is_folder" class="folder dark:bg-[#636463]" @click="openFolder(img.file_id)" v-bind:style="{
                             width: rowHeight + 'px',
                             height: rowHeight + 'px',
                         }">
-                        <Icon icon='entypo:folder' class="text-xl text-black icon-folder"></Icon>
+                        <Icon icon='entypo:folder' class="text-xl dark:text-white icon-folder "></Icon>
                         <div class="name">{{ img.name }}</div>
                     </div>
                     <div v-else>
                         <Icon v-if="img.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
                         <img @click="show(item.photos, img.url)" :src="img.url" :key="img.file_id"
-                        @error="handleImageError" 
+                        @error="handleImageError"
                         v-bind:style="{
                             width: rowHeight + 'px',
                             height: rowHeight + 'px',
@@ -31,8 +31,8 @@
 
         <div ref="timelineScroll" class="timeline-scroll" v-bind:class="{ scrolling }" @mousemove="timelineHover"
             @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
-            <span class="cursor st" ref="cursorSt" v-bind:style="{ top: timelineCursorY + 'px' }"></span>
-            <span class="cursor hv" v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
+            <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" v-bind:style="{ top: timelineCursorY + 'px' }"></span>
+            <span class="cursor hv border-t-2 border-black dark:border-t-amber-900" v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
                 timelineHoverCursorText }}</span>
 
             <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick"
@@ -718,10 +718,14 @@ export default {
     background-size: 40%;
     height: 60%; width: 100%;
     background-position: bottom;
-    opacity: 0.3;
+    opacity: 0.6;
 }
 .photo-row .photo .folder {
     cursor: pointer;
+    background-clip: content-box;
+    padding: 2px;
+    object-fit: cover;
+    border-radius: 3%;
 }
 .photo-row .photo .folder .name {
     cursor: pointer;
@@ -760,7 +764,6 @@ export default {
     pointer-events: none;
     position: absolute;
     font-size: 0.8em;
-    color: black;
     right: 5px;
     transform: translateY(-50%);
 }
@@ -778,7 +781,6 @@ export default {
     position: absolute;
     pointer-events: none;
     right: 5px;
-    background-color: black;
     min-width: 100%;
     min-height: 2px;
 }
@@ -795,7 +797,6 @@ export default {
 .timeline-scroll .cursor.hv {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 2px 5px;
-    border-top: 2px solid black;
     border-radius: 2px;
     width: auto;
     white-space: nowrap;
