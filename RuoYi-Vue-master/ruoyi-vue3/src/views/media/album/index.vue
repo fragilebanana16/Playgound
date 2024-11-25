@@ -18,7 +18,9 @@
                     </div>
                     <div v-else>
                         <Icon v-if="img.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-                        <img @click="show(item.photos, img.url)" :src="img.url" :key="img.l" v-bind:style="{
+                        <img @click="show(item.photos, img.url)" :src="img.url" :key="img.file_id"
+                        @error="handleImageError" 
+                        v-bind:style="{
                             width: rowHeight + 'px',
                             height: rowHeight + 'px',
                         }" />
@@ -196,7 +198,30 @@ export default {
         this.scrollPositionChange();
     },
 
+    watch: {
+		$route(from, to) {
+			console.log('route changed', from, to)
+			this.resetState();
+            this.fetchDays();
+		},
+	},
+    beforeDestroy() {
+        this.resetState();
+	},
+
     methods: {
+        /** Reset all state */
+        resetState() {
+            this.loading = true;
+            this.list = [];
+            this.numRows = 0;
+            this.heads = {};
+            this.days = [];
+            this.currentStart = 0;
+            this.currentEnd = 0;
+            this.timelineTicks = [];
+            this.state = Math.random();
+        },
         /** Open album folder */
         openFolder(id) {
             this.$router.push({ path: `/media/album/folder/${id}` });
@@ -378,7 +403,17 @@ export default {
                 id: '00' + index,
                 day_id: index,
                 count: 16, // 这里要和fetchDay的每天数量一致，否则recycle高度和timeline高度不匹配
+                detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
             }));
+
+            
+            if (this.$route.name === 'albums') {
+                const id = this.$route.params.id || 0;
+                // url = `/apps/polaroid/api/folder/${id}`;
+            }
+            const startState = this.state;
+            // await api
+            if (this.state !== startState) return;
             this.days = data;
 
             // Ticks
@@ -425,10 +460,14 @@ export default {
                         text: (dtYear === prevYear || dtYear === thisYear) ? undefined : dtYear,
                         mText: `${monthName} ${dtYear}`,
                     });
-                    prevMonth = dtMonth;
-                    prevYear = dtYear;
                 }
 
+                prevMonth = dtMonth;
+                prevYear = dtYear;
+                // Special headers
+                if (day.day_id === -0.1) {
+                    dateStr = "Folders";
+                }
                 // Add header to list
                 const head = {
                     id: ++this.numRows,
@@ -451,6 +490,13 @@ export default {
                 }
             }
 
+            // Check preloads 预处理了图片，冗余计算？如果fetchDays能先带一部分数据则先处理一部分，不用每次scroll再请求
+            for (const day of data) {
+                if (day.count && day.detail && day.detail.length > 0) {
+                    this.processDay(day.day_id, day.detail);
+                }
+            }
+
             // Fix view height variable
             this.handleViewSizeChange();
             this.loading = false;
@@ -458,6 +504,11 @@ export default {
 
         /** Fetch image data for one dayId */
         async fetchDay(dayId) {
+            // let url = `/apps/polaroid/api/days/${dayId}`;
+            // if (this.$route.name === 'albums') {
+            //     const id = this.$route.params.id || 0;
+            //     url = `/apps/polaroid/api/folder/${id}/${dayId}`;
+            // }
             const head = this.heads[dayId];
             head.loadedImages = true;
             const prefix = baseUrl + '/music/covers/'
@@ -594,6 +645,12 @@ export default {
             }
             this.$refs.scroller.scrollToPosition(1000);
         },
+        handleImageError(event: Event) {
+            const target = event.target as HTMLImageElement;
+            if (target) {
+                target.src = "@/assets/images/error.svg";
+            }
+        }
     },
 }
 
