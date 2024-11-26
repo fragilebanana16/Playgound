@@ -9,13 +9,7 @@
 
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="img of item.photos" :key="img.l">
-                    <div v-if="img.is_folder" class="folder dark:bg-[#636463]" @click="openFolder(img.file_id)" v-bind:style="{
-                            width: rowHeight + 'px',
-                            height: rowHeight + 'px',
-                        }">
-                        <Icon icon='entypo:folder' class="text-xl dark:text-white icon-folder "></Icon>
-                        <div class="name">{{ img.name }}</div>
-                    </div>
+                    <Folder v-if="img.is_folder" :data="img" :rowHeight="rowHeight" />
                     <div v-else>
                         <Icon v-if="img.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
                         <img @click="show(item.photos, img.url)" :src="img.url" :key="img.file_id"
@@ -54,6 +48,7 @@ import { defineComponent } from "vue";
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { Icon } from '@iconify/vue'
+import Folder from "./components/Folder.vue";
 const router = useRoute()
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
@@ -130,7 +125,8 @@ const MOCK_IMG_DATA = [
 export default {
     components: {
         RecycleScroller,
-        Icon
+        Icon,
+        Folder
     },
     data() {
         return {
@@ -221,10 +217,6 @@ export default {
             this.currentEnd = 0;
             this.timelineTicks = [];
             this.state = Math.random();
-        },
-        /** Open album folder */
-        openFolder(id) {
-            this.$router.push({ path: `/media/album/folder/${id}` });
         },
         /**
          * show v-viewer
@@ -708,31 +700,6 @@ export default {
 .photo-row .photo .icon-video-white {
     position: absolute;
     top: 8px; right: 8px;
-}
-.photo-row .photo .icon-folder {
-    position: absolute;
-    top: 50%;
-    left: 50%; 
-    transform: translate(-50%, -50%); 
-    cursor: pointer;
-    background-size: 40%;
-    height: 60%; width: 100%;
-    background-position: bottom;
-    opacity: 0.6;
-}
-.photo-row .photo .folder {
-    cursor: pointer;
-    background-clip: content-box;
-    padding: 2px;
-    object-fit: cover;
-    border-radius: 3%;
-}
-.photo-row .photo .folder .name {
-    cursor: pointer;
-    position: absolute;
-    width: 100%;
-    top: 80%;
-    text-align: center;
 }
 .head-row {
     height: 40px;
