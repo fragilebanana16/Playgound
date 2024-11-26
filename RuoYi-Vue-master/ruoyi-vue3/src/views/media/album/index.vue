@@ -8,17 +8,9 @@
             </h1>
 
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
-                <div class="photo" v-for="img of item.photos" :key="img.l">
-                    <Folder v-if="img.is_folder" :data="img" :rowHeight="rowHeight" />
-                    <div v-else>
-                        <Icon v-if="img.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-                        <img @click="show(item.photos, img.url)" :src="img.url" :key="img.file_id"
-                        @error="handleImageError"
-                        v-bind:style="{
-                            width: rowHeight + 'px',
-                            height: rowHeight + 'px',
-                        }" />
-                    </div>
+                <div class="photo" v-for="photo of item.photos" :key="photo.l">
+                    <Folder v-if="photo.is_folder" :data="photo" :rowHeight="rowHeight" />
+                    <Photo v-else :data="photo" :collection="item.photos" :rowHeight="rowHeight" :day="item.day" />
                 </div>
             </div>
         </RecycleScroller>
@@ -49,6 +41,7 @@ import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { Icon } from '@iconify/vue'
 import Folder from "./components/Folder.vue";
+import Photo  from "./components/Photo.vue";
 const router = useRoute()
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
@@ -126,7 +119,8 @@ export default {
     components: {
         RecycleScroller,
         Icon,
-        Folder
+        Folder,
+        Photo
     },
     data() {
         return {
@@ -217,22 +211,6 @@ export default {
             this.currentEnd = 0;
             this.timelineTicks = [];
             this.state = Math.random();
-        },
-        /**
-         * show v-viewer
-         * @param photos one row photos, todo: same day photos
-         * @param current current photo url
-         */
-        show(photos, current: String) {
-            const urls = photos.map(item => item.url)
-            const curIndex = urls.indexOf(current) ?? 0
-            console.log(`output->`,urls)
-            this.$viewerApi({
-                images: urls,
-                options: {
-                    initialViewIndex: curIndex
-                },
-            })
         },
         /** Do resize after some time */
         handleResizeWithDelay() {
@@ -669,15 +647,6 @@ export default {
     cursor: pointer;
 }
 
-.photo-row img {
-    background-clip: content-box;
-    background-color: #eee;
-    padding: 2px;
-    object-fit: cover;
-    border-radius: 3%;
-    cursor: pointer;
-}
-
 .photo-row .photo::before {
     content: "";
     position: absolute;
@@ -696,10 +665,6 @@ export default {
 
 .photo-row .photo:hover::before {
     opacity: 1;
-}
-.photo-row .photo .icon-video-white {
-    position: absolute;
-    top: 8px; right: 8px;
 }
 .head-row {
     height: 40px;
