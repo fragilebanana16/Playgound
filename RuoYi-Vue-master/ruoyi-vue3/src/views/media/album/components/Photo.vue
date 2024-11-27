@@ -1,9 +1,7 @@
 <template>
     <div>
-        <Icon icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-        <img @click="show(collection, data.url)" :src="data.url" :key="data.file_id"
-        @error="handleImageError"
-        v-bind:style="{
+        <Icon v-if="data.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
+        <img @click="show(collection, data.url)" :src="data.url" :key="data.file_id" @error="handleImageError" v-bind:style="{
             width: rowHeight + 'px',
             height: rowHeight + 'px',
         }" />
@@ -37,10 +35,10 @@ export default {
          * @param photos one row photos, todo: same day photos
          * @param current current photo url
          */
-         show(photos, current) {
+        show(photos, current) {
             const urls = photos.map(item => item.url)
             const curIndex = urls.indexOf(current) ?? 0
-            console.log(`output->`,urls)
+            console.log(`output->`, urls)
             this.$viewerApi({
                 images: urls,
                 options: {
@@ -52,10 +50,10 @@ export default {
 }
 </script>
 <style>
-
 .icon-video-white {
     position: absolute;
-    top: 8px; right: 8px;
+    top: 8px;
+    right: 8px;
 }
 
 img {
