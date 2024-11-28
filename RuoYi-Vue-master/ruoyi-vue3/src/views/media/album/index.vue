@@ -371,7 +371,7 @@ export default {
         async fetchDays() {
             const data = Array.from({ length: 5 }, (_, index) => ({
                 id: '00' + index,
-                day_id: index,
+                dayid: index,
                 count: 16, // 这里要和fetchDay的每天数量一致，否则recycle高度和timeline高度不匹配
                 detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
             }));
@@ -402,7 +402,7 @@ export default {
                 }
 
                 // Make date string
-                const dateTaken = new Date(Number(day.day_id) * 86400 * 1000);
+                const dateTaken = new Date(Number(day.dayid) * 86400 * 1000);
                 // mock data
                 const tempYear = dateTaken.getUTCFullYear();
                 dateTaken.setUTCFullYear(tempYear + dayIdx * 10);
@@ -417,7 +417,7 @@ export default {
                 // Create tick if month changed
                 const dtYear = dateTaken.getUTCFullYear();
                 const dtMonth = dateTaken.getUTCMonth()
-                if (Number.isInteger(day.day_id) && (dtMonth !== prevMonth || dtYear !== prevYear)) {
+                if (Number.isInteger(day.dayid) && (dtMonth !== prevMonth || dtYear !== prevYear)) {
                     // Format dateTaken as MM YYYY
                     const dateTimeFormat = new Intl.DateTimeFormat('en-US', { month: 'short' });
                     const monthName = dateTimeFormat.formatToParts(dateTaken)[0].value;
@@ -435,7 +435,7 @@ export default {
                 prevMonth = dtMonth;
                 prevYear = dtYear;
                 // Special headers
-                if (day.day_id === -0.1) {
+                if (day.dayid === -0.1) {
                     dateStr = "Folders";
                 }
                 // Add header to list
@@ -445,16 +445,16 @@ export default {
                     size: 40,
                     head: true,
                     loadedImages: false,
-                    dayId: day.day_id,
+                    dayId: day.dayid,
                 };
-                this.heads[day.day_id] = head;
+                this.heads[day.dayid] = head;
                 this.list.push(head);
                 currTopStatic += head.size;
 
                 // Add rows
                 const nrows = Math.ceil(day.count / this.numCols);
                 for (let i = 0; i < nrows; i++) {
-                    const row = this.getBlankRow(day.day_id);
+                    const row = this.getBlankRow(day.dayid);
                     this.list.push(row);
                     // Add placeholders wtf?
                     const leftNum = (day.count - i * this.numCols);
@@ -462,7 +462,7 @@ export default {
                     for (let j = 0; j < rowCount; j++) {
                         row.photos.push({
                             ph: true, // placeholder
-                            file_id: `${day.day_id}-${i}-${j}`,
+                            file_id: `${day.dayid}-${i}-${j}`,
                         });
                     }
                     // Increment timeline scroller top
@@ -473,7 +473,7 @@ export default {
             // Check preloads 预处理了图片，冗余计算？如果fetchDays能先带一部分数据则先处理一部分，不用每次scroll再请求
             for (const day of data) {
                 if (day.count && day.detail && day.detail.length > 0) {
-                    this.processDay(day.day_id, day.detail);
+                    this.processDay(day.dayid, day.detail);
                 }
             }
 
@@ -515,7 +515,7 @@ export default {
             // try {
             //     const res = await fetch(`/apps/betterphotos/api/days/${dayId}`);
             //     data = await res.json();
-            //     this.days.find(d => d.day_id === dayId).detail = data;
+            //     this.days.find(d => d.dayid === dayId).detail = data;
             //     this.processDay(dayId, data);
             // } catch (e) {
             //     console.error(e);

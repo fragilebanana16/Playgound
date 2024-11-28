@@ -1,7 +1,7 @@
 <template>
     <div>
         <Icon v-if="data.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-        <img @click="show(collection, data.url)" :src="data.ph ? undefined : data.url" :key="data.file_id" @error="handleImageError" alt="mountains" v-bind:style="{
+        <img @click="show(collection, data.url)" :src="data.ph ? undefined : data.url" :key="data.fileid" @error="handleImageError" alt="mountains" v-bind:style="{
             width: rowHeight + 'px',
             height: rowHeight + 'px',
         }" />

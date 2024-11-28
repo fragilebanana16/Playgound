@@ -1,5 +1,5 @@
 <template>
-    <div class="folder dark:bg-[#636463]" @click="openFolder(data.file_id)" 
+    <div class="folder dark:bg-[#636463]" @click="openFolder(data.fileid)" 
     v-bind:class="{
         hasPreview: previewFileInfos.length > 0,
         onePreview: previewFileInfos.length === 1,}" 
