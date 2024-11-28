@@ -1,7 +1,7 @@
 <template>
     <div>
         <Icon v-if="data.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-        <img @click="show(collection, data.url)" :src="data.url" :key="data.file_id" @error="handleImageError" v-bind:style="{
+        <img @click="show(collection, data.url)" :src="data.ph ? undefined : data.url" :key="data.file_id" @error="handleImageError" alt="mountains" v-bind:style="{
             width: rowHeight + 'px',
             height: rowHeight + 'px',
         }" />
@@ -9,7 +9,6 @@
 </template>
 <script>
 import { Icon } from '@iconify/vue'
-
 export default {
     name: 'Photo',
     components: {
@@ -36,9 +35,12 @@ export default {
          * @param current current photo url
          */
         show(photos, current) {
+            // Check if this is a placeholder
+            if (this.data.ph) {
+                return;
+            }
             const urls = photos.map(item => item.url)
             const curIndex = urls.indexOf(current) ?? 0
-            console.log(`output->`, urls)
             this.$viewerApi({
                 images: urls,
                 options: {
@@ -46,6 +48,9 @@ export default {
                 },
             })
         },
+        handleImageError(event) {
+            event.target.src = placeholder
+        }
     }
 }
 </script>
