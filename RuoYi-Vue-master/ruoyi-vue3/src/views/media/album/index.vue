@@ -6,11 +6,11 @@
             <h1 v-if="item.head" class="head-row" v-bind:class="{ 'first': item.id === 1 }">
                 {{ item.name }}
             </h1>
-
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.l">
                     <Folder v-if="photo.is_folder" :data="photo" :rowHeight="rowHeight" />
-                    <Photo v-else :data="photo" :collection="item.photos" :rowHeight="rowHeight" :day="item.day" />
+                    <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
+                            @reprocess="processDay" />
                 </div>
             </div>
         </RecycleScroller>
@@ -311,10 +311,6 @@ export default {
         scrollPositionChange(event) {
             if (event) {
                 this.timelineCursorY = event.target.scrollTop * this.timelineHeight / this.viewHeight;
-                console.log("scrolltop->", event.target.scrollTop)
-                console.log("timelineHeight->", this.timelineHeight)
-                console.log("viewHeight->", this.viewHeight)
-                console.log("timelineCursorY->", this.timelineCursorY)
                 this.timelineMoveHoverCursor(this.timelineCursorY);
             }
             if (this.scrollTimer) {
@@ -446,6 +442,7 @@ export default {
                     head: true,
                     loadedImages: false,
                     dayId: day.dayid,
+                    day: day,
                 };
                 this.heads[day.dayid] = head;
                 this.list.push(head);
@@ -454,7 +451,7 @@ export default {
                 // Add rows
                 const nrows = Math.ceil(day.count / this.numCols);
                 for (let i = 0; i < nrows; i++) {
-                    const row = this.getBlankRow(day.dayid);
+                    const row = this.getBlankRow(day);
                     this.list.push(row);
                     // Add placeholders wtf?
                     const leftNum = (day.count - i * this.numCols);
@@ -462,7 +459,7 @@ export default {
                     for (let j = 0; j < rowCount; j++) {
                         row.photos.push({
                             ph: true, // placeholder
-                            file_id: `${day.dayid}-${i}-${j}`,
+                            fileid: `${day.dayid}-${i}-${j}`,
                         });
                     }
                     // Increment timeline scroller top
@@ -473,7 +470,7 @@ export default {
             // Check preloads 预处理了图片，冗余计算？如果fetchDays能先带一部分数据则先处理一部分，不用每次scroll再请求
             for (const day of data) {
                 if (day.count && day.detail && day.detail.length > 0) {
-                    this.processDay(day.dayid, day.detail);
+                    this.processDay(day);
                 }
             }
 
@@ -494,7 +491,7 @@ export default {
             const prefix = baseUrl + '/music/covers/'
             let data: SongData[] = [];
             type SongData = {
-                file_id: string;
+                fileid: string;
                 url: string;
                 is_video: boolean;
                 is_folder: boolean;
@@ -507,27 +504,42 @@ export default {
             }
             const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
             randomArray.forEach((img, index) => {
-                const file_id = `001${index + 1}`;
+                const fileid = `001${index + 1}`;
                 const url = `${prefix}${img}`;
-                data.push({ file_id, url, is_video: index % 3 === 0, is_folder: index % 5 === 0, name: 'folder' + index / 5  });
+                data.push({ fileid, url, is_video: index % 3 === 0, is_folder: index % 5 === 0, name: 'folder' + index / 5  });
             });
             
             // try {
             //     const res = await fetch(`/apps/betterphotos/api/days/${dayId}`);
             //     data = await res.json();
-            //     this.days.find(d => d.dayid === dayId).detail = data;
-            //     this.processDay(dayId, data);
+            //     const day = this.days.find(d => d.dayid === dayId);
+            //     day.detail = data;
+            //     this.processDay(day);
             // } catch (e) {
             //     console.error(e);
             //     head.loadedImages = false;
             // }
-            this.processDay(dayId, data);
+            const day = this.days.find(d => d.dayid === dayId);
+            console.log(`daydayday->`,day)
+            day.detail = data;
+            this.processDay(day);
         },
 
         /** Process items from day response */
-        processDay(dayId, data) {
+        processDay(day) {
+            const dayId = day.dayid;
+            const data = day.detail;
             const head = this.heads[dayId];
             head.loadedImages = true;
+            // Reset rows if re-processing
+            if (head.day?.rows) {
+                for (const row of head.day.rows) {
+                    row.photos = [];
+                }
+            }
+            if (head.day) {
+                head.day.rows = new Set();
+            }
 
             // Get index of header O(n)
             const headIdx = this.list.findIndex(item => item.id === head.id);
@@ -538,7 +550,7 @@ export default {
             while (dataIdx < data.length) {
                 // Check if we ran out of rows
                 if (rowIdx >= this.list.length || this.list[rowIdx].head) {
-                    this.list.splice(rowIdx, 0, this.getBlankRow(dayId));
+                    this.list.splice(rowIdx, 0, this.getBlankRow(day));
                 }
 
                 const row = this.list[rowIdx];
@@ -556,6 +568,9 @@ export default {
                 // Add the photo to the row
                 this.list[rowIdx].photos.push(data[dataIdx]);
                 dataIdx++;
+
+                // Add row to day
+                head.day?.rows.add(row);
             }
 
             // Get rid of any extra rows
@@ -569,12 +584,13 @@ export default {
         },
 
         /** Get a new blank row */
-        getBlankRow(dayId) {
+        getBlankRow(day) {
             return {
                 id: ++this.numRows,
                 photos: [],
                 size: this.rowHeight,
-                dayId: dayId,
+                dayId: day.dayid,
+                day: day,
             };
         },
 

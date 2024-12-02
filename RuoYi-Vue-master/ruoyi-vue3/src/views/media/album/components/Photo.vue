@@ -1,7 +1,7 @@
 <template>
     <div>
         <Icon v-if="data.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-        <img @click="show(collection, data.url)" :src="data.ph ? undefined : data.url" :key="data.fileid"
+        <img @click="show(collection, data.url)" :src="data.ph ? '' : data.url" :key="data.fileid"
             @error="handleImageError" alt="mountains" v-bind:style="{
                 width: rowHeight + 'px',
                 height: rowHeight + 'px',
@@ -10,6 +10,7 @@
 </template>
 <script>
 import { Icon } from '@iconify/vue'
+import placeholder from '@/assets/images/error.svg'
 export default {
     name: 'Photo',
     components: {
@@ -27,7 +28,11 @@ export default {
         rowHeight: {
             type: Number,
             required: true,
-        }
+        },
+        day: {
+            type: Object,
+            required: true,
+        },
     },
     methods: {
         getCurrentImage() {
@@ -50,6 +55,7 @@ export default {
                 images: urls,
                 options: {
                     initialViewIndex: curIndex,
+                    hidden: this.processDeleted, // https://github.com/fengyuanchen/viewerjs?tab=readme-ov-file#options
                     toolbar: {
                         zoomIn: 4,
                         zoomOut: 4,
@@ -76,11 +82,36 @@ export default {
                             document.body.removeChild(a);
                         },
                         delete: () => {
-                            console.log(`output->delete`)
+                            this.$modal.confirm('是否确认删除"' + arguments[1] + '"的数据项?').then(() => {
+                                // todo
+                                this.day.fileInfos = this.day.detail.slice(0,2); 
+                                this.$modal.msgSuccess("删除成功");
+                            }).catch(() => { });
                         },
                     },
                 },
             })
+
+            // Store in day with a original copy
+            // this.day.fileInfos = this.day.detail.slice(0,2); // mock data: simulate delete
+            this.day.fiOrigIds = new Set(this.day.detail.map(f => f.fileid));
+        },
+        /** Remove deleted files from main view */
+        processDeleted() {
+            console.log(`output->hidden`)
+            // This is really an ugly hack, but the viewer
+            // does not provide a way to get the deleted files
+            // Compare new and old list of ids
+            const newIds = new Set(this.day.fileInfos.map(f => f.fileid));
+            const remIds = new Set([...this.day.fiOrigIds].filter(x => !newIds.has(x)));
+            // Exit if nothing to do
+            if (remIds.size === 0) {
+                return;
+            }
+            this.day.fiOrigIds = newIds;
+            // Remove deleted files from details
+            this.day.detail = this.day.detail.filter(d => !remIds.has(d.fileid));
+            this.$emit('reprocess', this.day);
         },
         handleImageError(event) {
             event.target.src = placeholder
@@ -89,6 +120,9 @@ export default {
 }
 </script>
 <style>
+.viewer-container{
+    z-index: 101 !important;
+}
 .icon-video-white {
     position: absolute;
     top: 8px;
@@ -144,19 +178,4 @@ img {
     /* 防止换行 */
 }
 
-/* 特定内容 */
-.viewer-download::after {
-    content: "下载";
-}
-
-.viewer-delete::after {
-    content: "删除";
-}
-
-.viewer-download:hover::after,
-.viewer-delete:hover::after {
-    visibility: visible;
-    /* 悬停时可见 */
-    opacity: 1;
-    /* 悬停时显示 */
-}</style>
+</style>
