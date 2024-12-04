@@ -10,11 +10,13 @@
                 <div class="photo" v-for="photo of item.photos" :key="photo.l">
                     <Folder v-if="photo.is_folder" :data="photo" :rowHeight="rowHeight" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
-                            @reprocess="processDay" />
+                            @select="selectPhoto"
+                            @reprocess="processDay"
+                            @clickImg="clickPhoto" />
                 </div>
             </div>
         </RecycleScroller>
-
+        <!-- Timeline -->
         <div ref="timelineScroll" class="timeline-scroll" v-bind:class="{ scrolling }" @mousemove="timelineHover"
             @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
             <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" v-bind:style="{ top: timelineCursorY + 'px' }"></span>
@@ -28,6 +30,10 @@
                     <span v-else class="dash"></span>
                 </template>
             </div>
+        </div>
+        <!-- Top bar for selections etc -->
+        <div v-if="selection.size > 0" class="top-bar">
+            {{ selection.size }} items selected
         </div>
     </div>
 </template>
@@ -169,6 +175,8 @@ export default {
             resizeTimer: null,
             /** Is mobile layout */
             isMobile: false,
+            /** List of selected file ids */
+            selection: new Set(),
         }
     },
 
@@ -470,8 +478,8 @@ export default {
             type SongData = {
                 fileid: string;
                 url: string;
-                is_video: boolean;
-                is_folder: boolean;
+                isvideo: boolean;
+                isfolder: boolean;
                 name: string;
             };
 
@@ -483,7 +491,7 @@ export default {
             randomArray.forEach((img, index) => {
                 const fileid = `001${index + 1}`;
                 const url = `${prefix}${img}`;
-                data.push({ fileid, url, is_video: index % 3 === 0, is_folder: index % 5 === 0, name: 'folder' + index / 5  });
+                data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5  });
             });
             
             // try {
@@ -686,7 +694,25 @@ export default {
                 return;
             }
             this.$refs.scroller.scrollToPosition(1000);
-        }
+        },
+        /** Clicking on photo */
+        clickPhoto(photoComponent, photos, current) {
+            if (this.selection.size > 0) { // selection mode
+                photoComponent.toggleSelect();
+            } else {
+                photoComponent.openFile(photos, current);
+            }
+        },
+        /** Add a photo to selection list */
+        selectPhoto(photo) {
+            photo.selected = !this.selection.has(photo.fileid) || undefined;
+            if (photo.selected) {
+                this.selection.add(photo.fileid);
+            } else {
+                this.selection.delete(photo.fileid);
+            }
+            this.$forceUpdate();
+        },
     },
 }
 
@@ -711,6 +737,20 @@ export default {
     display: inline-block;
     position: relative;
     cursor: pointer;
+}
+
+/** Top bar */
+.top-bar {
+    position: absolute;
+    font-size: 0.9rem;
+    top: 3px; right: 15px;
+    padding: 6px;
+    width: 300px;
+    max-width: calc(100vw - 30px);
+    background-color: #fff;
+    box-shadow: 0 0 2px gray;
+    border-radius: 10px;
+    opacity: 0.95;
 }
 
 .photo-row .photo::before {
@@ -804,6 +844,9 @@ export default {
 }
 
 @media (max-width: 768px) {
+    .top-bar {
+        top: 35px;
+    }
     .timeline-scroll .tick {
         background-color: black;
         padding: 1px 4px;

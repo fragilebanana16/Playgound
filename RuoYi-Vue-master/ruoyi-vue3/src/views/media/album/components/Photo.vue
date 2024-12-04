@@ -1,8 +1,9 @@
 <template>
-    <div>
-        <Icon v-if="data.is_video" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-        <img @click="show(collection, data.url)" :src="data.ph ? '' : data.url" :key="data.fileid"
-            @error="handleImageError" alt="mountains" v-bind:style="{
+    <div class="photo-container" :class="{ 'selected': data.selected }">
+        <Icon icon='material-symbols:check' class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
+        <Icon v-if="data.isvideo" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
+        <img @click="click(collection, data.url)" :src="data.ph ? '' : data.url" :key="data.fileid"
+            @error="handleImageError" alt="mountains" :style="{
                 width: rowHeight + 'px',
                 height: rowHeight + 'px',
             }" />
@@ -39,12 +40,18 @@ export default {
             const currentImage = this.collection[0]; // todo get index?
             return currentImage;
         },
+
+         /** Pass to parent */
+         click(photos, current) {
+            this.$emit('clickImg', this, photos, current);
+        },
+
         /**
          * show v-viewer
          * @param photos one row photos, todo: same day photos
          * @param current current photo url
          */
-        show(photos, current) {
+        openFile(photos, current) {
             // Check if this is a placeholder
             if (this.data.ph) {
                 return;
@@ -114,6 +121,10 @@ export default {
             this.day.count = this.day.detail.length;
             this.$emit('reprocess', this.day);
         },
+        toggleSelect() {
+            this.$emit('select', this.data);
+            this.$forceUpdate();
+        },
         handleImageError(event) {
             event.target.src = placeholder
         }
@@ -128,6 +139,7 @@ export default {
     position: absolute;
     top: 8px;
     right: 8px;
+    transition: padding 0.1s ease-in-out;
 }
 
 img {
@@ -177,6 +189,27 @@ img {
     /* 动画效果 */
     white-space: nowrap;
     /* 防止换行 */
+}
+
+.photo-container:hover .icon-checkmark {
+    opacity: 0.9;
+}
+.photo-container.selected .icon-checkmark {
+    opacity: 0.9;
+    filter: invert();
+}
+.photo-container.selected img {
+    padding: 8%;
+}
+.icon-checkmark {
+    opacity: 0;
+    position: absolute;
+    top: 8px; left: 8px;
+    background-color: #fff;
+    border-radius: 50%;
+    background-size: 80%;
+    padding: 5px;
+    cursor: pointer;
 }
 
 </style>
