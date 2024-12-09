@@ -1,12 +1,14 @@
 <template>
     <div class="photo-container" :class="{ 'selected': data.selected }">
-        <Icon icon='material-symbols:check' class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
+        <Icon icon='material-symbols:check' v-if="!data.ph" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
         <Icon v-if="data.isvideo" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-        <img @click="click(collection, data.url)" :src="data.ph ? '' : data.url" :key="data.fileid"
-            @error="handleImageError" alt="mountains" :style="{
+        <div class="img-outer" :style="{
                 width: rowHeight + 'px',
                 height: rowHeight + 'px',
-            }" />
+            }">
+        <img @click="click(collection, data.url)" :src="data.ph ? '' : data.url" :key="data.fileid"
+            @error="handleImageError" alt="mountains" />
+        </div>
     </div>
 </template>
 <script>
@@ -122,6 +124,9 @@ export default {
             this.$emit('reprocess', this.day);
         },
         toggleSelect() {
+            if (this.data.ph) {
+                return;
+            }
             this.$emit('select', this.data);
             this.$forceUpdate();
         },
@@ -149,6 +154,7 @@ img {
     object-fit: cover;
     border-radius: 3%;
     cursor: pointer;
+    width: 100%; height: 100%;
 }
 
 .viewer-download,
@@ -192,14 +198,17 @@ img {
 }
 
 .photo-container:hover .icon-checkmark {
-    opacity: 0.9;
+    opacity: 0.7;
 }
 .photo-container.selected .icon-checkmark {
     opacity: 0.9;
     filter: invert();
 }
+.photo-container.selected .img-outer {
+    padding: 6%;
+}
 .photo-container.selected img {
-    padding: 8%;
+    box-shadow: 0 0 6px 2px #000;
 }
 .icon-checkmark {
     opacity: 0;
@@ -211,5 +220,8 @@ img {
     padding: 5px;
     cursor: pointer;
 }
-
+.img-outer {
+    padding: 2px;
+    transition: all 0.1s ease-in-out;
+}
 </style>
