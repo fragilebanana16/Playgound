@@ -7,9 +7,9 @@
                 {{ item.name }}
             </h1>
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
-                <div class="photo" v-for="photo of item.photos" :key="photo.l">
+                <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
                     <Folder v-if="photo.is_folder" :data="photo" :rowHeight="rowHeight" />
-                    <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
+                    <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :selected="photo.s || false" :collection="item.photos"
                             @select="selectPhoto"
                             @reprocess="processDay"
                             @clickImg="clickPhoto" />
@@ -33,7 +33,18 @@
         </div>
         <!-- Top bar for selections etc -->
         <div v-if="selection.size > 0" class="top-bar">
-            {{ selection.size }} items selected
+            <div class="icon-container" @click="clearSelection">
+              <Icon icon='material-symbols:close' class="btn text-lg"  @click="clearSelection"></Icon>
+            </div>
+            <div class="text">
+                {{ selection.size }} items selected
+            </div>
+            <div class="icon-container" @click="clearSelection">
+                <Icon icon='material-symbols:delete-outline' class="btn text-lg"></Icon>
+            </div>
+            <div class="icon-container" @click="clearSelection">
+                <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
+            </div>
         </div>
     </div>
 </template>
@@ -209,6 +220,7 @@ export default {
     methods: {
         /** Reset all state */
         resetState() {
+            this.clearSelection();
             this.loading = true;
             this.list = [];
             this.numRows = 0;
@@ -262,7 +274,6 @@ export default {
         handleViewSizeChange() {
             setTimeout(() => {
                 this.viewHeight = this.$refs.scroller.$refs.wrapper.clientHeight;
-                console.log(this.viewHeight)
                 // Compute timeline tick positions
                 for (const tick of this.timelineTicks) {
                     tick.topC = Math.floor((tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight);
@@ -393,8 +404,6 @@ export default {
             // await api
             if (this.state !== startState) return;
             this.days = data;
-            console.log(`output->`,this.days)
-
             for (const [dayIdx, day] of data.entries()) {
                 day.count = Number(day.count);
                 day.rows = new Set();
@@ -519,10 +528,8 @@ export default {
             let prevYear = 9999;
             let prevMonth = 0;
             const thisYear = new Date().getFullYear();
-            console.log(`outputdddddddd->`,this.days)
             // Itearte over days
             for (const day of this.days) {
-                debugger
                 if (day.count === 0) {
                     console.log('skip', day);
                     continue;
@@ -539,7 +546,6 @@ export default {
                         timeZone: 'UTC',
                     });
                     const monthName = dateTimeFormat.formatToParts(dateTaken)[0].value;
-                    console.log(`>heheheh`)
                     // Create tick
                     this.timelineTicks.push({
                         dayId: day.id,
@@ -597,7 +603,9 @@ export default {
                 }
 
                 // Add the photo to the row
-                this.list[rowIdx].photos.push(data[dataIdx]);
+                const photo = data[dataIdx];
+                photo.s = false; // selected
+                this.list[rowIdx].photos.push(photo);
                 dataIdx++;
 
                 // Add row to day
@@ -705,14 +713,22 @@ export default {
         },
         /** Add a photo to selection list */
         selectPhoto(photo) {
-            photo.selected = !this.selection.has(photo.fileid) || undefined;
-            if (photo.selected) {
-                this.selection.add(photo.fileid);
+            photo.s = !this.selection.has(photo);
+            if (photo.s) {
+                this.selection.add(photo);
             } else {
-                this.selection.delete(photo.fileid);
+                this.selection.delete(photo);
             }
             this.$forceUpdate();
         },
+        /** Clear all selected photos */
+        clearSelection() {
+            for (const photo of this.selection) {
+                photo.s = false;
+            }
+            this.selection.clear();
+            this.$forceUpdate();
+        }
     },
 }
 
@@ -745,14 +761,28 @@ export default {
     font-size: 0.9rem;
     top: 3px; right: 15px;
     padding: 6px;
-    width: 300px;
+    width: 400px;
     max-width: calc(100vw - 30px);
     background-color: #fff;
     box-shadow: 0 0 2px gray;
     border-radius: 10px;
     opacity: 0.95;
+    display: flex;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: space-around;
+    margin-right: 3rem;
 }
-
+.top-bar .text {
+    flex-grow: 0.6;
+    line-height: 36px;
+    padding-left: 8px;
+}
+.top-bar .btn {
+    display: inline-block;
+    margin-right: 3px;
+    cursor: pointer;
+}
 .photo-row .photo::before {
     content: "";
     position: absolute;
@@ -842,10 +872,32 @@ export default {
     font-size: 0.95em;
     font-weight: 600;
 }
-
+.icon-container {
+    display: inline-block;
+    position: relative;
+    margin: -2px;
+}
+.icon-container:hover::before{
+    opacity: 1;
+}
+.icon-container::before {
+    content: '';
+    opacity: 0;
+    position: absolute;
+    top: 53%;
+    left: 43%;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1; /* 背景在图标下面 */
+    transition: opacity  0.3s;
+}
 @media (max-width: 768px) {
     .top-bar {
         top: 35px;
+        right: 15px;
     }
     .timeline-scroll .tick {
         background-color: black;

@@ -1,5 +1,5 @@
 <template>
-    <div class="photo-container" :class="{ 'selected': data.selected }">
+    <div class="photo-container" :class="{ 'selected': selected }">
         <Icon icon='material-symbols:check' v-if="!data.ph" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
         <Icon v-if="data.isvideo" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
         <div class="img-outer" :style="{
@@ -34,6 +34,10 @@ export default {
         },
         day: {
             type: Object,
+            required: true,
+        },
+        selected: {
+            type: Boolean,
             required: true,
         },
     },
@@ -107,10 +111,13 @@ export default {
         },
         /** Remove deleted files from main view */
         processDeleted() {
-            console.log(`output->hidden`)
             // This is really an ugly hack, but the viewer
             // does not provide a way to get the deleted files
             // Compare new and old list of ids
+            if (!this.day.fileInfos || !this.day.fiOrigIds) {
+                console.log(`processDeleted info needed.`)
+                return
+            }
             const newIds = new Set(this.day.fileInfos.map(f => f.fileid));
             const remIds = new Set([...this.day.fiOrigIds].filter(x => !newIds.has(x)));
             // Exit if nothing to do
@@ -128,7 +135,6 @@ export default {
                 return;
             }
             this.$emit('select', this.data);
-            this.$forceUpdate();
         },
         handleImageError(event) {
             event.target.src = placeholder
