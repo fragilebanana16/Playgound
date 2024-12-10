@@ -836,7 +836,7 @@ export default {
     vertical-align: middle;
     align-items: center;
     justify-content: space-around;
-    margin-right: 3rem;
+    margin-right: 2rem;
 }
 .top-bar .text {
     flex-grow: 0.6;
@@ -962,10 +962,12 @@ export default {
 @media (max-width: 768px) {
     .top-bar {
         top: 35px;
-        right: 15px;
+        right: 5px;
+        max-width: calc(100vw - 150px);
+
     }
     .timeline-scroll .tick {
-        background-color: black;
+        background-color: rgba(100, 100, 100, 0.1);
         padding: 1px 4px;
         border-radius: 4px;
     }

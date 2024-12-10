@@ -6,7 +6,12 @@
                 width: rowHeight + 'px',
                 height: rowHeight + 'px',
             }">
-        <img @click="click(collection, data.url)" :src="data.ph ? '' : data.url" :key="data.fileid"
+        <img @click="click(collection, data.url)" 
+        @contextmenu="contextmenu"
+        @touchstart="touchstart"
+        @touchend="touchend"
+        @touchcancel="touchend"
+        :src="data.ph ? '' : data.url" :key="data.fileid"
             @error="handleImageError" alt="mountains" />
         </div>
     </div>
@@ -40,6 +45,11 @@ export default {
             type: Boolean,
             required: true,
         },
+    },
+    data() {
+        return {
+            touchTimer: 0,
+        }
     },
     methods: {
         getCurrentImage() {
@@ -138,7 +148,23 @@ export default {
         },
         handleImageError(event) {
             event.target.src = placeholder
-        }
+        },
+        touchstart() {
+            this.touchTimer = setTimeout(() => {
+                this.toggleSelect();
+                this.touchTimer = 0;
+            }, 400);
+        },
+        contextmenu(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        },
+        touchend() {
+            if (this.touchTimer) {
+                clearTimeout(this.touchTimer);
+                this.touchTimer = 0;
+            }
+        },
     }
 }
 </script>
