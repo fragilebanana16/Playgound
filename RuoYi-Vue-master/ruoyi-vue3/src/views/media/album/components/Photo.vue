@@ -10,6 +10,7 @@
         @contextmenu="contextmenu"
         @touchstart="touchstart"
         @touchend="touchend"
+        @touchmove="touchend"
         @touchcancel="touchend"
         :src="data.ph ? '' : data.url" :key="data.fileid"
             @error="handleImageError" alt="mountains" />
@@ -153,7 +154,7 @@ export default {
             this.touchTimer = setTimeout(() => {
                 this.toggleSelect();
                 this.touchTimer = 0;
-            }, 400);
+            }, 600);
         },
         contextmenu(e) {
             e.preventDefault();
@@ -187,6 +188,9 @@ img {
     border-radius: 3%;
     cursor: pointer;
     width: 100%; height: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 
 .viewer-download,
