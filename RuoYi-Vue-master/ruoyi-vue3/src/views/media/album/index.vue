@@ -1,5 +1,5 @@
 <template>
-    <div class="album-container" ref="container" :class="{ 'icon-loading': loading }">
+    <div class="album-container" ref="container" :v-loading="loading">
         <!-- size-field look for item, item-size="300"-->
         <RecycleScroller ref="scroller" class="scroller" :items="list" size-field="size" key-field="id" v-slot="{ item }"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
@@ -37,12 +37,12 @@
               <Icon icon='material-symbols:close' class="btn text-lg"  @click="clearSelection"></Icon>
             </div>
             <div class="text">
-                {{ selection.size }} items selected
+                {{ selection.size }} item(s) selected
             </div>
-            <div class="icon-container" @click="clearSelection">
+            <div class="icon-container" @click="deleteSelection">
                 <Icon icon='material-symbols:delete-outline' class="btn text-lg"></Icon>
             </div>
-            <div class="icon-container" @click="clearSelection">
+            <div class="icon-container">
                 <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
             </div>
         </div>
@@ -130,7 +130,18 @@ const MOCK_IMG_DATA = [
     "What Lovers Do - Maroon 5,SZA.jpg",
     "What Makes You Beautiful - One Direction.jpg",
 ];
-
+type Day = {
+    id: string;
+    dayid: string;
+    count: Number;
+    detail: Array<DayDetail>;
+    rows: object;
+}; 
+type DayDetail = {
+    fileid: string;
+    dayid: string;
+    count: Number;
+}; 
 export default {
     components: {
         RecycleScroller,
@@ -394,7 +405,6 @@ export default {
                 detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
                 rows: new Set()
             }));
-
             
             if (this.$route.name === 'albums') {
                 const id = this.$route.params.id || 0;
@@ -605,6 +615,7 @@ export default {
                 // Add the photo to the row
                 const photo = data[dataIdx];
                 photo.s = false; // selected
+                photo.d = day; // backref to day
                 this.list[rowIdx].photos.push(photo);
                 dataIdx++;
 
@@ -728,7 +739,61 @@ export default {
             }
             this.selection.clear();
             this.$forceUpdate();
-        }
+        },
+        /** Delete all selected photos */
+        async deleteSelection() {
+            if (this.selection.size === 0) {
+                return;
+            }
+            const updatedDays = new Set<Day>();
+            const delIds = new Set();
+            for (const photo of this.selection) {
+                if (!photo.fileid) {
+                    continue;
+                }
+                delIds.add(photo.fileid);
+                updatedDays.add(photo.d);
+            }
+
+            // Get files data
+            // TODO: api call
+            // let fileInfos = [];
+            // this.loading = true;
+
+            // try {
+            //     fileInfos = await dav.getFiles([...delIds]);
+            // } catch {
+            //     this.loading = false;
+            //     alert('Failed to get file info');
+            //     return;
+            // }
+            // // Run all promises together
+            // const promises = [];
+            // // Delete each file
+            // delIds.clear();
+            // for (const fileInfo of fileInfos) {
+            //     promises.push((async () => {
+            //         try {
+            //             await dav.deleteFile(fileInfo.filename)
+            //             delIds.add(fileInfo.fileid);
+            //         } catch {
+            //             console.warn('Failed to delete', fileInfo.filename)
+            //         }
+            //     })());
+            // }
+            // await Promise.allSettled(promises);
+            // this.loading = false;
+            // Reflow all touched days
+
+            for (const day of updatedDays) {
+                day.detail = day.detail.filter(p => !delIds.has(p.fileid));
+                day.count = day.detail.length;
+                this.processDay(day);
+            }
+            this.clearSelection();
+            this.reflowTimeline();
+            this.handleViewSizeChange();
+        },
     },
 }
 
