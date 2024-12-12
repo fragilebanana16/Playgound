@@ -47,11 +47,10 @@ const { queryParams, form, rules } = toRefs(data);
 
 onMounted(() => {
   Promise.all([
-    listMusic(queryParams.value),
+    listMusic({pageNum: 1, pageSize: 100 }),
     listMusicPlaylist({pageNum: 1, pageSize: 10})
   ])
   .then(([tableRsp, albumRsp]) => {
-    debugger
     state.tableData = tableRsp
     state.SongList = albumRsp.rows
   })

@@ -210,7 +210,6 @@ const { queryParams, form, rules } = toRefs(data);
 function resetDB(){
   loading.value = true;
   resetToLocalMovies(queryParams.value).then(response => {
-    debugger
     proxy.$modal.msgSuccess(`重置${response}个电影`);
     loading.value = false;
   });

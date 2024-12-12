@@ -9,7 +9,7 @@
             <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
                     <Folder v-if="photo.is_folder" :data="photo" :rowHeight="rowHeight" />
-                    <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :selected="photo.s || false" :collection="item.photos"
+                    <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
                             @select="selectPhoto"
                             @reprocess="processDay"
                             @clickImg="clickPhoto" />
