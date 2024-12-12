@@ -1,6 +1,6 @@
 <template>
-    <div class="photo-container" :class="{ 'selected': selected }">
-        <Icon icon='material-symbols:check' v-if="!data.ph" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
+    <div class="photo-container" :class="{ 'selected': (data.flag & c.FLAG_SELECTED) }">
+        <Icon icon='material-symbols:check' v-if="!(data.flag & c.FLAG_PLACEHOLDER)" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
         <Icon v-if="data.isvideo" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
         <div class="img-outer" :style="{
                 width: rowHeight + 'px',
@@ -12,7 +12,7 @@
         @touchend="touchend"
         @touchmove="touchend"
         @touchcancel="touchend"
-        :src="data.ph ? '' : data.url" :key="data.fileid"
+        :src="(data.flag & c.FLAG_PLACEHOLDER) ? '' : data.url" :key="data.fileid"
             @error="handleImageError" alt="mountains" />
         </div>
     </div>
@@ -20,6 +20,7 @@
 <script>
 import { Icon } from '@iconify/vue'
 import placeholder from '@/assets/images/error.svg'
+import constants from '../constants'
 export default {
     name: 'Photo',
     components: {
@@ -42,14 +43,11 @@ export default {
             type: Object,
             required: true,
         },
-        selected: {
-            type: Boolean,
-            required: true,
-        },
     },
     data() {
         return {
             touchTimer: 0,
+            c: constants,
         }
     },
     methods: {
@@ -58,8 +56,8 @@ export default {
             return currentImage;
         },
 
-         /** Pass to parent */
-         click(photos, current) {
+        /** Pass to parent */
+        click(photos, current) {
             this.$emit('clickImg', this, photos, current);
         },
 
@@ -70,7 +68,7 @@ export default {
          */
         openFile(photos, current) {
             // Check if this is a placeholder
-            if (this.data.ph) {
+            if (this.data.flag & constants.FLAG_PLACEHOLDER) {
                 return;
             }
             const urls = photos.map(item => item.url)
@@ -142,7 +140,7 @@ export default {
             this.$emit('reprocess', this.day);
         },
         toggleSelect() {
-            if (this.data.ph) {
+            if (this.data.flag & constants.FLAG_PLACEHOLDER) {
                 return;
             }
             this.$emit('select', this.data);

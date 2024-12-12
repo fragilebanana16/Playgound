@@ -58,6 +58,7 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { Icon } from '@iconify/vue'
 import Folder from "./components/Folder.vue";
 import Photo  from "./components/Photo.vue";
+import constants from "./constants";
 const router = useRoute()
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
@@ -199,6 +200,8 @@ export default {
             isMobile: false,
             /** List of selected file ids */
             selection: new Set(),
+            /** Constants for HTML template */
+            c: constants,
         }
     },
 
@@ -463,7 +466,7 @@ export default {
                     const rowCount = leftNum > this.numCols ? this.numCols : leftNum;
                     for (let j = 0; j < rowCount; j++) {
                         row.photos.push({
-                            ph: true, // placeholder
+                            flag: constants.FLAG_PLACEHOLDER,
                             fileid: `${day.dayid}-${i}-${j}`,
                         });
                     }
@@ -614,7 +617,7 @@ export default {
 
                 // Add the photo to the row
                 const photo = data[dataIdx];
-                photo.s = false; // selected
+                photo.flag = 0; // flags
                 photo.d = day; // backref to day
                 this.list[rowIdx].photos.push(photo);
                 dataIdx++;
@@ -724,10 +727,12 @@ export default {
         },
         /** Add a photo to selection list */
         selectPhoto(photo) {
-            photo.s = !this.selection.has(photo);
-            if (photo.s) {
+            const nval = !this.selection.has(photo);
+            if (nval) {
+                photo.flag |= constants.FLAG_SELECTED;
                 this.selection.add(photo);
             } else {
+                photo.flag &= ~constants.FLAG_SELECTED;
                 this.selection.delete(photo);
             }
             this.$forceUpdate();
@@ -735,7 +740,7 @@ export default {
         /** Clear all selected photos */
         clearSelection() {
             for (const photo of this.selection) {
-                photo.s = false;
+                photo.flag &= ~constants.FLAG_SELECTED;
             }
             this.selection.clear();
             this.$forceUpdate();
