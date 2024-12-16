@@ -1,6 +1,6 @@
 <template>
   <div class="app-container home">
-    None
+    NoContent
   </div>
 </template>
 
