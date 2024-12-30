@@ -134,14 +134,21 @@ const MOCK_IMG_DATA = [
 type Day = {
     id: string;
     dayid: string;
-    count: Number;
+    count: number;
     detail: Array<DayDetail>;
-    rows: object;
+    rows: Array<Row>;
 }; 
+type Row = {
+    photos: Array<Photo>;
+}
+type Photo = {
+    flag: number;
+    fileid: string
+}
 type DayDetail = {
     fileid: string;
     dayid: string;
-    count: Number;
+    count: number;
 }; 
 export default {
     components: {
@@ -790,10 +797,57 @@ export default {
             // this.loading = false;
             // Reflow all touched days
 
+            // Animate the deletion
+            for (const photo of this.selection) {
+                if (delIds.has(photo.fileid)) {
+                    photo.flag |= constants.FLAG_LEAVING;
+                }
+            }
+            // wait for 250ms
+            await new Promise(resolve => setTimeout(resolve, 200));
+            // Speculate day reflow for animation
+            const exitedLeft = new Set();
+            for (const day of updatedDays) {
+                let nextExit = false;
+                for (const row of day.rows) {
+                    for (const photo of row.photos) {
+                        if (photo.flag & constants.FLAG_LEAVING) {
+                            nextExit = true;
+                        } else if (nextExit) {
+                            photo.flag |= constants.FLAG_EXIT_LEFT;
+                            exitedLeft.add(photo.fileid);
+                        }
+                    }
+                }
+            }
+            // wait for 200ms
+            await new Promise(resolve => setTimeout(resolve, 200));
+
             for (const day of updatedDays) {
                 day.detail = day.detail.filter(p => !delIds.has(p.fileid));
                 day.count = day.detail.length;
                 this.processDay(day);
+            }
+
+            // Enter from right all photos that exited left
+            for (const day of updatedDays) {
+                for (const row of day.rows) {
+                    for (const photo of row.photos) {
+                        if (exitedLeft.has(photo.fileid)) {
+                            photo.flag |= constants.FLAG_ENTER_RIGHT;
+                        }
+                    }
+                }
+            }
+            // wait for 200ms
+            await new Promise(resolve => setTimeout(resolve, 200));
+            // Clear enter right flags
+            for (const day of updatedDays) {
+                for (const row of day.rows) {
+                    for (const photo of row.photos) {
+                        photo.flag &= ~constants.FLAG_ENTER_RIGHT;
+                    }
+                }
             }
             this.clearSelection();
             this.reflowTimeline();

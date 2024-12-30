@@ -1,5 +1,10 @@
 <template>
-    <div class="photo-container" :class="{ 'selected': (data.flag & c.FLAG_SELECTED) }">
+    <div class="photo-container" :class="{
+            'selected': (data.flag & c.FLAG_SELECTED),
+            'leaving': (data.flag & c.FLAG_LEAVING),
+            'exit-left': (data.flag & c.FLAG_EXIT_LEFT),
+            'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
+        }">
         <Icon icon='material-symbols:check' v-if="!(data.flag & c.FLAG_PLACEHOLDER)" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
         <Icon v-if="data.isvideo" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
         <div class="img-outer" :style="{
@@ -167,10 +172,35 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
+/* Container and selection */
+.photo-container.leaving {
+    transition: all 0.2s ease-in;
+    transform: scale(0.9);
+    opacity: 0;
+}
+.photo-container.exit-left {
+    transition: all 0.2s ease-in;
+    transform: translateX(-20%);
+    opacity: 0.4;
+}
+@keyframes enter-right {
+    from {
+        transform: translateX(20%);
+        opacity: 0.4;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.photo-container.enter-right {
+    animation: enter-right 0.2s ease-out forwards;
+}
 .viewer-container{
     z-index: 101 !important;
 }
+/* Extra icons */
 .icon-video-white {
     position: absolute;
     top: 8px;
@@ -254,6 +284,7 @@ img {
     padding: 5px;
     cursor: pointer;
 }
+/* Actual image */
 .img-outer {
     padding: 2px;
     transition: all 0.1s ease-in-out;
