@@ -802,7 +802,6 @@ export default {
             // await Promise.allSettled(promises);
             // this.loading = false;
             await this.deleteFromViewWithAnimation(delIds, updatedDays);
-            this.clearSelection();
         },
         /**
          * Delete elements from main view with some animation
@@ -926,7 +925,7 @@ export default {
 }
 .top-bar .text {
     flex-grow: 0.6;
-    line-height: 36px;
+    line-height: 40px;
     padding-left: 8px;
 }
 .top-bar .btn {
@@ -1063,7 +1062,8 @@ export default {
     }
 
     .head-row.first {
-        padding-left: 34px;
+        padding-left: 38px;
+        padding-top: 12px;
     }
 }
 </style>
