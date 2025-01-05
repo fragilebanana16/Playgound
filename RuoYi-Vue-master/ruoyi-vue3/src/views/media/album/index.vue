@@ -416,7 +416,7 @@ export default {
                 rows: new Set()
             }));
             
-            if (this.$route.name === 'albums') {
+            if (this.$route.name === 'folders') {
                 const id = this.$route.params.id || 0;
                 // url = `/apps/polaroid/api/folder/${id}`;
             }
@@ -496,7 +496,7 @@ export default {
         /** Fetch image data for one dayId */
         async fetchDay(dayId) {
             // let url = `/apps/polaroid/api/days/${dayId}`;
-            // if (this.$route.name === 'albums') {
+            // if (this.$route.name === 'folders') {
             //     const id = this.$route.params.id || 0;
             //     url = `/apps/polaroid/api/folder/${id}/${dayId}`;
             // }
