@@ -11,7 +11,7 @@
                     <Folder v-if="photo.is_folder" :data="photo" :rowHeight="rowHeight" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
                             @select="selectPhoto"
-                            @reprocess="processDay"
+                            @reprocess="deleteFromViewWithAnimation"
                             @clickImg="clickPhoto" />
                 </div>
             </div>
@@ -536,7 +536,7 @@ export default {
             const day = this.days.find(d => d.dayid === dayId);
             day.detail = data;
             day.count = data.length;
-            this.processDay(day);
+            this.processDay(day, true);
         },
         /** Create timeline tick data */
         reflowTimeline() {
@@ -582,8 +582,14 @@ export default {
                 currTopRow += day.rows.size;
             }
         },
-        /** Process items from day response */
-        processDay(day) {
+        /**
+         * Process items from day response.
+         * Do not auto reflow if you plan to cal the reflow function later.
+         *
+         * @param {any} day Day object
+         * @param {boolean} autoReflowTimeline Whether to reflow timeline if row changed
+         */
+         processDay(day, autoReflowTimeline = false) {
             const dayId = day.dayid;
             const data = day.detail;
             const head = this.heads[dayId];
@@ -651,7 +657,7 @@ export default {
             // This will be true even if the head is being spliced
             // because one row is always removed in that case
             // So just reflow the timeline here
-            if (addedRow || spliceCount > 0) {
+            if (autoReflowTimeline && (addedRow || spliceCount > 0)) {
                 this.reflowTimeline();
                 this.handleViewSizeChange();
             }
@@ -795,15 +801,36 @@ export default {
             // }
             // await Promise.allSettled(promises);
             // this.loading = false;
-            // Reflow all touched days
-
+            await this.deleteFromViewWithAnimation(delIds, updatedDays);
+            this.clearSelection();
+        },
+        /**
+         * Delete elements from main view with some animation
+         * This function looks horribly slow, probably isn't that bad
+         * in all practical scenarios.
+         *
+         * This is also going to update day.detail for you and make
+         * a call to processDay so just pass it the list of ids to
+         * delete and the days that were updated.
+         *
+         * @param {Set} delIds Set of file ids to delete
+         * @param {Set} updatedDays of days that MAY be affected
+         */
+        async deleteFromViewWithAnimation(delIds, updatedDays) {
+            if (delIds.size === 0 || updatedDays.size === 0) {
+                return;
+            }
             // Animate the deletion
-            for (const photo of this.selection) {
-                if (delIds.has(photo.fileid)) {
-                    photo.flag |= constants.FLAG_LEAVING;
+            for (const day of updatedDays) {
+                for (const row of day.rows) {
+                    for (const photo of row.photos) {
+                        if (delIds.has(photo.fileid)) {
+                            photo.flag |= constants.FLAG_LEAVING;
+                        }
+                    }
                 }
             }
-            // wait for 250ms
+            // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
             // Speculate day reflow for animation
             const exitedLeft = new Set();
@@ -849,7 +876,7 @@ export default {
                     }
                 }
             }
-            this.clearSelection();
+            // Reflow timeline
             this.reflowTimeline();
             this.handleViewSizeChange();
         },

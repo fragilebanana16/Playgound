@@ -140,9 +140,7 @@ export default {
             }
             this.day.fiOrigIds = newIds;
             // Remove deleted files from details
-            this.day.detail = this.day.detail.filter(d => !remIds.has(d.fileid));
-            this.day.count = this.day.detail.length;
-            this.$emit('reprocess', this.day);
+            this.$emit('reprocess', remIds, new Set([this.day])); // 不修改this.day，传Set包装
         },
         toggleSelect() {
             if (this.data.flag & constants.FLAG_PLACEHOLDER) {
@@ -172,55 +170,7 @@ export default {
     }
 }
 </script>
-<style scoped>
-/* Container and selection */
-.photo-container.leaving {
-    transition: all 0.2s ease-in;
-    transform: scale(0.9);
-    opacity: 0;
-}
-.photo-container.exit-left {
-    transition: all 0.2s ease-in;
-    transform: translateX(-20%);
-    opacity: 0.4;
-}
-@keyframes enter-right {
-    from {
-        transform: translateX(20%);
-        opacity: 0.4;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-.photo-container.enter-right {
-    animation: enter-right 0.2s ease-out forwards;
-}
-.viewer-container{
-    z-index: 101 !important;
-}
-/* Extra icons */
-.icon-video-white {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    transition: padding 0.1s ease-in-out;
-}
-
-img {
-    background-clip: content-box;
-    background-color: #eee;
-    padding: 2px;
-    object-fit: cover;
-    border-radius: 3%;
-    cursor: pointer;
-    width: 100%; height: 100%;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    user-select: none;
-}
-
+<style>
 .viewer-download,
 .viewer-delete {
     color: #fff;
@@ -259,6 +209,56 @@ img {
     /* 动画效果 */
     white-space: nowrap;
     /* 防止换行 */
+}
+.viewer-container{
+    z-index: 101 !important; /* 弹窗在预览之上 */
+}
+</style>
+<style scoped>
+/* Container and selection */
+.photo-container.leaving {
+    transition: all 0.2s ease-in;
+    transform: scale(0.9);
+    opacity: 0;
+}
+.photo-container.exit-left {
+    transition: all 0.2s ease-in;
+    transform: translateX(-20%);
+    opacity: 0.4;
+}
+@keyframes enter-right {
+    from {
+        transform: translateX(20%);
+        opacity: 0.4;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.photo-container.enter-right {
+    animation: enter-right 0.2s ease-out forwards;
+}
+
+/* Extra icons */
+.icon-video-white {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    transition: padding 0.1s ease-in-out;
+}
+
+img {
+    background-clip: content-box;
+    background-color: #eee;
+    padding: 2px;
+    object-fit: cover;
+    border-radius: 3%;
+    cursor: pointer;
+    width: 100%; height: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
 }
 
 .photo-container:hover .icon-checkmark {
