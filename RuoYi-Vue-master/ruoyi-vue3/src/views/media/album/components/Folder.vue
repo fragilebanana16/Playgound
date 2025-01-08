@@ -63,14 +63,21 @@ export default {
     }
 }
 </script>
-<style>
+<style lang="scss" scoped>
 
 .folder {
     cursor: pointer;
-    background-clip: content-box;
-    padding: 2px;
-    object-fit: cover;
-    border-radius: 3%;
+    .name {
+        cursor: pointer;
+        width: 100%;
+        padding: 0 5%;
+        text-align: center;
+        font-size: 1.08em;
+        word-wrap: break-word;
+        text-overflow: ellipsis;
+        max-height: 35%;
+        line-height: 1em;
+    }
 }
 
 .folder .name {
@@ -85,18 +92,6 @@ export default {
     max-height: 35%;
 }
 
-.icon-folder {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    background-size: 40%;
-    height: 60%;
-    width: 100%;
-    background-position: bottom;
-    opacity: 0.6;
-}
 .big-icon {
     cursor: pointer;
     z-index: 100;
@@ -104,16 +99,20 @@ export default {
     top: 0; left: 0;
     width: 100%; height: 100%;
     transition: opacity 0.2s ease-in-out;
+    .folder.hasPreview & {
+        .icon-folder { opacity: 1; }
+        .name { color: white; }
+    }
+    .folder.hasPreview:hover & { opacity: 0; }
+    .icon-folder {
+        cursor: pointer;
+        height: 65%; width: 100%;
+        opacity: 0.3;
+        background-size: 40%;
+        background-position: bottom;
+    }
 }
-.folder.hasPreview .big-icon .name {
-    color: white;
-}
-.folder.hasPreview:hover .big-icon {
-    opacity: 0;
-}
-.folder:hover .previews img {
-    filter: brightness(100%);
-}
+
 .previews {
     z-index: 3;
     line-height: 0;
@@ -130,14 +129,20 @@ export default {
     display: inline-block;
     filter: brightness(50%);
     transition: filter 0.2s ease-in-out;
+    img {
+        padding: 0;
+        width: 50%;
+        height: 50%;
+        display: inline-block;
+        transition: filter 0.2s ease-in-out;
+        filter: brightness(50%);
+        .folder:hover & {
+            filter: brightness(100%);
+        }
+        .folder.onePreview & {
+            width: 100%; height: 100%;
+        }
+    }
 }
-.previews img:nth-of-type(1) { border-top-left-radius: 3px; }
-.previews img:nth-of-type(2) { border-top-right-radius: 3px; }
-.previews img:nth-of-type(3) { border-bottom-left-radius: 3px; }
-.previews img:nth-of-type(4) { border-bottom-right-radius: 3px; }
-.folder.onePreview .previews img {
-    width: 100%;
-    height: 100%;
-    border-radius: 3px;
-}
+
 </style>

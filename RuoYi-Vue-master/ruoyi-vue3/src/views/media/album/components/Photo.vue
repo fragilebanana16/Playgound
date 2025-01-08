@@ -1,6 +1,7 @@
 <template>
-    <div class="photo-container" :class="{
+    <div class="p-outer" :class="{
             'selected': (data.flag & c.FLAG_SELECTED),
+            // 'p-loading': !(data.flag & c.FLAG_LOADED),
             'leaving': (data.flag & c.FLAG_LEAVING),
             'exit-left': (data.flag & c.FLAG_EXIT_LEFT),
             'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
@@ -12,13 +13,15 @@
                 height: rowHeight + 'px',
             }">
         <img @click="click(collection, data.url)" 
-        @contextmenu="contextmenu"
-        @touchstart="touchstart"
-        @touchend="touchend"
-        @touchmove="touchend"
-        @touchcancel="touchend"
-        :src="(data.flag & c.FLAG_PLACEHOLDER) ? '' : data.url" :key="data.fileid"
-            @error="handleImageError" alt="mountains" />
+            @contextmenu="contextmenu"
+            @touchstart="touchstart"
+            @touchend="touchend"
+            @touchmove="touchend"
+            @touchcancel="touchend"
+            :src="getUrl()"
+            :key="data.fileid"
+            @load = "data.flag |= c.FLAG_LOADED"
+            @error="handleImageError" />
         </div>
     </div>
 </template>
@@ -56,6 +59,16 @@ export default {
         }
     },
     methods: {
+        /** Get URL for image to show */
+        getUrl() {
+            if (this.data.flag & constants.FLAG_PLACEHOLDER) {
+                return '';
+            } else if (this.data.flag & constants.FLAG_LOAD_FAIL) {
+                return placeholder;
+            } else {
+                return this.data.url
+            }
+        },
         getCurrentImage() {
             const currentImage = this.collection[0]; // todo get index?
             return currentImage;
@@ -150,6 +163,7 @@ export default {
         },
         handleImageError(event) {
             event.target.src = placeholder
+            this.data.flag |= (constants.FLAG_LOADED | constants.FLAG_LOAD_FAIL);
         },
         touchstart() {
             this.touchTimer = setTimeout(() => {
@@ -170,7 +184,7 @@ export default {
     }
 }
 </script>
-<style>
+<style lang="scss" scoped>
 .viewer-download,
 .viewer-delete {
     color: #fff;
@@ -214,30 +228,28 @@ export default {
     z-index: 101 !important; /* 弹窗在预览之上 */
 }
 </style>
-<style scoped>
+<style lang="scss" scoped>
 /* Container and selection */
-.photo-container.leaving {
-    transition: all 0.2s ease-in;
-    transform: scale(0.9);
-    opacity: 0;
-}
-.photo-container.exit-left {
-    transition: all 0.2s ease-in;
-    transform: translateX(-20%);
-    opacity: 0.4;
-}
-@keyframes enter-right {
-    from {
-        transform: translateX(20%);
+.p-outer {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    &.leaving {
+        transition: all 0.2s ease-in;
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    &.exit-left {
+        transition: all 0.2s ease-in;
+        transform: translateX(-20%);
         opacity: 0.4;
     }
-    to {
-        transform: translateX(0);
-        opacity: 1;
+    &.enter-right {
+        animation: enter-right 0.2s ease-out forwards;
     }
 }
-.photo-container.enter-right {
-    animation: enter-right 0.2s ease-out forwards;
+@keyframes enter-right {
+    from { transform: translateX(20%); opacity: 0.4; }
+    to { transform: translateX(0); opacity: 1; }
 }
 
 /* Extra icons */
@@ -259,23 +271,11 @@ img {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     user-select: none;
+    .selected & { box-shadow: 0 0 6px 2px #eee; }
+    .p-loading & { opacity: 0; }
 }
 
-.photo-container:hover .icon-checkmark {
-    opacity: 0.7;
-}
-.photo-container.selected .icon-checkmark {
-    opacity: 0.9;
-    filter: invert();
-}
-.photo-container.selected .img-outer {
-    padding: 6%;
-}
-.photo-container.selected img {
-    box-shadow: 0 0 6px 2px #000;
-}
 .icon-checkmark {
-    opacity: 0;
     position: absolute;
     top: 8px; left: 8px;
     background-color: #fff;
@@ -283,10 +283,16 @@ img {
     background-size: 80%;
     padding: 5px;
     cursor: pointer;
+    opacity: 0;
+    .p-outer:hover & { opacity: 0.7; }
+    .selected & { opacity: 0.9; filter: invert(1); }
 }
 /* Actual image */
-.img-outer {
+div.img-outer {
     padding: 2px;
     transition: all 0.1s ease-in-out;
+    background-clip: content-box, padding-box;
+    .selected & { padding: 6%; }
+    .p-loading & { background-color: #fff; }
 }
 </style>

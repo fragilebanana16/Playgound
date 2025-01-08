@@ -1,14 +1,14 @@
 <template>
     <div class="album-container" ref="container" :v-loading="loading">
         <!-- size-field look for item, item-size="300"-->
-        <RecycleScroller ref="scroller" class="scroller" :items="list" size-field="size" key-field="id" v-slot="{ item }"
+        <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
-            <h1 v-if="item.head" class="head-row" v-bind:class="{ 'first': item.id === 1 }">
+            <h1 v-if="item.head" class="head-row" :class="{ 'first': item.id === 1 }">
                 {{ item.name }}
             </h1>
-            <div class="photo-row" v-bind:style="{ height: rowHeight + 'px' }">
+            <div class="photo-row" :style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
-                    <Folder v-if="photo.is_folder" :data="photo" :rowHeight="rowHeight" />
+                    <Folder v-if="photo.isfolder" :data="photo" :rowHeight="rowHeight" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
                             @select="selectPhoto"
                             @reprocess="deleteFromViewWithAnimation"
@@ -17,18 +17,15 @@
             </div>
         </RecycleScroller>
         <!-- Timeline -->
-        <div ref="timelineScroll" class="timeline-scroll" v-bind:class="{ scrolling }" @mousemove="timelineHover"
+        <div ref="timelineScroll" class="timeline-scroll" :class="{ scrolling }" @mousemove="timelineHover"
             @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
-            <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" v-bind:style="{ top: timelineCursorY + 'px' }"></span>
-            <span class="cursor hv border-t-2 border-black dark:border-t-amber-900" v-bind:style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
+            <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" :style="{ top: timelineCursorY + 'px' }"></span>
+            <span class="cursor hv border-t-2 border-black dark:border-t-amber-900" :style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
                 timelineHoverCursorText }}</span>
             <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick"
-                v-bind:class="{ 'dash': !tick['text'] }"
-                v-bind:style="{ top: Math.floor((index === 0 ? 10 : 0) + tick['topC']) + 'px' }">
-                <template v-if="tick['s']">
-                    <span v-if="tick['text']">{{ tick['text'] }}</span>
-                    <span v-else class="dash"></span>
-                </template>
+                :class="{ 'dash': !tick['text'] }"
+                :style="{ top: Math.floor((index === 0 ? 10 : 0) + tick['topC']) + 'px' }">
+                <span v-if="tick['text']">{{ tick['text'] }}</span>
             </div>
         </div>
         <!-- Top bar for selections etc -->
@@ -222,8 +219,8 @@ export default {
         // }, 100);
 
         // Set scrollbar
-        // Timeline scroller init
-        this.$refs.scroller.$el.addEventListener('scroll', this.scrollPositionChange, false);
+        // Timeline recycler init
+        this.$refs.recycler.$el.addEventListener('scroll', this.scrollPositionChange, false);
         this.scrollPositionChange();
     },
 
@@ -268,13 +265,13 @@ export default {
             let height = this.$refs.container.clientHeight;
             let width = this.$refs.container.clientWidth - 40;  // 预留和时间线的间距
             this.timelineHeight = this.$refs.timelineScroll.clientHeight;
-            this.$refs.scroller.$el.style.height = (height - 4) + 'px';
+            this.$refs.recycler.$el.style.height = (height - 4) + 'px';
             // Mobile devices
             if (window.innerWidth <= 768) {
-                width += 10;
+                width -= 4;
                 this.isMobile = true;
             } else {
-                width -= 12;
+                width -= 40;
                 this.isMobile = false;
             }
 
@@ -282,7 +279,7 @@ export default {
                 // Don't change cols if already initialized
                 this.numCols = Math.max(MIN_COLS, Math.floor(width / MAX_PHOTO_WIDTH));
             }
-            this.rowHeight = Math.floor(width / this.numCols) - 4;
+            this.rowHeight = Math.floor(width / this.numCols);
 
             // Set heights of rows
             this.list.filter(r => !r.head).forEach(row => {
@@ -294,7 +291,7 @@ export default {
         /** Handle change in rows and view size */
         handleViewSizeChange() {
             setTimeout(() => {
-                this.viewHeight = this.$refs.scroller.$refs.wrapper.clientHeight;
+                this.viewHeight = this.$refs.recycler.$refs.wrapper.clientHeight;
                 // Compute timeline tick positions
                 for (const tick of this.timelineTicks) {
                     tick.topC = Math.floor((tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight);
@@ -345,7 +342,7 @@ export default {
         /**
          * Triggered when position of scroll change.
          * This does NOT indicate the items have changed, only that
-         * the pixel position of the scroller has changed.
+         * the pixel position of the recycler has changed.
          */
         scrollPositionChange(event) {
             if (event) {
@@ -700,7 +697,7 @@ export default {
         timelineTouch(event) {
             const rect = event.target.getBoundingClientRect();
             const y = event.targetTouches[0].pageY - rect.top;
-            this.$refs.scroller.scrollToPosition(this.getTimelinePosition(y));
+            this.$refs.recycler.scrollToPosition(this.getTimelinePosition(y));
             event.preventDefault();
             event.stopPropagation();
         },
@@ -712,10 +709,10 @@ export default {
 
         /** Handle mouse click on right timeline */
         timelineClick(event) {
-            this.$refs.scroller.scrollToPosition(this.getTimelinePosition(event.offsetY));
+            this.$refs.recycler.scrollToPosition(this.getTimelinePosition(event.offsetY));
         },
 
-        /** Get scroller equivalent position from event */
+        /** Get recycler equivalent position from event */
         getTimelinePosition(y) {
             const tH = this.viewHeight;
             const maxH = this.timelineHeight;
@@ -728,7 +725,7 @@ export default {
             if (!head) {
                 return;
             }
-            this.$refs.scroller.scrollToPosition(1000);
+            this.$refs.recycler.scrollToPosition(1000);
         },
         /** Clicking on photo */
         clickPhoto(photoComponent, photos, current) {
@@ -885,7 +882,11 @@ export default {
 </script>
 
   
-<style scoped>
+<style lang="scss" scoped>
+@mixin phone {
+  @media (max-width: 768px) { @content; }
+}
+
 .album-container {
     height: calc(100vh - 84px);
     width: 100%;
@@ -894,16 +895,29 @@ export default {
     /* no text will be selected  */
 }
 
-.scroller {
+.recycler  {
     width: calc(100% + 20px);
-
+    .photo-row .photo {
+        display: inline-block;
+        position: relative;
+        cursor: pointer;
+        vertical-align: top;
+    }
+    .head-row {
+        height: 40px;
+        padding-top: 10px;
+        padding-left: 3px;
+        font-size: 0.9em;
+        font-weight: 600;
+        @include phone {
+            &.first {
+                padding-left: 38px;
+                padding-top: 12px;
+            }
+        }
+    }
 }
 
-.photo-row .photo {
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
-}
 
 /** Top bar */
 .top-bar {
@@ -922,12 +936,16 @@ export default {
     align-items: center;
     justify-content: space-around;
     margin-right: 2rem;
+    .text {
+        flex-grow: 1;
+        line-height: 40px;
+        padding-left: 8px;
+    }
+    @include phone {
+        top: 35px; right: 15px;
+    }
 }
-.top-bar .text {
-    flex-grow: 0.6;
-    line-height: 40px;
-    padding-left: 8px;
-}
+
 .top-bar .btn {
     display: inline-block;
     margin-right: 3px;
@@ -952,76 +970,73 @@ export default {
 .photo-row .photo:hover::before {
     opacity: 1;
 }
-.head-row {
-    height: 40px;
-    padding-top: 10px;
-    padding-left: 3px;
-    font-size: 0.9em;
-    font-weight: bold;
-}
 
 .timeline-scroll {
     overflow-y: clip;
     position: absolute;
     height: 100%;
-    width: 40px;
+    width: 36px;
     top: 0;
     right: 0;
     cursor: ns-resize;
     opacity: 0;
     transition: opacity .2s ease-in-out;
     z-index: 1;
+    &:hover, &.scrolling {
+        opacity: 1;
+    }
+    .tick {
+        pointer-events: none;
+        position: absolute;
+        font-size: 0.75em;
+        font-weight: 600;
+        opacity: 0.95;
+        right: 7px;
+        transform: translateY(-50%);
+        z-index: 1;
+        &.dash {
+            height: 4px;
+            width: 4px;
+            border-radius: 50%;
+            background-color: #000;
+            opacity: 0.2;
+            display: block;
+            @include phone { display: none; }
+        }
+        @include phone {
+            background-color: #fff;
+            padding: 0px 4px;
+            border-radius: 4px;
+        }
+    }
+    .cursor {
+        position: absolute;
+        pointer-events: none;
+        right: 0;
+        background-color: #000;
+        min-width: 100%;
+        min-height: 1.5px;
+        &.st {
+            font-size: 0.75em;
+            opacity: 0;
+        }
+        &.hv {
+            background-color: #fff;
+            padding: 2px 5px;
+            border-top: 2px solid #000;
+            border-radius: 2px;
+            width: auto;
+            white-space: nowrap;
+            z-index: 100;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+    }
+    &:hover .cursor.st {
+        opacity: 1;
+    }
 }
 
-.timeline-scroll:hover,
-.timeline-scroll.scrolling {
-    opacity: 1;
-}
-
-.timeline-scroll .tick {
-    pointer-events: none;
-    position: absolute;
-    font-size: 0.8em;
-    right: 5px;
-    transform: translateY(-50%);
-}
-
-.timeline-scroll .tick .dash {
-    height: 4px;
-    width: 4px;
-    border-radius: 50%;
-    background-color: #444;
-    opacity: 0.5;
-    display: block;
-}
-
-.timeline-scroll .cursor {
-    position: absolute;
-    pointer-events: none;
-    right: 5px;
-    min-width: 100%;
-    min-height: 2px;
-}
-
-.timeline-scroll .cursor.st {
-    font-size: 0.8em;
-    opacity: 0;
-}
-
-.timeline-scroll:hover .cursor.st {
-    opacity: 1;
-}
-
-.timeline-scroll .cursor.hv {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 2px 5px;
-    border-radius: 2px;
-    width: auto;
-    white-space: nowrap;
-    z-index: 100;
-    font-size: 0.95em;
-    font-weight: 600;
-}
 .icon-container {
     display: inline-block;
     position: relative;
@@ -1044,26 +1059,5 @@ export default {
     z-index: -1; /* 背景在图标下面 */
     transition: opacity  0.3s;
 }
-@media (max-width: 768px) {
-    .top-bar {
-        top: 35px;
-        right: 5px;
-        max-width: calc(100vw - 150px);
 
-    }
-    .timeline-scroll .tick {
-        background-color: rgba(100, 100, 100, 0.1);
-        padding: 1px 4px;
-        border-radius: 4px;
-    }
-
-    .timeline-scroll .tick.dash {
-        display: none;
-    }
-
-    .head-row.first {
-        padding-left: 38px;
-        padding-top: 12px;
-    }
-}
 </style>
