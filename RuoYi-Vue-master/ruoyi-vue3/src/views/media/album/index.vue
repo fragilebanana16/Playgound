@@ -63,6 +63,18 @@ const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 const baseUrl = '/dev-api';
 const MAX_PHOTO_WIDTH = 175;
 const MIN_COLS = 3;
+
+// Define API routes
+const API_ROUTES = {
+    DAYS: 'days',
+    DAY: 'days/{dayId}',
+    FOLDER_DAYS: 'folder/{folderId}',
+    FOLDER_DAY: 'folder/{folderId}/{dayId}',
+};
+for (const [key, value] of Object.entries(API_ROUTES)) {
+    API_ROUTES[key] = '/apps/memories/api/' + value;
+}
+
 const MOCK_IMG_DATA = [
     "A Sky Full of Stars - Coldplay.jpg",
     "After All - Elton John,Charlie Puth.jpg",
@@ -413,13 +425,22 @@ export default {
                 rows: new Set()
             }));
             
+            let url = API_ROUTES.DAYS;
+            let params = {};
+
             if (this.$route.name === 'folders') {
-                const id = this.$route.params.id || 0;
-                // url = `/apps/polaroid/api/folder/${id}`;
+                url = API_ROUTES.FOLDER_DAYS;
+                params['folderId'] = this.$route.params.id || 0;
             }
             const startState = this.state;
             // await api
+            // const res = await axios.get(generateUrl(url, params));
+            // const data = res.data;
             if (this.state !== startState) return;
+            await this.processDays(data);
+        },
+        /** Process the data for days call including folders */
+        async processDays(data) {
             this.days = data;
             for (const [dayIdx, day] of data.entries()) {
                 day.count = Number(day.count);
@@ -492,48 +513,56 @@ export default {
 
         /** Fetch image data for one dayId */
         async fetchDay(dayId) {
-            // let url = `/apps/polaroid/api/days/${dayId}`;
+            // let url = API_ROUTES.DAY;
+            // const params = { dayId };
             // if (this.$route.name === 'folders') {
-            //     const id = this.$route.params.id || 0;
-            //     url = `/apps/polaroid/api/folder/${id}/${dayId}`;
+            //     url = API_ROUTES.FOLDER_DAY;
+            //     params.folderId = this.$route.params.id || 0;
             // }
+
+            // Do this in advance to prevent duplicate requests
             const head = this.heads[dayId];
             head.loadedImages = true;
-            const prefix = baseUrl + '/music/covers/'
-            let data: SongData[] = [];
-            type SongData = {
-                fileid: string;
-                url: string;
-                isvideo: boolean;
-                isfolder: boolean;
-                name: string;
-            };
 
-            function getRandomElements(arr, count) {
-                const shuffled = [...arr].sort(() => Math.random() - 0.5);
-                return shuffled.slice(0, count);
-            }
-            const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
-            randomArray.forEach((img, index) => {
-                const fileid = `001${index + 1}`;
-                const url = `${prefix}${img}`;
-                data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5  });
-            });
             
-            // try {
-            //     const res = await fetch(`/apps/betterphotos/api/days/${dayId}`);
-            //     data = await res.json();
-            //     const day = this.days.find(d => d.dayid === dayId);
-            //     day.detail = data;
-            //     this.processDay(day);
-            // } catch (e) {
-            //     console.error(e);
-            //     head.loadedImages = false;
-            // }
-            const day = this.days.find(d => d.dayid === dayId);
-            day.detail = data;
-            day.count = data.length;
-            this.processDay(day, true);
+            try {
+                const startState = this.state;
+                // const res = await axios.get(generateUrl(url, params));
+                // const data = res.data;
+                
+                // *************** mock data ********************
+                const prefix = baseUrl + '/music/covers/'
+                let data: SongData[] = [];
+                type SongData = {
+                    fileid: string;
+                    url: string;
+                    isvideo: boolean;
+                    isfolder: boolean;
+                    name: string;
+                };
+
+                function getRandomElements(arr, count) {
+                    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+                    return shuffled.slice(0, count);
+                }
+                const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
+                randomArray.forEach((img, index) => {
+                    const fileid = `001${index + 1}`;
+                    const url = `${prefix}${img}`;
+                    data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5  });
+                });
+
+                if (this.state !== startState) return;
+                // *************** mock data ********************
+
+                const day = this.days.find(d => d.dayid === dayId);
+                day.detail = data;
+                day.count = data.length;
+                this.processDay(day, true);
+            } catch (e) {
+                console.error(e);
+                head.loadedImages = false;
+            }
         },
         /** Create timeline tick data */
         reflowTimeline() {
@@ -627,8 +656,10 @@ export default {
 
                 // Add the photo to the row
                 const photo = data[dataIdx];
-                photo.flag = 0; // flags
-                photo.d = day; // backref to day
+                if (typeof photo.flag === "undefined") {
+                    photo.flag = 0; // flags
+                    photo.d = day; // backref to day
+                }
                 this.list[rowIdx].photos.push(photo);
                 dataIdx++;
 
@@ -829,7 +860,7 @@ export default {
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
             // Speculate day reflow for animation
-            const exitedLeft = new Set();
+            const exitedLeft = new Set<Photo>();
             for (const day of updatedDays) {
                 let nextExit = false;
                 for (const row of day.rows) {
@@ -838,7 +869,7 @@ export default {
                             nextExit = true;
                         } else if (nextExit) {
                             photo.flag |= constants.FLAG_EXIT_LEFT;
-                            exitedLeft.add(photo.fileid);
+                            exitedLeft.add(photo);
                         }
                     }
                 }
@@ -853,25 +884,18 @@ export default {
             }
 
             // Enter from right all photos that exited left
-            for (const day of updatedDays) {
-                for (const row of day.rows) {
-                    for (const photo of row.photos) {
-                        if (exitedLeft.has(photo.fileid)) {
-                            photo.flag |= constants.FLAG_ENTER_RIGHT;
-                        }
-                    }
-                }
-            }
+            exitedLeft.forEach((photo) => {
+                photo.flag &= ~constants.FLAG_EXIT_LEFT;
+                photo.flag |= constants.FLAG_ENTER_RIGHT;
+            });
+
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
             // Clear enter right flags
-            for (const day of updatedDays) {
-                for (const row of day.rows) {
-                    for (const photo of row.photos) {
-                        photo.flag &= ~constants.FLAG_ENTER_RIGHT;
-                    }
-                }
-            }
+            exitedLeft.forEach((photo) => {
+                photo.flag &= ~constants.FLAG_ENTER_RIGHT;
+            });
+
             // Reflow timeline
             this.reflowTimeline();
             this.handleViewSizeChange();
