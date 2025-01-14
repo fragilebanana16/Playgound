@@ -411,6 +411,22 @@ export default {
             }
         },
 
+        /** Get query string for API calls */
+        appendQuery(url) {
+            const query = new URLSearchParams();
+            // Favorites
+            if (this.$route.name === 'Favorite') {
+                query.set('fav', '1');
+            }
+            // Create query string and append to URL
+            const queryStr = query.toString();
+            if (queryStr) {
+                url += '?' + queryStr;
+            }
+            console.log(`appendQuery->`,url)
+            return url;
+        },
+
         /** Fetch timeline main call */
         async fetchDays() {
             const data = Array.from({ length: 5 }, (_, index) => ({
@@ -433,8 +449,9 @@ export default {
                 params['folderId'] = this.$route.params.id || 0;
             }
             const startState = this.state;
+            this.appendQuery(url) // for test favoirate menu
             // await api
-            // const res = await axios.get(generateUrl(url, params));
+            // const res = await axios.get(generateUrl(this.appendQuery(url), params));
             // const data = res.data;
             if (this.state !== startState) return;
             await this.processDays(data);
@@ -527,7 +544,7 @@ export default {
             
             try {
                 const startState = this.state;
-                // const res = await axios.get(generateUrl(url, params));
+                // const res = await axios.get(generateUrl(this.appendQuery(url), params));
                 // const data = res.data;
                 
                 // *************** mock data ********************
