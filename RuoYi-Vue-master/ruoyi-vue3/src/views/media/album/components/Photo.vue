@@ -184,7 +184,7 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .viewer-download,
 .viewer-delete {
     color: #fff;
