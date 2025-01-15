@@ -8,7 +8,7 @@
         }">
         <Icon icon='material-symbols:check' v-if="!(data.flag & c.FLAG_PLACEHOLDER)" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
         <Icon v-if="data.flag & c.FLAG_IS_VIDEO" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
-        <Icon v-if="data.flag & c.FLAG_IS_FAVORITE" icon='tabler:star-filled' class="text-xl text-white icon-starred"></Icon>
+        <Icon v-if="data.flag & c.FLAG_IS_FAVORITE" icon='uis:favorite' class="text-white icon-starred"></Icon>
         <div class="img-outer" :style="{
                 width: rowHeight + 'px',
                 height: rowHeight + 'px',

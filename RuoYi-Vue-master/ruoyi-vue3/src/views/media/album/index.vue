@@ -560,6 +560,7 @@ export default {
                     url: string;
                     isvideo: boolean;
                     isfolder: boolean;
+                    isfavorite: boolean;
                     name: string;
                 };
 
@@ -571,7 +572,7 @@ export default {
                 randomArray.forEach((img, index) => {
                     const fileid = `001${index + 1}`;
                     const url = `${prefix}${img}`;
-                    data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5  });
+                    data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5, isfavorite : index % 6 === 0  });
                 });
 
                 if (this.state !== startState) return;
