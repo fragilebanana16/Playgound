@@ -57,10 +57,10 @@ import Folder from "./components/Folder.vue";
 import Photo  from "./components/Photo.vue";
 import constants from "./constants";
 const router = useRoute()
-const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 const baseUrl = '/dev-api';
+const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const MAX_PHOTO_WIDTH = 175;
 const MIN_COLS = 3;
 
@@ -390,10 +390,15 @@ export default {
             this.currentStart = startIndex;
             this.currentEnd = endIndex;
             setTimeout(() => {
-                if (this.currentStart === startIndex && this.currentEnd === endIndex) {
+                // Get the overlapping range between startIndex and
+                // currentStart and endIndex and currentEnd.
+                // This is the range of rows that we need to update.
+                const start = Math.max(startIndex, this.currentStart);
+                const end = Math.min(endIndex, this.currentEnd);
+                if (end - start > 0) {
                     this.loadScrollChanges(startIndex, endIndex);
                 }
-            }, 300);
+            }, SCROLL_LOAD_DELAY);
         },
 
         /** Load image data for given view */
@@ -677,6 +682,17 @@ export default {
                     photo.flag = 0; // flags
                     photo.d = day; // backref to day
                 }
+
+                // Flag conversion
+                if (photo.isvideo) {
+                    photo.flag |= constants.FLAG_IS_VIDEO;
+                    delete photo.isvideo;
+                }
+                if (photo.isfavorite) {
+                    photo.flag |= constants.FLAG_IS_FAVORITE;
+                    delete photo.favorite;
+                }
+
                 this.list[rowIdx].photos.push(photo);
                 dataIdx++;
 

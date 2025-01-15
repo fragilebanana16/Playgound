@@ -7,7 +7,8 @@
             'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
         }">
         <Icon icon='material-symbols:check' v-if="!(data.flag & c.FLAG_PLACEHOLDER)" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
-        <Icon v-if="data.isvideo" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
+        <Icon v-if="data.flag & c.FLAG_IS_VIDEO" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
+        <Icon v-if="data.flag & c.FLAG_IS_FAVORITE" icon='tabler:star-filled' class="text-xl text-white icon-starred"></Icon>
         <div class="img-outer" :style="{
                 width: rowHeight + 'px',
                 height: rowHeight + 'px',
@@ -255,9 +256,18 @@ export default {
 /* Extra icons */
 .icon-video-white {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    transition: padding 0.1s ease-in-out;
+    background-size: 100%;
+    height: 20px; width: 20px;
+    top: 10px; right: 10px;
+    z-index: 100;
+}
+.icon-starred {
+    position: absolute;
+    background-size: 100%;
+    height: 24px; width: 24px;
+    bottom: 10px; left: 10px;
+    z-index: 100;
+    pointer-events: none;
 }
 
 img {
@@ -277,7 +287,8 @@ img {
 
 .icon-checkmark {
     position: absolute;
-    top: 8px; left: 8px;
+    top: 10px; left: 10px;
+    z-index: 100;
     background-color: #fff;
     border-radius: 50%;
     background-size: 80%;
