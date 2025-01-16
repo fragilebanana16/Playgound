@@ -28,7 +28,7 @@
 </template>
 <script>
 import { Icon } from '@iconify/vue'
-import placeholder from '@/assets/images/error.svg'
+import errorsvg from '@/assets/images/error.svg'
 import constants from '../constants'
 export default {
     name: 'Photo',
@@ -65,7 +65,10 @@ export default {
             if (this.data.flag & constants.FLAG_PLACEHOLDER) {
                 return '';
             } else if (this.data.flag & constants.FLAG_LOAD_FAIL) {
-                return placeholder;
+                return errorsvg;
+            } else if (this.data.flag & constants.FLAG_FORCE_RELOAD) {
+                this.data.flag &= ~constants.FLAG_FORCE_RELOAD;
+                return undefined;
             } else {
                 return this.data.url
             }

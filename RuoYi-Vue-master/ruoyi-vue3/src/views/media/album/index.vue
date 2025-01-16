@@ -382,10 +382,28 @@ export default {
 
             // Reset image state
             for (let i = startIndex; i < endIndex; i++) {
-                if ((i < this.currentStart || i > this.currentEnd) && this.list[i].photos) {
-                    this.list[i].photos.forEach(photo => {
-                        photo.l = 0;
-                    });
+                const row = this.list[i];
+                if (!row) {
+                    continue;
+                }
+                // Initialize photos and add placeholders
+                if (row.pct && !row.photos.length) {
+                    row.photos = new Array(row.pct);
+                    for (let j = 0; j < row.pct; j++) {
+                        row.photos[j] = {
+                            flag: constants.FLAG_PLACEHOLDER,
+                            fileid: `${row.dayId}-${i}-${j}`,
+                        };
+                    }
+                    delete row.pct;
+                }
+                // Force reload all loaded images
+                if ((i < this.currentStart || i > this.currentEnd) && row.photos) {
+                    for (const photo of row.photos) {
+                        if (photo.flag & constants.FLAG_LOADED) {
+                            photo.flag = (photo.flag & ~constants.FLAG_LOADED) | constants.FLAG_FORCE_RELOAD; // Reload only if already loaded
+                        }
+                    }
                 }
             }
 
@@ -467,7 +485,8 @@ export default {
         },
         /** Process the data for days call including folders */
         async processDays(data) {
-            this.days = data;
+            const list: any[] = [];
+            const heads = {};
             for (const [dayIdx, day] of data.entries()) {
                 day.count = Number(day.count);
                 day.rows = new Set();
@@ -502,26 +521,26 @@ export default {
                     dayId: day.dayid,
                     day: day,
                 };
-                this.heads[day.dayid] = head;
-                this.list.push(head);
+                heads[day.dayid] = head;
+                list.push(head);
 
                 // Add rows
                 const nrows = Math.ceil(day.count / this.numCols);
                 for (let i = 0; i < nrows; i++) {
                     const row = this.getBlankRow(day);
-                    this.list.push(row);
+                    list.push(row);
                     day.rows.add(row);
                     // Add placeholders wtf?
                     const leftNum = (day.count - i * this.numCols);
-                    const rowCount = leftNum > this.numCols ? this.numCols : leftNum;
-                    for (let j = 0; j < rowCount; j++) {
-                        row.photos.push({
-                            flag: constants.FLAG_PLACEHOLDER,
-                            fileid: `${day.dayid}-${i}-${j}`,
-                        });
-                    }
+                    row.pct = leftNum > this.numCols ? this.numCols : leftNum;
+                    row.photos = [];
                 }
             }
+
+            // Store globally
+            this.days = data;
+            this.list = list;
+            this.heads = heads;
 
             // Check preloads 预处理了图片，冗余计算？如果fetchDays能先带一部分数据则先处理一部分，不用每次scroll再请求
             for (const day of data) {
