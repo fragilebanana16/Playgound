@@ -4,7 +4,7 @@
         <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
             <h1 v-if="item.head" class="head-row" :class="{ 'first': item.id === 1 }">
-                {{ item.name }}
+                {{ getHeadName(item) }}
             </h1>
             <div class="photo-row" :style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
@@ -212,6 +212,8 @@ export default {
             scrollTimer: null,
             /** Resizing timer */
             resizeTimer: null,
+            /** View size reflow timer */
+            viewSizeChangeTimer: null,
             /** Is mobile layout */
             isMobile: false,
             /** Set of dayIds for which images loaded */
@@ -305,7 +307,12 @@ export default {
 
         /** Handle change in rows and view size */
         handleViewSizeChange() {
-            setTimeout(() => {
+            if (this.viewSizeChangeTimer) {
+                return;
+            }
+            this.viewSizeChangeTimer = setTimeout(() => {
+                this.viewSizeChangeTimer = null;
+                this.reflowTimeline();
                 this.viewHeight = this.$refs.recycler.$refs.wrapper.clientHeight;
                 // Compute timeline tick positions
                 for (const tick of this.timelineTicks) {
@@ -454,6 +461,31 @@ export default {
             return url;
         },
 
+       /** Get name of header */
+       getHeadName(head) {
+            // Check cache
+            if (head.name) {
+                return head.name;
+            }
+            // Special headers
+            if (head.dayId === -0.1) {
+                head.name = "Folders";
+                return head.name;
+            }
+            // Make date string
+            // The reason this function is separate from processDays is
+            // because this call is terribly slow even on desktop
+            const dateTaken = new Date(Number(head.dayId)*86400*1000);
+            let name = dateTaken.toLocaleDateString("en-US", { dateStyle: 'full', timeZone: 'UTC' });
+            if (dateTaken.getUTCFullYear() === new Date().getUTCFullYear()) {
+                // hack: remove last 6 characters of date string
+                name = name.substring(0, name.length - 6);
+            }
+            // Cache and return
+            head.name = name;
+            return head.name;
+        },
+
         /** Fetch timeline main call */
         async fetchDays() {
             const data = Array.from({ length: 5 }, (_, index) => ({
@@ -481,10 +513,10 @@ export default {
             // const res = await axios.get(generateUrl(this.appendQuery(url), params));
             // const data = res.data;
             if (this.state !== startState) return;
-            await this.processDays(data);
+            this.processDays(data);
         },
         /** Process the data for days call including folders */
-        async processDays(data) {
+        processDays(data) {
             const list: any[] = [];
             const heads = {};
             for (const [dayIdx, day] of data.entries()) {
@@ -495,27 +527,9 @@ export default {
                     continue;
                 }
 
-                // Make date string
-                const dateTaken = new Date(Number(day.dayid) * 86400 * 1000);
-                // mock data
-                const tempYear = dateTaken.getUTCFullYear();
-                dateTaken.setUTCFullYear(tempYear + dayIdx * 10);
-                // mock data
-
-                let dateStr = dateTaken.toLocaleDateString("en-US", { dateStyle: 'full', timeZone: 'UTC' });
-                if (dateTaken.getUTCFullYear() === new Date().getUTCFullYear()) {
-                    // hack: remove last 6 characters of date string
-                    dateStr = dateStr.substring(0, dateStr.length - 6);
-                }
-
-                // Special headers
-                if (day.dayid === -0.1) {
-                    dateStr = "Folders";
-                }
                 // Add header to list
                 const head = {
                     id: ++this.numRows,
-                    name: dateStr,
                     size: 40,
                     head: true,
                     dayId: day.dayid,
@@ -550,7 +564,6 @@ export default {
             }
 
             // Fix view height variable
-            this.reflowTimeline();
             this.handleViewSizeChange();
             this.loading = false;
         },
@@ -600,7 +613,7 @@ export default {
                 const day = this.days.find(d => d.dayid === dayId);
                 day.detail = data;
                 day.count = data.length;
-                this.processDay(day, true);
+                this.processDay(day);
             } catch (e) {
                 console.error(e);
             }
@@ -654,9 +667,8 @@ export default {
          * Do not auto reflow if you plan to cal the reflow function later.
          *
          * @param {any} day Day object
-         * @param {boolean} autoReflowTimeline Whether to reflow timeline if row changed
          */
-         processDay(day, autoReflowTimeline = false) {
+         processDay(day) {
             const dayId = day.dayid;
             const data = day.detail;
             const head = this.heads[dayId];
@@ -737,8 +749,7 @@ export default {
             // This will be true even if the head is being spliced
             // because one row is always removed in that case
             // So just reflow the timeline here
-            if (autoReflowTimeline && (addedRow || spliceCount > 0)) {
-                this.reflowTimeline();
+            if (addedRow || spliceCount > 0) {
                 this.handleViewSizeChange();
             }
         },
@@ -941,6 +952,9 @@ export default {
                 photo.flag |= constants.FLAG_ENTER_RIGHT;
             });
 
+            // clear selection at this point
+            this.clearSelection();
+
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
             // Clear enter right flags
@@ -949,7 +963,6 @@ export default {
             });
 
             // Reflow timeline
-            this.reflowTimeline();
             this.handleViewSizeChange();
         },
     },
