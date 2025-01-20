@@ -813,14 +813,6 @@ export default {
             return y * tH / maxH;
         },
 
-        /** Scroll to given day Id */
-        scrollToDay(dayId) {
-            const head = this.heads[dayId];
-            if (!head) {
-                return;
-            }
-            this.$refs.recycler.scrollToPosition(1000);
-        },
         /** Clicking on photo */
         clickPhoto(photoComponent, photos, current) {
             if (this.selection.size > 0) { // selection mode
