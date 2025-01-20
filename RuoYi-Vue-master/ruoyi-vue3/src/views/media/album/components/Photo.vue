@@ -166,7 +166,7 @@ export default {
             this.$emit('select', this.data);
         },
         handleImageError(event) {
-            event.target.src = placeholder
+            event.target.src = errorsvg
             this.data.flag |= (constants.FLAG_LOADED | constants.FLAG_LOAD_FAIL);
         },
         touchstart() {
