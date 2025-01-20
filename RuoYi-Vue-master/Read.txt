@@ -1,3 +1,12 @@
+- 命令
+#### 后端
+ruoyi-vue3> ..\bin\run.bat
+#### 关闭后端
+ruoyi-vue3> ..\ry.bat
+#### mysql启停
+net start mysql57
+net stop mysql57
+
 后端部署:
 
 在ruoyi项目的bin目录下执行package.bat打包Web工程: RuoYi-Vue-master\bin\package.bat
