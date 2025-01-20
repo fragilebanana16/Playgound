@@ -1129,7 +1129,10 @@ export default {
 .icon-container {
     display: inline-block;
     position: relative;
-    margin: -2px;
+    margin-bottom: 0.3rem;
+    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+    margin: 0 0.5rem 0.3rem 0.5rem;
 }
 .icon-container:hover::before{
     opacity: 1;
@@ -1138,8 +1141,8 @@ export default {
     content: '';
     opacity: 0;
     position: absolute;
-    top: 53%;
-    left: 43%;
+    top: 56%;
+    left: 45%;
     width: 30px;
     height: 30px;
     background-color: rgba(0, 0, 0, 0.2);
