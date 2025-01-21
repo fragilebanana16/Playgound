@@ -27,6 +27,7 @@
     </div>
 </template>
 <script>
+/// <reference path="../types.js" />
 import { Icon } from '@iconify/vue'
 import errorsvg from '@/assets/images/error.svg'
 import constants from '../constants'
@@ -38,7 +39,9 @@ export default {
     props: {
         data: {
             type: Object,
-            required: true
+            required: true,
+            /** @type {IPhoto} */
+
         },
         collection: {
             type: Object,
@@ -51,6 +54,7 @@ export default {
         day: {
             type: Object,
             required: true,
+            /** @type {IDay} */
         },
     },
     data() {
