@@ -33,6 +33,7 @@ export default {
     },
     props: {
         data: {
+            /** @type {IFolder} */
             type: Object,
             required: true
         },

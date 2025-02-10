@@ -6,7 +6,7 @@
             'exit-left': (data.flag & c.FLAG_EXIT_LEFT),
             'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
         }">
-        <Icon icon='material-symbols:check' v-if="!(data.flag & c.FLAG_PLACEHOLDER)" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
+        <Icon icon='material-symbols:check-circle-rounded' v-if="!(data.flag & c.FLAG_PLACEHOLDER)" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
         <Icon v-if="data.flag & c.FLAG_IS_VIDEO" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
         <Icon v-if="data.flag & c.FLAG_IS_FAVORITE" icon='uis:favorite' class="text-white icon-starred"></Icon>
         <div class="img-outer" :style="{
@@ -27,7 +27,6 @@
     </div>
 </template>
 <script>
-/// <reference path="../types.js" />
 import { Icon } from '@iconify/vue'
 import errorsvg from '@/assets/images/error.svg'
 import constants from '../constants'
@@ -38,12 +37,12 @@ export default {
     },
     props: {
         data: {
+            /** @type {IPhoto} */
             type: Object,
             required: true,
-            /** @type {IPhoto} */
-
         },
         collection: {
+            /** @type {IPhoto[]} */
             type: Object,
             required: true
         },
@@ -52,9 +51,9 @@ export default {
             required: true,
         },
         day: {
+            /** @type {IDay} */
             type: Object,
             required: true,
-            /** @type {IDay} */
         },
     },
     data() {
@@ -82,7 +81,12 @@ export default {
             return currentImage;
         },
 
-        /** Pass to parent */
+        /**
+         * 
+         * Pass to parent
+         * 
+         * @param {IPhoto[]} photos - 233
+         */
         click(photos, current) {
             this.$emit('clickImg', this, photos, current);
         },
@@ -296,13 +300,12 @@ img {
     position: absolute;
     top: 10px; left: 10px;
     z-index: 100;
-    background-color: #fff;
+    color: #fff;
     border-radius: 50%;
     background-size: 80%;
-    padding: 5px;
     cursor: pointer;
     opacity: 0;
-    .p-outer:hover & { opacity: 0.7; }
+    .p-outer:hover & { opacity: 0.9; }
     .selected & { opacity: 0.9; filter: invert(1); }
 }
 /* Actual image */

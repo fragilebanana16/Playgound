@@ -3,10 +3,19 @@
         <!-- size-field look for item, item-size="300"-->
         <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
-            <h1 v-if="item.head" class="head-row" :class="{ 'first': item.id === 1 }">
-                {{ getHeadName(item) }}
-            </h1>
-            <div class="photo-row" :style="{ height: rowHeight + 'px' }">
+            <div v-if="item.type === 0" class="head-row"
+                :class="{
+                    'first': item.id === 1,
+                    'selected': item.selected,
+                }"
+            >
+                <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select"  @click="selectHead(item)"></Icon>
+                <span class="name"
+                     @click="selectHead(item)">
+                    {{ item.name || getHeadName(item) }}
+                </span>
+            </div>
+            <div v-else class="photo-row" :style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
                     <Folder v-if="photo.isfolder" :data="photo" :rowHeight="rowHeight" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
@@ -57,6 +66,7 @@ import Folder from "./components/Folder.vue";
 import Photo  from "./components/Photo.vue";
 import constants from "./constants";
 import * as utils from "./utils";
+import { IDay, IHeadRow, IPhoto, IRow, IRowType, ITick } from "./types";
 const router = useRoute()
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
@@ -64,7 +74,6 @@ const baseUrl = '/dev-api';
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const MAX_PHOTO_WIDTH = 175;
 const MIN_COLS = 3;
-
 // Define API routes
 const API_ROUTES = {
     DAYS: 'days',
@@ -141,25 +150,7 @@ const MOCK_IMG_DATA = [
     "What Lovers Do - Maroon 5,SZA.jpg",
     "What Makes You Beautiful - One Direction.jpg",
 ];
-type Day = {
-    id: string;
-    dayid: string;
-    count: number;
-    detail: Array<DayDetail>;
-    rows: Array<Row>;
-}; 
-type Row = {
-    photos: Array<Photo>;
-}
-type Photo = {
-    flag: number;
-    fileid: string
-}
-type DayDetail = {
-    fileid: string;
-    dayid: string;
-    count: number;
-}; 
+
 export default {
     components: {
         RecycleScroller,
@@ -177,16 +168,15 @@ export default {
             /** Loading days response */
             loading: true,
             /** Main list of rows */
-            list: [],
+            list: [] as IRow[],
             /** Counter of rows */
             numRows: 0,
             /** Computed number of columns */
             numCols: 5,
             /** Header rows for dayId key */
-            heads: {},
+            heads: {} as { [dayid: number]: IHeadRow },
             /** Original days response */
             days: [],
-
             /** Computed row height */
             rowHeight: 100,
             /** Total height of recycler */
@@ -214,7 +204,7 @@ export default {
             /** Resizing timer */
             resizeTimer: null,
             /** View size reflow timer */
-            reflowTimelineTimer: null,
+            reflowTimelineReq: false,
             /** Is mobile layout */
             isMobile: false,
             /** Set of dayIds for which images loaded */
@@ -226,16 +216,14 @@ export default {
         }
     },
 
-    mounted() {
-        this.handleResize();
-        this.fetchDays();
+    async mounted() {
+        // // Wait for one tick before doing anything
+        await this.$nextTick();
+        // Fit to window
+        this.handleResize(); 
+        // Get data
+        await this.fetchDays();
 
-        //       setTimeout(() => {
-        //   console.log(`output->this.timelineHeight`, this.$refs.timelineScroll.clientHeight);
-        //   this.handleResize();
-        // }, 100);
-
-        // Set scrollbar
         // Timeline recycler init
         this.$refs.recycler.$el.addEventListener('scroll', this.scrollPositionChange, false);
         this.scrollPositionChange();
@@ -251,7 +239,12 @@ export default {
     beforeDestroy() {
         this.resetState();
 	},
-
+    created() {
+        window.addEventListener("resize", this.handleResizeWithDelay);
+    },
+    destroyed() {
+        window.removeEventListener("resize", this.handleResizeWithDelay);
+    },
     methods: {
         /** Reset all state */
         resetState() {
@@ -277,13 +270,15 @@ export default {
                 this.resizeTimer = null;
             }, 300);
         },
-
         /** Handle window resize and initialization */
         handleResize() {
-            let height = this.$refs.container.clientHeight;
-            let width = this.$refs.container.clientWidth - 40;  // 预留和时间线的间距
-            this.timelineHeight = this.$refs.timelineScroll.clientHeight;
-            this.$refs.recycler.$el.style.height = (height - 4) + 'px';
+            const e = this.$refs.container as Element;
+            let height = e.clientHeight;
+            let width = e.clientWidth - 40; // 预留和时间线的间距
+            this.timelineHeight = e.clientHeight;
+
+            const recycler = this.$refs.recycler as any;
+            recycler.$el.style.height = (height - 4) + 'px';
             // Mobile devices
             if (window.innerWidth <= 768) {
                 width -= 4;
@@ -300,10 +295,10 @@ export default {
             this.rowHeight = Math.floor(width / this.numCols);
 
             // Set heights of rows
-            this.list.filter(r => !r.head).forEach(row => {
+            this.list.filter(r => r.type === IRowType.PHOTOS).forEach(row => {
                 row.size = this.rowHeight;
             });
-            this.reflowTimeline();
+            this.reflowTimeline(true);
         },
 
         /**
@@ -312,10 +307,8 @@ export default {
          * the pixel position of the recycler has changed.
          */
         scrollPositionChange(event) {
-            if (event) {
-                this.timelineCursorY = event.target.scrollTop * this.timelineHeight / this.viewHeight;
-                this.timelineMoveHoverCursor(this.timelineCursorY);
-            }
+            this.timelineCursorY = event ? event.target.scrollTop * this.timelineHeight / this.viewHeight : 0;
+            this.timelineMoveHoverCursor(this.timelineCursorY);
             if (this.scrollTimer) {
                 clearTimeout(this.scrollTimer);
             }
@@ -444,7 +437,6 @@ export default {
                 detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
                 rows: new Set()
             }));
-            
             let url = API_ROUTES.DAYS;
             let params = {};
 
@@ -458,12 +450,12 @@ export default {
             // const res = await axios.get(generateUrl(this.appendQuery(url), params));
             // const data = res.data;
             if (this.state !== startState) return;
-            this.processDays(data);
+            await　this.processDays(data);
         },
         /** Process the data for days call including folders */
-        processDays(data) {
-            const list: any[] = [];
-            const heads = {};
+        async processDays(data: IDay[]) {
+            const list: typeof this.list = [];
+            const heads: typeof this.heads = {};
             for (const [dayIdx, day] of data.entries()) {
                 day.count = Number(day.count);
                 day.rows = new Set();
@@ -473,10 +465,11 @@ export default {
                 }
 
                 // Add header to list
-                const head = {
+                const head: IHeadRow = {
                     id: ++this.numRows,
                     size: 40,
-                    head: true,
+                    type: IRowType.HEAD,
+                    selected: false,
                     dayId: day.dayid,
                     day: day,
                 };
@@ -507,10 +500,10 @@ export default {
                     this.processDay(day);
                 }
             }
+            this.loading = false;
 
             // Fix view height variable
-            this.reflowTimeline();
-            this.loading = false;
+            await this.reflowTimeline();
         },
 
         /** Fetch image data for one dayId */
@@ -554,7 +547,6 @@ export default {
 
                 if (this.state !== startState) return;
                 // *************** mock data ********************
-
                 const day = this.days.find(d => d.dayid === dayId);
                 day.detail = data;
                 day.count = data.length;
@@ -564,17 +556,17 @@ export default {
             }
         },
         /** Re-create timeline tick data in the next frame */
-        reflowTimeline() {
-            if (this.reflowTimelineTimer) {
+        async reflowTimeline(orderOnly = false) {
+            if (this.reflowTimelineReq) {
                 return;
             }
-            this.reflowTimelineTimer = setTimeout(() => {
-                this.reflowTimelineTimer = null;
-                this.reflowTimelineNow();
-            }, 0);
+            this.reflowTimelineReq = true;
+            await this.$nextTick();
+            this.reflowTimelineNow(orderOnly);
+            this.reflowTimelineReq = false;
         },
-        /** Re-create timeline tick data */
-        reflowTimelineNow() {
+        /** Recreate the timeline from scratch */
+        recreateTimeline(orderOnly = false) {
             // Clear timeline
             this.timelineTicks = [];
             // Ticks
@@ -610,8 +602,14 @@ export default {
                 currTopStatic += this.heads[day.dayid].size;
                 currTopRow += day.rows.size;
             }
+        },
+        reflowTimelineNow(orderOnly = false) {
+            if (!orderOnly) {
+                this.recreateTimeline();
+            }
+            const recycler: any = this.$refs.recycler;
+            this.viewHeight = recycler.$refs.wrapper.clientHeight;
 
-            this.viewHeight = this.$refs.recycler.$refs.wrapper.clientHeight;
             // Compute timeline tick positions
             for (const tick of this.timelineTicks) {
                 tick.topC = Math.floor((tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight);
@@ -679,7 +677,7 @@ export default {
                 }
             }
             if (head.day) {
-                head.day.rows = new Set();
+                head.day.rows.clear();
             }
 
             // Check if some row was added
@@ -693,7 +691,7 @@ export default {
             let dataIdx = 0;
             while (dataIdx < data.length) {
                 // Check if we ran out of rows
-                if (rowIdx >= this.list.length || this.list[rowIdx].head) {
+                if (rowIdx >= this.list.length || this.list[rowIdx].type === IRowType.HEAD) {
                     addedRow = true;
                     this.list.splice(rowIdx, 0, this.getBlankRow(day));
                 }
@@ -738,7 +736,7 @@ export default {
 
             // Get rid of any extra rows
             let spliceCount = 0;
-            for (let i = rowIdx + 1; i < this.list.length && !this.list[i].head; i++) {
+            for (let i = rowIdx + 1; i < this.list.length && this.list[i].type !== IRowType.HEAD; i++) {
                 spliceCount++;
             }
             if (spliceCount > 0) {
@@ -822,8 +820,8 @@ export default {
             }
         },
         /** Add a photo to selection list */
-        selectPhoto(photo) {
-            const nval = !this.selection.has(photo);
+        selectPhoto(photo: IPhoto, val?: boolean, noUpdate?: boolean) {
+            const nval = val ?? !this.selection.has(photo);
             if (nval) {
                 photo.flag |= constants.FLAG_SELECTED;
                 this.selection.add(photo);
@@ -831,22 +829,62 @@ export default {
                 photo.flag &= ~constants.FLAG_SELECTED;
                 this.selection.delete(photo);
             }
-            this.$forceUpdate();
+            if (!noUpdate && photo.d) {
+                this.updateHeadSelected(this.heads[photo.d.dayid]);
+                this.$forceUpdate();
+            }
         },
         /** Clear all selected photos */
         clearSelection() {
+            const heads = new Set<IHeadRow>();
             for (const photo of this.selection) {
                 photo.flag &= ~constants.FLAG_SELECTED;
+                heads.add(this.heads[photo.d.dayid]);
             }
             this.selection.clear();
+            heads.forEach(this.updateHeadSelected);
             this.$forceUpdate();
+        },
+        /** Select or deselect all photos in a head */
+        selectHead(head: IHeadRow) {
+            head.selected = !head.selected;
+            if (head.day && head.day.rows) {
+                for (const row of head.day.rows) {
+                    if (row.photos) {
+                        for (const photo of row.photos) {
+                            this.selectPhoto(photo, head.selected, true);
+                        }
+                    }
+                }
+            }
+            
+            this.$forceUpdate();
+        },
+        /** Check if the day for a photo is selected entirely */
+        updateHeadSelected(head: IHeadRow) {
+            let selected = true;
+            // Check if all photos are selected
+            if (head.day && head.day.rows) {
+                for (const row of head.day.rows) {
+                    if (row.photos) {
+                        for (const photo of row.photos) {
+                            if (!(photo.flag & this.c.FLAG_SELECTED)) {
+                                selected = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            // Update head
+            head.selected = selected;
         },
         /** Delete all selected photos */
         async deleteSelection() {
             if (this.selection.size === 0) {
                 return;
             }
-            const updatedDays = new Set<Day>();
+            const updatedDays = new Set<IDay>();
             const delIds = new Set();
             for (const photo of this.selection) {
                 if (!photo.fileid) {
@@ -915,7 +953,7 @@ export default {
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
             // Speculate day reflow for animation
-            const exitedLeft = new Set<Photo>();
+            const exitedLeft = new Set<IPhoto>();
             for (const day of updatedDays) {
                 let nextExit = false;
                 for (const row of day.rows) {
@@ -977,25 +1015,53 @@ export default {
 }
 
 .recycler  {
+    height: 300px;
     width: calc(100% + 20px);
-    .photo-row .photo {
-        display: inline-block;
-        position: relative;
-        cursor: pointer;
-        vertical-align: top;
-    }
-    .head-row {
-        height: 40px;
-        padding-top: 10px;
-        padding-left: 3px;
-        font-size: 0.9em;
-        font-weight: 600;
-        @include phone {
-            &.first {
-                padding-left: 38px;
-                padding-top: 12px;
-            }
+}
+.photo-row > .photo {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    vertical-align: top;
+}
+.head-row {
+    height: 40px;
+    padding-top: 10px;
+    padding-left: 3px;
+    font-size: 0.9em;
+    font-weight: 600;
+    @include phone {
+        &.first {
+            padding-left: 38px;
+            padding-top: 12px;
         }
+    }
+    > .select {
+        position: absolute;
+        left: 5px; top: 50%;
+        color: #000000;
+        display: none;
+        transform: translateY(-30%);
+        transition: opacity 0.2s ease;
+        border-radius: 50%;
+        background-size: 70%;
+        cursor: pointer;
+    }
+    > .name {
+        transition: margin 0.2s ease;
+        cursor: pointer;
+    }
+    .hover &, &.selected {
+        > .select {
+            display: inline-block;
+            opacity: 1;
+        }
+        > .name {
+            margin-left: 25px;
+        }
+    }
+    &.selected > .select {
+        // filter: invert(1);
     }
 }
 
@@ -1017,7 +1083,7 @@ export default {
     align-items: center;
     justify-content: space-around;
     margin-right: 2rem;
-    .text {
+    > .text {
         flex-grow: 1;
         line-height: 40px;
         padding-left: 8px;
@@ -1066,7 +1132,7 @@ export default {
     &:hover, &.scrolling {
         opacity: 1;
     }
-    .tick {
+    > .tick {
         pointer-events: none;
         position: absolute;
         font-size: 0.75em;
@@ -1090,7 +1156,7 @@ export default {
             border-radius: 4px;
         }
     }
-    .cursor {
+    > .cursor {
         position: absolute;
         pointer-events: none;
         right: 0;
@@ -1113,7 +1179,7 @@ export default {
             font-weight: 600;
         }
     }
-    &:hover .cursor.st {
+    &:hover > .cursor.st {
         opacity: 1;
     }
 }
