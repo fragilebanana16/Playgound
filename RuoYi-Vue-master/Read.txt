@@ -37,3 +37,8 @@ netstat -ano | findstr :8081
 
  -  Cannot read properties of null (reading 'nextSibling') 
 通常需要将页面用div包裹
+
+
+【BUG】
+                            提交                                    |                    描述                    |                原因                 |             状态           |
+cdd82ec62dfac7ec9f4f914d2de7ff87bb88c308 | 相册照片全选行删除行头重叠    |                                       |                               |
