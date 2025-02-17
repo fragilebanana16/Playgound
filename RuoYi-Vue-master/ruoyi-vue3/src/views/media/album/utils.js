@@ -10,3 +10,28 @@ export function getMonthName(date) {
     });
     return dateTimeFormat.formatToParts(date)[0].value;
 }
+
+export function genFileInfo(obj) {
+    const fileInfo = {}
+
+    Object.keys(obj).forEach(key => {
+        const data = obj[key]
+
+        // flatten object if any
+        if (!!data && typeof data === 'object') {
+            Object.assign(fileInfo, genFileInfo(data))
+        } else {
+            // format key and add it to the fileInfo
+            if (data === 'false') {
+                fileInfo[camelcase(key)] = false
+            } else if (data === 'true') {
+                fileInfo[camelcase(key)] = true
+            } else {
+                fileInfo[camelcase(key)] = isNumber(data)
+                    ? Number(data)
+                    : data
+            }
+        }
+    })
+    return fileInfo
+}

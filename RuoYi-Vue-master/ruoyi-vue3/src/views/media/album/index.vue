@@ -39,7 +39,7 @@
         </div>
         <!-- Top bar for selections etc -->
         <div v-if="selection.size > 0" class="top-bar">
-            <div class="icon-container" @click="clearSelection">
+            <div class="icon-container">
               <Icon icon='material-symbols:close' class="btn text-lg"  @click="clearSelection"></Icon>
             </div>
             <div class="text">
@@ -66,6 +66,7 @@ import Folder from "./components/Folder.vue";
 import Photo  from "./components/Photo.vue";
 import constants from "./constants";
 import * as utils from "./utils";
+import * as dav from "./DavRequest"
 import { IDay, IHeadRow, IPhoto, IRow, IRowType, ITick } from "./types";
 const router = useRoute()
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
@@ -835,13 +836,15 @@ export default {
             }
         },
         /** Clear all selected photos */
-        clearSelection() {
+        clearSelection(only?: Set<IPhoto>) {
             const heads = new Set<IHeadRow>();
-            for (const photo of this.selection) {
+            new Set((only || this.selection) as Set<IPhoto>).forEach((photo: IPhoto) => {
                 photo.flag &= ~constants.FLAG_SELECTED;
-                heads.add(this.heads[photo.d.dayid]);
-            }
-            this.selection.clear();
+                if (photo.d) {
+                    heads.add(this.heads[photo.d.dayid]);
+                }
+                this.selection.delete(photo);
+            })
             heads.forEach(this.updateHeadSelected);
             this.$forceUpdate();
         },
@@ -884,45 +887,15 @@ export default {
             if (this.selection.size === 0) {
                 return;
             }
-            const updatedDays = new Set<IDay>();
-            const delIds = new Set();
-            for (const photo of this.selection) {
-                if (!photo.fileid) {
-                    continue;
-                }
-                delIds.add(photo.fileid);
-                updatedDays.add(photo.d);
+
+            this.loading = true;
+            const list = [...this.selection];
+            for await (const delIds of dav.deleteFilesByIds(list.map(p => p.fileid))) {
+                const delIdsSet = new Set(delIds.filter(i => i));
+                const updatedDays = new Set(list.filter(f => delIdsSet.has(f.fileid)).map(f => f.d));
+                await this.deleteFromViewWithAnimation(delIdsSet, updatedDays);
             }
-
-            // Get files data
-            // TODO: api call
-            // let fileInfos = [];
-            // this.loading = true;
-
-            // try {
-            //     fileInfos = await dav.getFiles([...delIds]);
-            // } catch {
-            //     this.loading = false;
-            //     alert('Failed to get file info');
-            //     return;
-            // }
-            // // Run all promises together
-            // const promises = [];
-            // // Delete each file
-            // delIds.clear();
-            // for (const fileInfo of fileInfos) {
-            //     promises.push((async () => {
-            //         try {
-            //             await dav.deleteFile(fileInfo.filename)
-            //             delIds.add(fileInfo.fileid);
-            //         } catch {
-            //             console.warn('Failed to delete', fileInfo.filename)
-            //         }
-            //     })());
-            // }
-            // await Promise.allSettled(promises);
-            // this.loading = false;
-            await this.deleteFromViewWithAnimation(delIds, updatedDays);
+            this.loading = false;
         },
         /**
          * Delete elements from main view with some animation
@@ -940,18 +913,27 @@ export default {
             if (delIds.size === 0 || updatedDays.size === 0) {
                 return;
             }
+
+            // Set of photos that are being deleted
+            const delPhotos = new Set<IPhoto>();
+
             // Animate the deletion
             for (const day of updatedDays) {
                 for (const row of day.rows) {
                     for (const photo of row.photos) {
                         if (delIds.has(photo.fileid)) {
                             photo.flag |= constants.FLAG_LEAVING;
+                            delPhotos.add(photo);
                         }
                     }
                 }
             }
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
+
+            // clear selection at this point
+            this.clearSelection(delPhotos);
+
             // Speculate day reflow for animation
             const exitedLeft = new Set<IPhoto>();
             for (const day of updatedDays) {
@@ -981,9 +963,6 @@ export default {
                 photo.flag &= ~constants.FLAG_EXIT_LEFT;
                 photo.flag |= constants.FLAG_ENTER_RIGHT;
             });
-
-            // clear selection at this point
-            this.clearSelection();
 
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
