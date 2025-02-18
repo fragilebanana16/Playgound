@@ -1,5 +1,5 @@
 <template>
-    <div class="album-container" ref="container" :v-loading="loading">
+    <div class="album-container" ref="container" :v-loading="loading > 0">
         <!-- size-field look for item, item-size="300"-->
         <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
@@ -167,7 +167,7 @@ export default {
                 "https://picsum.photos/250/200"
             ],
             /** Loading days response */
-            loading: true,
+            loading: 0,
             /** Main list of rows */
             list: [] as IRow[],
             /** Counter of rows */
@@ -250,7 +250,7 @@ export default {
         /** Reset all state */
         resetState() {
             this.clearSelection();
-            this.loading = true;
+            this.loading = 0;
             this.list = [];
             this.numRows = 0;
             this.heads = {};
@@ -445,13 +445,27 @@ export default {
                 url = API_ROUTES.FOLDER_DAYS;
                 params['folderId'] = this.$route.params.id || 0;
             }
-            const startState = this.state;
-            this.appendQuery(url) // for test favoirate menu
-            // await api
-            // const res = await axios.get(generateUrl(this.appendQuery(url), params));
-            // const data = res.data;
-            if (this.state !== startState) return;
-            await　this.processDays(data);
+
+            try {
+                // try {
+                // this.loading++;
+                // const startState = this.state;
+                // const res = await axios.get<IDay[]>(generateUrl(this.appendQuery(url), params));
+                // const data = res.data;
+                // if (this.state !== startState) return;
+                // await this.processDays(data);
+                // } finally {
+                //     this.loading--;
+                // }
+                this.loading++;
+                const startState = this.state;
+                this.appendQuery(url) // for test favoirate menu
+                if (this.state !== startState) return;
+                await　this.processDays(data);
+            }
+            finally{
+                this.loading--;
+            }
         },
         /** Process the data for days call including folders */
         async processDays(data: IDay[]) {
@@ -505,6 +519,11 @@ export default {
 
             // Fix view height variable
             await this.reflowTimeline();
+
+            // Check if we didn't find anything
+            if (this.list.length === 0) {
+                console.error('No photos to show here');
+            }
         },
 
         /** Fetch image data for one dayId */
@@ -889,13 +908,17 @@ export default {
             }
 
             this.loading = true;
-            const list = [...this.selection];
-            for await (const delIds of dav.deleteFilesByIds(list.map(p => p.fileid))) {
-                const delIdsSet = new Set(delIds.filter(i => i));
-                const updatedDays = new Set(list.filter(f => delIdsSet.has(f.fileid)).map(f => f.d));
-                await this.deleteFromViewWithAnimation(delIdsSet, updatedDays);
+            try {
+                const list = [...this.selection];
+                this.loading++;
+                for await (const delIds of dav.deleteFilesByIds(list.map(p => p.fileid))) {
+                    const delIdsSet = new Set(delIds.filter(i => i));
+                    const updatedDays = new Set(list.filter(f => delIdsSet.has(f.fileid)).map(f => f.d));
+                    await this.deleteFromViewWithAnimation(delIdsSet, updatedDays);
+                }
+            } finally {
+                this.loading--;
             }
-            this.loading = false;
         },
         /**
          * Delete elements from main view with some animation
