@@ -211,7 +211,7 @@ export default {
             /** Set of dayIds for which images loaded */
             loadedDays: new Set(),
             /** List of selected file ids */
-            selection: new Set(),
+            selection: new Map<number, IPhoto>(),
             /** Constants for HTML template */
             c: constants,
         }
@@ -841,13 +841,13 @@ export default {
         },
         /** Add a photo to selection list */
         selectPhoto(photo: IPhoto, val?: boolean, noUpdate?: boolean) {
-            const nval = val ?? !this.selection.has(photo);
+            const nval = val ?? !this.selection.has(photo.fileid);
             if (nval) {
                 photo.flag |= constants.FLAG_SELECTED;
-                this.selection.add(photo);
+                this.selection.set(photo.fileid, photo);
             } else {
                 photo.flag &= ~constants.FLAG_SELECTED;
-                this.selection.delete(photo);
+                this.selection.delete(photo.fileid);
             }
             if (!noUpdate && photo.d) {
                 this.updateHeadSelected(this.heads[photo.d.dayid]);
@@ -857,12 +857,13 @@ export default {
         /** Clear all selected photos */
         clearSelection(only?: Set<IPhoto>) {
             const heads = new Set<IHeadRow>();
-            new Set((only || this.selection) as Set<IPhoto>).forEach((photo: IPhoto) => {
+            const toClear: IterableIterator<IPhoto> = only || this.selection.values();
+            Array.from(toClear).forEach((photo: IPhoto) => {
                 photo.flag &= ~constants.FLAG_SELECTED;
                 if (photo.d) {
                     heads.add(this.heads[photo.d.dayid]);
                 }
-                this.selection.delete(photo);
+                this.selection.delete(photo.fileid);
             })
             heads.forEach(this.updateHeadSelected);
             this.$forceUpdate();
@@ -911,12 +912,13 @@ export default {
             try {
                 const list = [...this.selection];
                 this.loading++;
-                for await (const delIds of dav.deleteFilesByIds(list.map(p => p.fileid))) {
-                    const delIdsSet = new Set(delIds.filter(i => i));
-                    const updatedDays = new Set(list.filter(f => delIdsSet.has(f.fileid)).map(f => f.d));
-                    await this.deleteFromViewWithAnimation(delIdsSet, updatedDays);
+                for await (const delIds of dav.deleteFilesByIds(Array.from(this.selection.keys()))) {
+                    const delPhotos = delIds.map(id => this.selection.get(id));
+                    await this.deleteFromViewWithAnimation(delPhotos);
                 }
-            } finally {
+            } catch (error) {
+                console.error(error);
+            }finally {
                 this.loading--;
             }
         },
@@ -929,28 +931,22 @@ export default {
          * a call to processDay so just pass it the list of ids to
          * delete and the days that were updated.
          *
-         * @param {Set} delIds Set of file ids to delete
-         * @param {Set} updatedDays of days that MAY be affected
+         * @param delPhotos photos to delete
          */
-        async deleteFromViewWithAnimation(delIds, updatedDays) {
-            if (delIds.size === 0 || updatedDays.size === 0) {
+        async deleteFromViewWithAnimation(delPhotos: IPhoto[]) {
+            if (delPhotos.length === 0) {
                 return;
             }
 
-            // Set of photos that are being deleted
-            const delPhotos = new Set<IPhoto>();
+            // Get all days that need to be updatd
+            const updatedDays = new Set<IDay>(delPhotos.map(p => p.d as IDay));
+            const delPhotosSet = new Set(delPhotos);
 
             // Animate the deletion
-            for (const day of updatedDays) {
-                for (const row of day.rows) {
-                    for (const photo of row.photos) {
-                        if (delIds.has(photo.fileid)) {
-                            photo.flag |= constants.FLAG_LEAVING;
-                            delPhotos.add(photo);
-                        }
-                    }
-                }
+            for (const photo of delPhotos) {
+                photo.flag |= this.c.FLAG_LEAVING;
             }
+
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
 
@@ -961,8 +957,8 @@ export default {
             const exitedLeft = new Set<IPhoto>();
             for (const day of updatedDays) {
                 let nextExit = false;
-                for (const row of day.rows) {
-                    for (const photo of row.photos) {
+                for (const row of day.rows ?? []) {
+                    for (const photo of row.photos ?? []) {
                         if (photo.flag & constants.FLAG_LEAVING) {
                             nextExit = true;
                         } else if (nextExit) {
@@ -976,7 +972,7 @@ export default {
             await new Promise(resolve => setTimeout(resolve, 200));
 
             for (const day of updatedDays) {
-                day.detail = day.detail.filter(p => !delIds.has(p.fileid));
+                day.detail = (day.detail ?? []).filter(p => !delPhotosSet.has(p));
                 day.count = day.detail.length;
                 this.processDay(day);
             }

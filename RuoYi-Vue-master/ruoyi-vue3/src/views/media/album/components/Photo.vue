@@ -165,7 +165,9 @@ export default {
             }
             this.day.fiOrigIds = newIds;
             // Remove deleted files from details
-            this.$emit('reprocess', remIds, new Set([this.day])); // 不修改this.day，传Set包装
+            // Get IPhotos of the deleted file Ids
+            const remPhotos = this.day.detail.filter(p => remIds.has(p.fileid));
+            this.emitReprocess(remPhotos);
         },
         toggleSelect() {
             if (this.data.flag & constants.FLAG_PLACEHOLDER) {
