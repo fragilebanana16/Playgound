@@ -850,6 +850,9 @@ export default {
         },
         /** Add a photo to selection list */
         selectPhoto(photo: IPhoto, val?: boolean, noUpdate?: boolean) {
+            if (photo.flag & this.c.FLAG_PLACEHOLDER) {
+                return; // ignore placeholders
+            }
             const nval = val ?? !this.selection.has(photo.fileid);
             if (nval) {
                 photo.flag |= constants.FLAG_SELECTED;
@@ -883,6 +886,7 @@ export default {
         /** Select or deselect all photos in a head */
         selectHead(head: IHeadRow) {
             head.selected = !head.selected;
+            debugger
             if (head.day && head.day.rows) {
                 for (const row of head.day.rows) {
                     if (row.photos) {
@@ -944,6 +948,7 @@ export default {
                         }
                     });
                 }
+                this.clearSelection();
             } finally {
                 this.loading--;
             }

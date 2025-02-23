@@ -42,3 +42,4 @@ netstat -ano | findstr :8081
 【BUG】
                             提交                                    |                    描述                    |                原因                 |             状态           |
 cdd82ec62dfac7ec9f4f914d2de7ff87bb88c308 | 相册照片全选行删除行头重叠    |                                       |                               |
+e2c1b3b72f2b64fe5c2e5a0c87d89cc871a0e0e9| 相册照片文件夹可被行选          |                                       |                               |
