@@ -40,7 +40,7 @@
         <!-- Top bar for selections etc -->
         <div v-if="selection.size > 0" class="top-bar">
             <div class="icon-container">
-              <Icon icon='material-symbols:close' class="btn text-lg"  @click="clearSelection"></Icon>
+              <Icon icon='material-symbols:close' class="btn text-lg"  @click="clearSelection()"></Icon>
             </div>
             <div class="text">
                 {{ selection.size }} item(s) selected
@@ -48,9 +48,18 @@
             <div class="icon-container" @click="deleteSelection">
                 <Icon icon='material-symbols:delete-outline' class="btn text-lg"></Icon>
             </div>
-            <div class="icon-container">
-                <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
-            </div>
+            <el-dropdown trigger="click">
+                <div class="icon-container">
+                    <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
+                </div>
+                <template #dropdown>
+                <el-dropdown-menu>
+                    <el-dropdown-item @click="favoriteSelection">Favoriate</el-dropdown-item>
+                    <el-dropdown-item>Action</el-dropdown-item>
+                </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            
         </div>
     </div>
 </template>
@@ -274,6 +283,10 @@ export default {
         /** Handle window resize and initialization */
         handleResize() {
             const e = this.$refs.container as Element;
+            if (!e) {
+                console.log('handleResize null e')
+                return;
+            }
             let height = e.clientHeight;
             let width = e.clientWidth - 40; // 预留和时间线的间距
             this.timelineHeight = e.clientHeight;
@@ -858,7 +871,10 @@ export default {
         clearSelection(only?: Set<IPhoto>) {
             const heads = new Set<IHeadRow>();
             const toClear: IterableIterator<IPhoto> = only || this.selection.values();
+    debugger
+
             Array.from(toClear).forEach((photo: IPhoto) => {
+
                 photo.flag &= ~constants.FLAG_SELECTED;
                 if (photo.d) {
                     heads.add(this.heads[photo.d.dayid]);
@@ -902,6 +918,41 @@ export default {
             // Update head
             head.selected = selected;
         },
+
+        /**
+         * Check if all files selected currently are favorites
+         */
+        allSelectedFavorites() {
+            return Array.from(this.selection.values() as IPhoto[]).every((p) => p.flag & this.c.FLAG_IS_FAVORITE);
+        },
+
+        /**
+         * Favorite the currently selected photos
+         */
+        async favoriteSelection() {
+            try {
+                const val = !this.allSelectedFavorites();
+                this.loading++;
+                for await (const favIds of dav.favoriteFilesByIds(Array.from(this.selection.keys()), val)) {
+                    console.log(`favIds->`,favIds)
+                    favIds.forEach(id => {
+                        const photo = this.selection.get(id);
+                        if (!photo) {
+                            return;
+                        }
+
+                        if (val) {
+                            photo.flag |= this.c.FLAG_IS_FAVORITE;
+                        } else {
+                            photo.flag &= ~this.c.FLAG_IS_FAVORITE;
+                        }
+                    });
+                }
+            } finally {
+                this.loading--;
+            }
+        },
+
         /** Delete all selected photos */
         async deleteSelection() {
             if (this.selection.size === 0) {
@@ -912,6 +963,7 @@ export default {
             try {
                 const list = [...this.selection];
                 this.loading++;
+
                 for await (const delIds of dav.deleteFilesByIds(Array.from(this.selection.keys()))) {
                     const delPhotos = delIds.map(id => this.selection.get(id));
                     await this.deleteFromViewWithAnimation(delPhotos);

@@ -1,3 +1,4 @@
+import { camelCase, isNumberStr } from '@/utils'
 /** Get JS date object from dayId */
 export function dayIdToDate(dayId){
     return new Date(Number(dayId)*86400*1000);
@@ -23,11 +24,11 @@ export function genFileInfo(obj) {
         } else {
             // format key and add it to the fileInfo
             if (data === 'false') {
-                fileInfo[camelcase(key)] = false
+                fileInfo[camelCase(key)] = false
             } else if (data === 'true') {
-                fileInfo[camelcase(key)] = true
+                fileInfo[camelCase(key)] = true
             } else {
-                fileInfo[camelcase(key)] = isNumber(data)
+                fileInfo[camelCase(key)] = isNumberStr(data)
                     ? Number(data)
                     : data
             }
