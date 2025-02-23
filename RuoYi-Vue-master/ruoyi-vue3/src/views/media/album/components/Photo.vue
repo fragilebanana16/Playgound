@@ -1,28 +1,23 @@
 <template>
     <div class="p-outer" :class="{
-            'selected': (data.flag & c.FLAG_SELECTED),
-            // 'p-loading': !(data.flag & c.FLAG_LOADED),
-            'leaving': (data.flag & c.FLAG_LEAVING),
-            'exit-left': (data.flag & c.FLAG_EXIT_LEFT),
-            'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
-        }">
-        <Icon icon='material-symbols:check-circle-rounded' v-if="!(data.flag & c.FLAG_PLACEHOLDER)" class="icon-checkmark select text-lg"  @click="toggleSelect"></Icon>
-        <Icon v-if="data.flag & c.FLAG_IS_VIDEO" icon='iconamoon:folder-video-fill' class="text-xl text-white icon-video-white"></Icon>
+        'selected': (data.flag & c.FLAG_SELECTED),
+        // 'p-loading': !(data.flag & c.FLAG_LOADED),
+        'leaving': (data.flag & c.FLAG_LEAVING),
+        'exit-left': (data.flag & c.FLAG_EXIT_LEFT),
+        'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
+    }">
+        <Icon icon='material-symbols:check-circle-rounded' v-if="!(data.flag & c.FLAG_PLACEHOLDER)"
+            class="icon-checkmark select text-lg" @click="toggleSelect"></Icon>
+        <Icon v-if="data.flag & c.FLAG_IS_VIDEO" icon='iconamoon:folder-video-fill'
+            class="text-xl text-white icon-video-white"></Icon>
         <Icon v-if="data.flag & c.FLAG_IS_FAVORITE" icon='uis:favorite' class="text-white icon-starred"></Icon>
         <div class="img-outer" :style="{
-                width: rowHeight + 'px',
-                height: rowHeight + 'px',
-            }">
-        <img @click="click(collection, data.url)" 
-            @contextmenu="contextmenu"
-            @touchstart="touchstart"
-            @touchend="touchend"
-            @touchmove="touchend"
-            @touchcancel="touchend"
-            :src="getUrl()"
-            :key="data.fileid"
-            @load = "data.flag |= c.FLAG_LOADED"
-            @error="handleImageError" />
+            width: rowHeight + 'px',
+            height: rowHeight + 'px',
+        }">
+            <img @click="click(collection, data.url)" @contextmenu="contextmenu" @touchstart="touchstart"
+                @touchend="touchend" @touchmove="touchend" @touchcancel="touchend" :src="getUrl()" :key="data.fileid"
+                @load="data.flag |= c.FLAG_LOADED" @error="handleImageError" />
         </div>
     </div>
 </template>
@@ -136,7 +131,7 @@ export default {
                         delete: () => {
                             this.$modal.confirm('是否确认删除"' + arguments[1] + '"的数据项?').then(() => {
                                 // todo
-                                this.day.fileInfos = this.day.detail.slice(0,2); 
+                                this.day.fileInfos = this.day.detail.slice(0, 2);
                                 this.$modal.msgSuccess("删除成功");
                             }).catch(() => { });
                         },
@@ -238,8 +233,10 @@ export default {
     white-space: nowrap;
     /* 防止换行 */
 }
-.viewer-container{
-    z-index: 101 !important; /* 弹窗在预览之上 */
+
+.viewer-container {
+    z-index: 101 !important;
+    /* 弹窗在预览之上 */
 }
 </style>
 <style lang="scss" scoped>
@@ -247,38 +244,54 @@ export default {
 .p-outer {
     will-change: transform, opacity;
     transform: translateZ(0);
+
     &.leaving {
         transition: all 0.2s ease-in;
         transform: scale(0.9);
         opacity: 0;
     }
+
     &.exit-left {
         transition: all 0.2s ease-in;
         transform: translateX(-20%);
         opacity: 0.4;
     }
+
     &.enter-right {
         animation: enter-right 0.2s ease-out forwards;
     }
 }
+
 @keyframes enter-right {
-    from { transform: translateX(20%); opacity: 0.4; }
-    to { transform: translateX(0); opacity: 1; }
+    from {
+        transform: translateX(20%);
+        opacity: 0.4;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* Extra icons */
 .icon-video-white {
     position: absolute;
     background-size: 100%;
-    height: 20px; width: 20px;
-    top: 10px; right: 10px;
+    height: 20px;
+    width: 20px;
+    top: 10px;
+    right: 10px;
     z-index: 100;
 }
+
 .icon-starred {
     position: absolute;
     background-size: 100%;
-    height: 24px; width: 24px;
-    bottom: 10px; left: 10px;
+    height: 24px;
+    width: 24px;
+    bottom: 10px;
+    left: 10px;
     z-index: 100;
     pointer-events: none;
 }
@@ -290,32 +303,53 @@ img {
     object-fit: cover;
     border-radius: 3%;
     cursor: pointer;
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     user-select: none;
-    .selected & { box-shadow: 0 0 6px 2px #eee; }
-    .p-loading & { opacity: 0; }
+
+    .selected & {
+        box-shadow: 0 0 6px 2px #eee;
+    }
+
+    .p-loading & {
+        opacity: 0;
+    }
 }
 
 .icon-checkmark {
     position: absolute;
-    top: 10px; left: 10px;
+    top: 10px;
+    left: 10px;
     z-index: 100;
     color: #fff;
     border-radius: 50%;
     background-size: 80%;
     cursor: pointer;
     opacity: 0;
-    .p-outer:hover & { opacity: 0.9; }
-    .selected & { opacity: 0.9; filter: invert(1); }
+
+    .p-outer:hover & {
+        opacity: 0.9;
+    }
+
+    .selected & {
+        opacity: 0.9;
+        filter: invert(1);
+    }
 }
+
 /* Actual image */
 div.img-outer {
     padding: 2px;
     transition: all 0.1s ease-in-out;
     background-clip: content-box, padding-box;
-    .selected & { padding: 6%; }
-    .p-loading & { background-color: #fff; }
-}
-</style>
+
+    .selected & {
+        padding: 6%;
+    }
+
+    .p-loading & {
+        background-color: #fff;
+    }
+}</style>

@@ -3,25 +3,21 @@
         <!-- size-field look for item, item-size="300"-->
         <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
-            <div v-if="item.type === 0" class="head-row"
-                :class="{
-                    'first': item.id === 1,
-                    'selected': item.selected,
-                }"
-            >
-                <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select"  @click="selectHead(item)"></Icon>
-                <span class="name"
-                     @click="selectHead(item)">
+            <div v-if="item.type === 0" class="head-row" :class="{
+                'first': item.id === 1,
+                'selected': item.selected,
+            }">
+                <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectHead(item)">
+                </Icon>
+                <span class="name" @click="selectHead(item)">
                     {{ item.name || getHeadName(item) }}
                 </span>
             </div>
             <div v-else class="photo-row" :style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
-                    <Folder v-if="photo.isfolder" :data="photo" :rowHeight="rowHeight" />
+                    <Folder v-if="photo.isfolder" :data="photo" :rowHeight="rowHeight" :key="photo.fileid" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
-                            @select="selectPhoto"
-                            @reprocess="deleteFromViewWithAnimation"
-                            @clickImg="clickPhoto" />
+                        @select="selectPhoto" @reprocess="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
                 </div>
             </div>
         </RecycleScroller>
@@ -29,10 +25,10 @@
         <div ref="timelineScroll" class="timeline-scroll" :class="{ scrolling }" @mousemove="timelineHover"
             @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
             <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" :style="{ top: timelineCursorY + 'px' }"></span>
-            <span class="cursor hv border-t-2 border-black dark:border-t-amber-900" :style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
-                timelineHoverCursorText }}</span>
-            <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick"
-                :class="{ 'dash': !tick['text'] }"
+            <span class="cursor hv border-t-2 border-black dark:border-t-amber-900"
+                :style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
+                    timelineHoverCursorText }}</span>
+            <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick" :class="{ 'dash': !tick['text'] }"
                 :style="{ top: Math.floor((index === 0 ? 10 : 0) + tick['topC']) + 'px' }">
                 <span v-if="tick['text']">{{ tick['text'] }}</span>
             </div>
@@ -40,7 +36,7 @@
         <!-- Top bar for selections etc -->
         <div v-if="selection.size > 0" class="top-bar">
             <div class="icon-container">
-              <Icon icon='material-symbols:close' class="btn text-lg"  @click="clearSelection()"></Icon>
+                <Icon icon='material-symbols:close' class="btn text-lg" @click="clearSelection()"></Icon>
             </div>
             <div class="text">
                 {{ selection.size }} item(s) selected
@@ -53,13 +49,13 @@
                     <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
                 </div>
                 <template #dropdown>
-                <el-dropdown-menu>
-                    <el-dropdown-item @click="favoriteSelection">Favoriate</el-dropdown-item>
-                    <el-dropdown-item>Action</el-dropdown-item>
-                </el-dropdown-menu>
+                    <el-dropdown-menu>
+                        <el-dropdown-item @click="favoriteSelection">Favoriate</el-dropdown-item>
+                        <el-dropdown-item>Action</el-dropdown-item>
+                    </el-dropdown-menu>
                 </template>
             </el-dropdown>
-            
+
         </div>
     </div>
 </template>
@@ -72,7 +68,7 @@ import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { Icon } from '@iconify/vue'
 import Folder from "./components/Folder.vue";
-import Photo  from "./components/Photo.vue";
+import Photo from "./components/Photo.vue";
 import constants from "./constants";
 import * as utils from "./utils";
 import * as dav from "./DavRequest"
@@ -230,7 +226,7 @@ export default {
         // // Wait for one tick before doing anything
         await this.$nextTick();
         // Fit to window
-        this.handleResize(); 
+        this.handleResize();
         // Get data
         await this.fetchDays();
 
@@ -240,15 +236,15 @@ export default {
     },
 
     watch: {
-		$route(from, to) {
-			console.log('route changed', from, to)
-			this.resetState();
+        $route(from, to) {
+            console.log('route changed', from, to)
+            this.resetState();
             this.fetchDays();
-		},
-	},
+        },
+    },
     beforeDestroy() {
         this.resetState();
-	},
+    },
     created() {
         window.addEventListener("resize", this.handleResizeWithDelay);
     },
@@ -409,12 +405,12 @@ export default {
             if (queryStr) {
                 url += '?' + queryStr;
             }
-            console.log(`appendQuery->`,url)
+            console.log(`appendQuery->`, url)
             return url;
         },
 
-       /** Get name of header */
-       getHeadName(head) {
+        /** Get name of header */
+        getHeadName(head) {
             // Check cache
             if (head.name) {
                 return head.name;
@@ -442,7 +438,7 @@ export default {
         async fetchDays() {
             const data = Array.from({ length: 5 }, (_, index) => ({
                 id: '00' + index,
-                dayid: index * 1000, 
+                dayid: index * 1000,
                 // const today = new Date();
                 // const epoch = new Date(0); // 1970年1月1日
                 // const diffTime = today - epoch; // 计算天数差以毫秒为单位
@@ -474,9 +470,9 @@ export default {
                 const startState = this.state;
                 this.appendQuery(url) // for test favoirate menu
                 if (this.state !== startState) return;
-                await　this.processDays(data);
+                await this.processDays(data);
             }
-            finally{
+            finally {
                 this.loading--;
             }
         },
@@ -554,7 +550,7 @@ export default {
                 const startState = this.state;
                 // const res = await axios.get(generateUrl(this.appendQuery(url), params));
                 // const data = res.data;
-                
+
                 // *************** mock data ********************
                 const prefix = baseUrl + '/music/covers/'
                 let data: SongData[] = [];
@@ -575,7 +571,7 @@ export default {
                 randomArray.forEach((img, index) => {
                     const fileid = `001${index + 1}`;
                     const url = `${prefix}${img}`;
-                    data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5, isfavorite : index % 6 === 0  });
+                    data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5, isfavorite: index % 6 === 0 });
                 });
 
                 if (this.state !== startState) return;
@@ -672,7 +668,7 @@ export default {
                 // Lookahead for next labelled tick
                 // If showing this tick would overlap the next one, don't show this one
                 let i = idx + 1;
-                while(i < this.timelineTicks.length) {
+                while (i < this.timelineTicks.length) {
                     if (this.timelineTicks[i].text) {
                         break;
                     }
@@ -698,7 +694,7 @@ export default {
          *
          * @param {any} day Day object
          */
-         processDay(day) {
+        processDay(day) {
             const dayId = day.dayid;
             const data = day.detail;
             const head = this.heads[dayId];
@@ -871,7 +867,7 @@ export default {
         clearSelection(only?: Set<IPhoto>) {
             const heads = new Set<IHeadRow>();
             const toClear: IterableIterator<IPhoto> = only || this.selection.values();
-    debugger
+            debugger
 
             Array.from(toClear).forEach((photo: IPhoto) => {
 
@@ -896,7 +892,7 @@ export default {
                     }
                 }
             }
-            
+
             this.$forceUpdate();
         },
         /** Check if the day for a photo is selected entirely */
@@ -934,7 +930,7 @@ export default {
                 const val = !this.allSelectedFavorites();
                 this.loading++;
                 for await (const favIds of dav.favoriteFilesByIds(Array.from(this.selection.keys()), val)) {
-                    console.log(`favIds->`,favIds)
+                    console.log(`favIds->`, favIds)
                     favIds.forEach(id => {
                         const photo = this.selection.get(id);
                         if (!photo) {
@@ -970,7 +966,7 @@ export default {
                 }
             } catch (error) {
                 console.error(error);
-            }finally {
+            } finally {
                 this.loading--;
             }
         },
@@ -1053,7 +1049,9 @@ export default {
   
 <style lang="scss" scoped>
 @mixin phone {
-  @media (max-width: 768px) { @content; }
+    @media (max-width: 768px) {
+        @content;
+    }
 }
 
 .album-container {
@@ -1064,31 +1062,36 @@ export default {
     /* no text will be selected  */
 }
 
-.recycler  {
+.recycler {
     height: 300px;
     width: calc(100% + 20px);
 }
-.photo-row > .photo {
+
+.photo-row>.photo {
     display: inline-block;
     position: relative;
     cursor: pointer;
     vertical-align: top;
 }
+
 .head-row {
     height: 40px;
     padding-top: 10px;
     padding-left: 3px;
     font-size: 0.9em;
     font-weight: 600;
+
     @include phone {
         &.first {
             padding-left: 38px;
             padding-top: 12px;
         }
     }
-    > .select {
+
+    >.select {
         position: absolute;
-        left: 5px; top: 50%;
+        left: 5px;
+        top: 50%;
         color: #000000;
         display: none;
         transform: translateY(-30%);
@@ -1097,20 +1100,25 @@ export default {
         background-size: 70%;
         cursor: pointer;
     }
-    > .name {
+
+    >.name {
         transition: margin 0.2s ease;
         cursor: pointer;
     }
-    .hover &, &.selected {
-        > .select {
+
+    .hover &,
+    &.selected {
+        >.select {
             display: inline-block;
             opacity: 1;
         }
-        > .name {
+
+        >.name {
             margin-left: 25px;
         }
     }
-    &.selected > .select {
+
+    &.selected>.select {
         // filter: invert(1);
     }
 }
@@ -1120,7 +1128,8 @@ export default {
 .top-bar {
     position: absolute;
     font-size: 0.9rem;
-    top: 3px; right: 15px;
+    top: 3px;
+    right: 15px;
     padding: 6px;
     width: 400px;
     max-width: calc(100vw - 30px);
@@ -1133,13 +1142,16 @@ export default {
     align-items: center;
     justify-content: space-around;
     margin-right: 2rem;
-    > .text {
+
+    >.text {
         flex-grow: 1;
         line-height: 40px;
         padding-left: 8px;
     }
+
     @include phone {
-        top: 35px; right: 15px;
+        top: 35px;
+        right: 15px;
     }
 }
 
@@ -1148,6 +1160,7 @@ export default {
     margin-right: 3px;
     cursor: pointer;
 }
+
 .photo-row .photo::before {
     content: "";
     position: absolute;
@@ -1179,10 +1192,13 @@ export default {
     opacity: 0;
     transition: opacity .2s ease-in-out;
     z-index: 1;
-    &:hover, &.scrolling {
+
+    &:hover,
+    &.scrolling {
         opacity: 1;
     }
-    > .tick {
+
+    >.tick {
         pointer-events: none;
         position: absolute;
         font-size: 0.75em;
@@ -1191,6 +1207,7 @@ export default {
         right: 7px;
         transform: translateY(-50%);
         z-index: 1;
+
         &.dash {
             height: 4px;
             width: 4px;
@@ -1198,25 +1215,32 @@ export default {
             background-color: #000;
             opacity: 0.2;
             display: block;
-            @include phone { display: none; }
+
+            @include phone {
+                display: none;
+            }
         }
+
         @include phone {
             background-color: #fff;
             padding: 0px 4px;
             border-radius: 4px;
         }
     }
-    > .cursor {
+
+    >.cursor {
         position: absolute;
         pointer-events: none;
         right: 0;
         background-color: #000;
         min-width: 100%;
         min-height: 1.5px;
+
         &.st {
             font-size: 0.75em;
             opacity: 0;
         }
+
         &.hv {
             background-color: #fff;
             padding: 2px 5px;
@@ -1229,7 +1253,8 @@ export default {
             font-weight: 600;
         }
     }
-    &:hover > .cursor.st {
+
+    &:hover>.cursor.st {
         opacity: 1;
     }
 }
@@ -1242,9 +1267,11 @@ export default {
     margin-left: 0.5rem;
     margin: 0 0.5rem 0.3rem 0.5rem;
 }
-.icon-container:hover::before{
+
+.icon-container:hover::before {
     opacity: 1;
 }
+
 .icon-container::before {
     content: '';
     opacity: 0;
@@ -1256,8 +1283,7 @@ export default {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    z-index: -1; /* 背景在图标下面 */
-    transition: opacity  0.3s;
-}
-
-</style>
+    z-index: -1;
+    /* 背景在图标下面 */
+    transition: opacity 0.3s;
+}</style>
