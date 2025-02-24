@@ -24,7 +24,7 @@
 <script>
 import { Icon } from '@iconify/vue'
 import errorsvg from '@/assets/images/error.svg'
-import constants from '../constants'
+import {c} from '../constants'
 export default {
     name: 'Photo',
     components: {
@@ -54,18 +54,18 @@ export default {
     data() {
         return {
             touchTimer: 0,
-            c: constants,
+            c:c,
         }
     },
     methods: {
         /** Get URL for image to show */
         getUrl() {
-            if (this.data.flag & constants.FLAG_PLACEHOLDER) {
+            if (this.data.flag & c.FLAG_PLACEHOLDER) {
                 return '';
-            } else if (this.data.flag & constants.FLAG_LOAD_FAIL) {
+            } else if (this.data.flag & c.FLAG_LOAD_FAIL) {
                 return errorsvg;
-            } else if (this.data.flag & constants.FLAG_FORCE_RELOAD) {
-                this.data.flag &= ~constants.FLAG_FORCE_RELOAD;
+            } else if (this.data.flag & c.FLAG_FORCE_RELOAD) {
+                this.data.flag &= ~c.FLAG_FORCE_RELOAD;
                 return undefined;
             } else {
                 return this.data.url
@@ -93,7 +93,7 @@ export default {
          */
         openFile(photos, current) {
             // Check if this is a placeholder
-            if (this.data.flag & constants.FLAG_PLACEHOLDER) {
+            if (this.data.flag & c.FLAG_PLACEHOLDER) {
                 return;
             }
             const urls = photos.map(item => item.url)
@@ -165,14 +165,14 @@ export default {
             this.emitReprocess(remPhotos);
         },
         toggleSelect() {
-            if (this.data.flag & constants.FLAG_PLACEHOLDER) {
+            if (this.data.flag & this.collection.FLAG_PLACEHOLDER) {
                 return;
             }
             this.$emit('select', this.data);
         },
         handleImageError(event) {
             event.target.src = errorsvg
-            this.data.flag |= (constants.FLAG_LOADED | constants.FLAG_LOAD_FAIL);
+            this.data.flag |= (c.FLAG_LOADED | c.FLAG_LOAD_FAIL);
         },
         touchstart() {
             this.touchTimer = setTimeout(() => {

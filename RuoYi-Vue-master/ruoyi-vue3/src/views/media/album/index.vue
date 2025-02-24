@@ -15,7 +15,7 @@
             </div>
             <div v-else class="photo-row" :style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
-                    <Folder v-if="photo.isfolder" :data="photo" :rowHeight="rowHeight" :key="photo.fileid" />
+                    <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :rowHeight="rowHeight" :key="photo.fileid" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
                         @select="selectPhoto" @reprocess="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
                 </div>
@@ -69,7 +69,7 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { Icon } from '@iconify/vue'
 import Folder from "./components/Folder.vue";
 import Photo from "./components/Photo.vue";
-import constants from "./constants";
+import { TagDayID, c } from "./constants";
 import * as utils from "./utils";
 import * as dav from "./DavRequest"
 import { IDay, IHeadRow, IPhoto, IRow, IRowType, ITick } from "./types";
@@ -217,8 +217,9 @@ export default {
             loadedDays: new Set(),
             /** List of selected file ids */
             selection: new Map<number, IPhoto>(),
-            /** Constants for HTML template */
-            c: constants,
+            /** Flag consts */
+            c:c,
+
         }
     },
 
@@ -305,7 +306,7 @@ export default {
             this.rowHeight = Math.floor(width / this.numCols);
 
             // Set heights of rows
-            this.list.filter(r => r.type === IRowType.PHOTOS).forEach(row => {
+            this.list.filter(r => r.type !== IRowType.HEAD).forEach(row => {
                 row.size = this.rowHeight;
             });
             this.reflowTimeline(true);
@@ -346,7 +347,7 @@ export default {
                     row.photos = new Array(row.pct);
                     for (let j = 0; j < row.pct; j++) {
                         row.photos[j] = {
-                            flag: constants.FLAG_PLACEHOLDER,
+                            flag: c.FLAG_PLACEHOLDER,
                             fileid: `${row.dayId}-${i}-${j}`,
                         };
                     }
@@ -355,8 +356,8 @@ export default {
                 // Force reload all loaded images
                 if ((i < this.currentStart || i > this.currentEnd) && row.photos) {
                     for (const photo of row.photos) {
-                        if (photo.flag & constants.FLAG_LOADED) {
-                            photo.flag = (photo.flag & ~constants.FLAG_LOADED) | constants.FLAG_FORCE_RELOAD; // Reload only if already loaded
+                        if (photo.flag & c.FLAG_LOADED) {
+                            photo.flag = (photo.flag & ~c.FLAG_LOADED) | c.FLAG_FORCE_RELOAD; // Reload only if already loaded
                         }
                     }
                 }
@@ -416,7 +417,7 @@ export default {
                 return head.name;
             }
             // Special headers
-            if (head.dayId === -0.1) {
+            if (head.dayId === TagDayID.FOLDERS) {
                 head.name = "Folders";
                 return head.name;
             }
@@ -558,8 +559,8 @@ export default {
                     fileid: string;
                     url: string;
                     isvideo: boolean;
-                    isfolder: boolean;
                     isfavorite: boolean;
+                    isfolder: boolean;
                     name: string;
                 };
 
@@ -742,14 +743,17 @@ export default {
 
                 // Flag conversion
                 if (photo.isvideo) {
-                    photo.flag |= constants.FLAG_IS_VIDEO;
+                    photo.flag |= c.FLAG_IS_VIDEO;
                     delete photo.isvideo;
                 }
                 if (photo.isfavorite) {
-                    photo.flag |= constants.FLAG_IS_FAVORITE;
-                    delete photo.favorite;
+                    photo.flag |= c.FLAG_IS_FAVORITE;
+                    delete photo.isfavorite;
                 }
-
+                if (photo.isfolder) {
+                    photo.flag |= this.c.FLAG_IS_FOLDER;
+                    delete photo.isfolder;
+                }
                 this.list[rowIdx].photos.push(photo);
                 dataIdx++;
 
@@ -782,9 +786,15 @@ export default {
 
         /** Get a new blank row */
         getBlankRow(day) {
+            let rowType = IRowType.PHOTOS;
+            if (day.dayid === TagDayID.FOLDERS) {
+                rowType = IRowType.FOLDERS;
+            }
+
             return {
                 id: ++this.numRows,
                 photos: [],
+                type: rowType,
                 size: this.rowHeight,
                 dayId: day.dayid,
                 day: day,
@@ -850,15 +860,15 @@ export default {
         },
         /** Add a photo to selection list */
         selectPhoto(photo: IPhoto, val?: boolean, noUpdate?: boolean) {
-            if (photo.flag & this.c.FLAG_PLACEHOLDER) {
+            if (photo.flag & c.FLAG_PLACEHOLDER || photo.flag & c.FLAG_IS_FOLDER) {
                 return; // ignore placeholders
             }
             const nval = val ?? !this.selection.has(photo.fileid);
             if (nval) {
-                photo.flag |= constants.FLAG_SELECTED;
+                photo.flag |= c.FLAG_SELECTED;
                 this.selection.set(photo.fileid, photo);
             } else {
-                photo.flag &= ~constants.FLAG_SELECTED;
+                photo.flag &= ~c.FLAG_SELECTED;
                 this.selection.delete(photo.fileid);
             }
             if (!noUpdate && photo.d) {
@@ -870,11 +880,8 @@ export default {
         clearSelection(only?: Set<IPhoto>) {
             const heads = new Set<IHeadRow>();
             const toClear: IterableIterator<IPhoto> = only || this.selection.values();
-            debugger
-
             Array.from(toClear).forEach((photo: IPhoto) => {
-
-                photo.flag &= ~constants.FLAG_SELECTED;
+                photo.flag &= ~c.FLAG_SELECTED;
                 if (photo.d) {
                     heads.add(this.heads[photo.d.dayid]);
                 }
@@ -886,7 +893,6 @@ export default {
         /** Select or deselect all photos in a head */
         selectHead(head: IHeadRow) {
             head.selected = !head.selected;
-            debugger
             if (head.day && head.day.rows) {
                 for (const row of head.day.rows) {
                     if (row.photos) {
@@ -907,7 +913,7 @@ export default {
                 for (const row of head.day.rows) {
                     if (row.photos) {
                         for (const photo of row.photos) {
-                            if (!(photo.flag & this.c.FLAG_SELECTED)) {
+                            if (!(photo.flag & c.FLAG_SELECTED)) {
                                 selected = false;
                                 break;
                             }
@@ -923,7 +929,7 @@ export default {
          * Check if all files selected currently are favorites
          */
         allSelectedFavorites() {
-            return Array.from(this.selection.values() as IPhoto[]).every((p) => p.flag & this.c.FLAG_IS_FAVORITE);
+            return Array.from(this.selection.values() as IPhoto[]).every((p) => p.flag & c.FLAG_IS_FAVORITE);
         },
 
         /**
@@ -942,9 +948,9 @@ export default {
                         }
 
                         if (val) {
-                            photo.flag |= this.c.FLAG_IS_FAVORITE;
+                            photo.flag |= c.FLAG_IS_FAVORITE;
                         } else {
-                            photo.flag &= ~this.c.FLAG_IS_FAVORITE;
+                            photo.flag &= ~c.FLAG_IS_FAVORITE;
                         }
                     });
                 }
@@ -997,7 +1003,7 @@ export default {
 
             // Animate the deletion
             for (const photo of delPhotos) {
-                photo.flag |= this.c.FLAG_LEAVING;
+                photo.flag |= c.FLAG_LEAVING;
             }
 
             // wait for 200ms
@@ -1012,10 +1018,10 @@ export default {
                 let nextExit = false;
                 for (const row of day.rows ?? []) {
                     for (const photo of row.photos ?? []) {
-                        if (photo.flag & constants.FLAG_LEAVING) {
+                        if (photo.flag & c.FLAG_LEAVING) {
                             nextExit = true;
                         } else if (nextExit) {
-                            photo.flag |= constants.FLAG_EXIT_LEFT;
+                            photo.flag |= c.FLAG_EXIT_LEFT;
                             exitedLeft.add(photo);
                         }
                     }
@@ -1032,15 +1038,15 @@ export default {
 
             // Enter from right all photos that exited left
             exitedLeft.forEach((photo) => {
-                photo.flag &= ~constants.FLAG_EXIT_LEFT;
-                photo.flag |= constants.FLAG_ENTER_RIGHT;
+                photo.flag &= ~c.FLAG_EXIT_LEFT;
+                photo.flag |= c.FLAG_ENTER_RIGHT;
             });
 
             // wait for 200ms
             await new Promise(resolve => setTimeout(resolve, 200));
             // Clear enter right flags
             exitedLeft.forEach((photo) => {
-                photo.flag &= ~constants.FLAG_ENTER_RIGHT;
+                photo.flag &= ~c.FLAG_ENTER_RIGHT;
             });
 
             // Reflow timeline
