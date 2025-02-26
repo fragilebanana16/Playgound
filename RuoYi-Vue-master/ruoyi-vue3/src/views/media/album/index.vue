@@ -84,8 +84,6 @@ const MIN_COLS = 3;
 const API_ROUTES = {
     DAYS: 'days',
     DAY: 'days/{dayId}',
-    FOLDER_DAYS: 'folder/{folderId}',
-    FOLDER_DAY: 'folder/{folderId}/{dayId}',
 };
 for (const [key, value] of Object.entries(API_ROUTES)) {
     API_ROUTES[key] = '/apps/memories/api/' + value;
@@ -401,6 +399,12 @@ export default {
             if (this.$route.name === 'Favorite') {
                 query.set('fav', '1');
             }
+            
+            // Folder
+            if (this.$route.name === 'folders') {
+                query.set('folder', this.$route.params.path || '/');
+            }
+
             // Create query string and append to URL
             const queryStr = query.toString();
             if (queryStr) {
@@ -425,11 +429,7 @@ export default {
             // The reason this function is separate from processDays is
             // because this call is terribly slow even on desktop
             const dateTaken = utils.dayIdToDate(head.dayId);
-            let name = dateTaken.toLocaleDateString("en-US", { dateStyle: 'full', timeZone: 'UTC' });
-            if (dateTaken.getUTCFullYear() === new Date().getUTCFullYear()) {
-                // hack: remove last 6 characters of date string
-                name = name.substring(0, name.length - 6);
-            }
+            const name = utils.getLongDateStr(dateTaken, true);
             // Cache and return
             head.name = name;
             return head.name;
@@ -450,11 +450,6 @@ export default {
             }));
             let url = API_ROUTES.DAYS;
             let params = {};
-
-            if (this.$route.name === 'folders') {
-                url = API_ROUTES.FOLDER_DAYS;
-                params['folderId'] = this.$route.params.id || 0;
-            }
 
             try {
                 // try {
@@ -539,10 +534,6 @@ export default {
         async fetchDay(dayId) {
             // let url = API_ROUTES.DAY;
             // const params = { dayId };
-            // if (this.$route.name === 'folders') {
-            //     url = API_ROUTES.FOLDER_DAY;
-            //     params.folderId = this.$route.params.id || 0;
-            // }
 
             // Do this in advance to prevent duplicate requests
             this.loadedDays.add(dayId);
@@ -650,7 +641,7 @@ export default {
 
             // Compute timeline tick positions
             for (const tick of this.timelineTicks) {
-                tick.topC = Math.floor((tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight);
+                tick.topC = (tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight;
             }
             // Do another pass to figure out which timeline points are visible
             // This is not as bad as it looks, it's actually 12*O(n)
@@ -837,7 +828,7 @@ export default {
             }
 
             const date = utils.dayIdToDate(dayId);
-            this.timelineHoverCursorText = `${utils.getMonthName(date)} ${date.getUTCFullYear()}`;
+            this.timelineHoverCursorText = utils.getShortDateStr(date);
         },
 
         /** Handle touch on right timeline */
@@ -1087,6 +1078,10 @@ export default {
     overflow: hidden;
     user-select: none;
     /* no text will be selected  */
+    * {
+        -webkit-tap-highlight-color: transparent; // Disable webkit tap highlight, seems useless?
+        -webkit-touch-callout: none;
+    }
 }
 
 .recycler {

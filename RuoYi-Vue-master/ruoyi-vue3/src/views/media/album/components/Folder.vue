@@ -55,9 +55,9 @@ export default {
         this.previewFileInfos = getRandomElements(previewArr, 4).map((url, index) => { return { id: index, url: prefix + url }; });
     },
     methods: {
-        /** Open album folder */
+        /** Open album folder :IFolder*/
         openFolder(id) {
-            this.$router.push({ path: `/media/album/folder/${id}` });
+            this.$router.push({ path: `/media/album/folder/${id}` }); // const path = folder.path.split('/').slice(3).join('/')
         },
     }
 }

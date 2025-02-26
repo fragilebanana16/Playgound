@@ -4,12 +4,22 @@ export function dayIdToDate(dayId){
     return new Date(Number(dayId)*86400*1000);
 }
 /** Get month name from number */
-export function getMonthName(date) {
-    const dateTimeFormat = new Intl.DateTimeFormat('en-US', {
+export function getShortDateStr(date) {
+    return date.toLocaleDateString("en-US", {
         month: 'short',
+        year: 'numeric',
         timeZone: 'UTC',
     });
-    return dateTimeFormat.formatToParts(date)[0].value;
+}
+/** Get long date string with optional year if same as current */
+export function getLongDateStr(date, skipYear=false) {
+    return date.toLocaleDateString("en-US", {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: (skipYear && date.getUTCFullYear() === new Date().getUTCFullYear()) ? undefined : 'numeric',
+        timeZone: 'UTC',
+    });
 }
 
 export function genFileInfo(obj) {
