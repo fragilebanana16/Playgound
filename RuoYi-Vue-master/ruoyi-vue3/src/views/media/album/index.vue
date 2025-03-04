@@ -455,8 +455,18 @@ export default {
                 // try {
                 // this.loading++;
                 // const startState = this.state;
-                // const res = await axios.get<IDay[]>(generateUrl(this.appendQuery(url), params));
-                // const data = res.data;
+                // let data: IDay[] = [];
+                // if (this.$route.name === 'ThisDay') {
+                //     data = await dav.getOnThisDayData();
+                // } else {
+                //     data = (await axios.get<IDay[]>(generateUrl(this.appendQuery(url), params))).data;
+                // }
+                // mock data
+                if (this.$route.name === 'Thisday') {
+                    data.splice(0,3);
+                }
+                // mock data
+
                 // if (this.state !== startState) return;
                 // await this.processDays(data);
                 // } finally {
