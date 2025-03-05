@@ -22,12 +22,19 @@
             </div>
         </RecycleScroller>
         <!-- Timeline -->
-        <div ref="timelineScroll" class="timeline-scroll" :class="{ scrolling }" @mousemove="timelineHover"
+        <div ref="timelineScroll" class="timeline-scroll" 
+            :class="{
+                'scrolling-recycler': scrollingRecycler,
+                'scrolling-timeline': scrollingTimeline,
+            }" 
+            @mousemove="timelineHover"
             @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
             <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" :style="{ transform: `translateY(${timelineCursorY}px)` }"></span>
             <span class="cursor hv border-t-2 border-black dark:border-t-amber-900"
-                :style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
-                    timelineHoverCursorText }}</span>
+                :style="{ transform: `translateY(${timelineHoverCursorY}px)` }">
+                  <div class="text"> {{ timelineHoverCursorText }} </div>
+                  <div class="icon"> <Icon icon='material-symbols:unfold-more'></Icon> </div>
+                </span>
             <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick" :class="{ 'dash': !tick['text'] }"
                 :style="{ top: Math.floor((index === 0 ? 10 : 0) + tick['topC']) + 'px' }">
                 <span v-if="tick['text']">{{ tick['text'] }}</span>
@@ -201,10 +208,14 @@ export default {
             currentEnd: 0,
             /** State for request cancellations */
             state: Math.random(),
-            /** Scrolling currently */
-            scrolling: false,
-            /** Scrolling timer */
-            scrollTimer: null,
+            /** Scrolling recycler currently */
+            scrollingRecycler: false,
+            /** Scrolling recycler timer */
+            scrollingRecyclerTimer: null as number | null,
+            /** Scrolling using the timeline currently */
+            scrollingTimeline: false,
+            /** Scrolling timeline timer */
+            scrollingTimelineTimer: null as number | null,
             /** Resizing timer */
             resizeTimer: null,
             /** View size reflow timer */
@@ -318,13 +329,11 @@ export default {
         scrollPositionChange(event) {
             this.timelineCursorY = event ? event.target.scrollTop * this.timelineHeight / this.viewHeight : 0;
             this.timelineMoveHoverCursor(this.timelineCursorY);
-            if (this.scrollTimer) {
-                clearTimeout(this.scrollTimer);
-            }
-            this.scrolling = true;
-            this.scrollTimer = setTimeout(() => {
-                this.scrolling = false;
-                this.scrollTimer = null;
+            if (this.scrollingRecyclerTimer) window.clearTimeout(this.scrollingRecyclerTimer);
+            this.scrollingRecycler = true;
+            this.scrollingRecyclerTimer = window.setTimeout(() => {
+                this.scrollingRecycler = false;
+                this.scrollingRecyclerTimer = null;
             }, 1500);
         },
 
@@ -843,6 +852,17 @@ export default {
             this.$refs.recycler.scrollToPosition(this.getTimelinePosition(y));
             event.preventDefault();
             event.stopPropagation();
+            this.handleTimelineScroll();
+        },
+
+        /** Update that timeline is being used to scroll recycler */
+        handleTimelineScroll() {
+            if (this.scrollingTimelineTimer) window.clearTimeout(this.scrollingTimelineTimer);
+            this.scrollingTimeline = true;
+            this.scrollingTimelineTimer = window.setTimeout(() => {
+                this.scrollingTimeline = false;
+                this.scrollingTimelineTimer = null;
+            }, 1500);
         },
 
         /** Handle mouse leave on right timeline */
@@ -852,7 +872,9 @@ export default {
 
         /** Handle mouse click on right timeline */
         timelineClick(event) {
-            this.$refs.recycler.scrollToPosition(this.getTimelinePosition(event.offsetY));
+            const recycler: any = this.$refs.recycler;
+            recycler.scrollToPosition(this.getTimelinePosition(event.offsetY));
+            this.handleTimelineScroll();
         },
 
         /** Get recycler equivalent position from event */
@@ -1220,9 +1242,22 @@ export default {
     transition: opacity .2s ease-in-out;
     z-index: 1;
 
-    &:hover,
-    &.scrolling {
+    &:hover, &.scrolling-recycler {
         opacity: 1;
+    }
+    // Hide ticks on mobile unless hovering
+    @include phone {
+        &:not(.scrolling-timeline) {
+            .cursor.hv {
+                left: 15px;
+                border: 2px solid black;
+                border-radius: 10px;
+                > .text { display: none; }
+                > .icon { display: block; }
+            }
+            > .tick { opacity: 0; }
+        }
+        .cursor.st { display: none; }
     }
 
     >.tick {
@@ -1278,6 +1313,10 @@ export default {
             z-index: 100;
             font-size: 0.95em;
             font-weight: 600;
+            > .icon {
+                display: none;
+                transform: translateX(-5px);
+            }
         }
     }
 
