@@ -17,7 +17,7 @@
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
                     <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :rowHeight="rowHeight" :key="photo.fileid" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
-                        @select="selectPhoto" @reprocess="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
+                        @select="selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
                 </div>
             </div>
         </RecycleScroller>

@@ -162,7 +162,7 @@ export default {
             // Remove deleted files from details
             // Get IPhotos of the deleted file Ids
             const remPhotos = this.day.detail.filter(p => remIds.has(p.fileid));
-            this.emitReprocess(remPhotos);
+            this.$emit('delete', remPhotos);
         },
         toggleSelect() {
             if (this.data.flag & this.collection.FLAG_PLACEHOLDER) {
