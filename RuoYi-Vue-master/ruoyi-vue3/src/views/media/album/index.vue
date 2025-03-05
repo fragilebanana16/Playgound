@@ -24,7 +24,7 @@
         <!-- Timeline -->
         <div ref="timelineScroll" class="timeline-scroll" :class="{ scrolling }" @mousemove="timelineHover"
             @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
-            <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" :style="{ top: timelineCursorY + 'px' }"></span>
+            <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" :style="{ transform: `translateY(${timelineCursorY}px)` }"></span>
             <span class="cursor hv border-t-2 border-black dark:border-t-amber-900"
                 :style="{ transform: `translateY(${timelineHoverCursorY}px)` }">{{
                     timelineHoverCursorText }}</span>
@@ -533,11 +533,6 @@ export default {
             this.loading = false;
             // Fix view height variable
             await this.reflowTimeline();
-
-            // Check if we didn't find anything
-            if (this.list.length === 0) {
-                console.error('No photos to show here');
-            }
         },
 
         /** Fetch image data for one dayId */
