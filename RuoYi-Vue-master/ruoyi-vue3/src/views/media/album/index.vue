@@ -1250,10 +1250,12 @@ export default {
         &:not(.scrolling-timeline) {
             .cursor.hv {
                 left: 15px;
-                border: 2px solid black;
-                border-radius: 10px;
+                 border: none;
+                 box-shadow: 0 0 5px -3px #000;
+                 height: 30px;
+                 border-radius: 15px;
                 > .text { display: none; }
-                > .icon { display: block; }
+                > .icon { display: block; transform: translate(-3px, 5px);}
             }
             > .tick { opacity: 0; }
         }
@@ -1298,7 +1300,7 @@ export default {
         min-width: 100%;
         min-height: 1.5px;
         will-change: transform;
-        
+
         &.st {
             font-size: 0.75em;
             opacity: 0;
