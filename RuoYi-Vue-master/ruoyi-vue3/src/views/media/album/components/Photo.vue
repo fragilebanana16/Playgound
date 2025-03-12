@@ -242,9 +242,6 @@ export default {
 <style lang="scss" scoped>
 /* Container and selection */
 .p-outer {
-    will-change: transform, opacity;
-    transform: translateZ(0);
-
     &.leaving {
         transition: all 0.2s ease-in;
         transform: scale(0.9);
@@ -342,11 +339,12 @@ img {
 /* Actual image */
 div.img-outer {
     padding: 2px;
-    transition: all 0.1s ease-in-out;
+    transition: transform 0.1s ease-in-out;
     background-clip: content-box, padding-box;
 
-    .selected & {
-        padding: 6%;
+    .selected > & {
+        // 父元素是 class 为 selected 的元素，并且 .img-outer 是该 selected 元素的 直接 子元素，实测.selected  &也能触发
+        transform: scale(0.9); 
     }
 
     .p-loading & {

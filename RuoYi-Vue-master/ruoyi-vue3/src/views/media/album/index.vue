@@ -1297,7 +1297,8 @@ export default {
         background-color: #000;
         min-width: 100%;
         min-height: 1.5px;
-
+        will-change: transform;
+        
         &.st {
             font-size: 0.75em;
             opacity: 0;
