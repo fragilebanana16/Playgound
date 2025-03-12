@@ -4,11 +4,9 @@
         <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
             <div v-if="item.type === 0" class="head-row" :class="{
-                'first': item.id === 1,
                 'selected': item.selected,
             }">
-                <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectHead(item)">
-                </Icon>
+                <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectHead(item)" />
                 <span class="name" @click="selectHead(item)">
                     {{ item.name || getHeadName(item) }}
                 </span>
@@ -1130,13 +1128,6 @@ export default {
     font-size: 0.9em;
     font-weight: 600;
 
-    @include phone {
-        &.first {
-            padding-left: 38px;
-            padding-top: 12px;
-        }
-    }
-
     >.select {
         position: absolute;
         left: 5px;
@@ -1151,7 +1142,8 @@ export default {
     }
 
     >.name {
-        transition: margin 0.2s ease;
+        display: block;
+        transition: transform 0.2s ease;
         cursor: pointer;
     }
 
@@ -1163,13 +1155,15 @@ export default {
         }
 
         >.name {
-            margin-left: 25px;
+            transform: translateX(25px);
         }
     }
 
-    &.selected>.select {
-        // filter: invert(1);
+    &.selected >.select {
+        opacity: 1;
     }
+
+    @include phone { transform: translateX(8px); }
 }
 
 
