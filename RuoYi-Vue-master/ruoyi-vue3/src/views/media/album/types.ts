@@ -70,6 +70,7 @@ export type IRow = {
 export type IHeadRow = IRow & {
     type: IRowType.HEAD;
     selected: boolean;
+    super?: string;
 }
 export enum IRowType {
     HEAD = 0,

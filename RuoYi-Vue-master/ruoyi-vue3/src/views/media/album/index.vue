@@ -6,10 +6,15 @@
             <div v-if="item.type === 0" class="head-row" :class="{
                 'selected': item.selected,
             }">
-                <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectHead(item)" />
-                <span class="name" @click="selectHead(item)">
-                    {{ item.name || getHeadName(item) }}
-                </span>
+                <div class="super" v-if="item.super !== undefined">
+                    {{ item.super }}
+                </div>
+                <div class="main">
+                    <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectHead(item)" />
+                    <span class="name" @click="selectHead(item)">
+                        {{ item.name || getHeadName(item) }}
+                    </span>
+                </div>
             </div>
             <div v-else class="photo-row" :style="{ height: rowHeight + 'px' }">
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
@@ -60,7 +65,6 @@
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
-
         </div>
     </div>
 </template>
@@ -78,6 +82,7 @@ import { TagDayID, c } from "./constants";
 import * as utils from "./utils";
 import * as dav from "./DavRequest"
 import { IDay, IHeadRow, IPhoto, IRow, IRowType, ITick } from "./types";
+import moment from 'moment';
 const router = useRoute()
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
@@ -493,7 +498,19 @@ export default {
         async processDays(data: IDay[]) {
             const list: typeof this.list = [];
             const heads: typeof this.heads = {};
-            for (const [dayIdx, day] of data.entries()) {
+
+            // Store the preloads in a separate map.
+            // This is required since otherwise the inner detail objects
+            // do not become reactive (which happens only after assignment).
+            const preloads: {
+                [dayId: number]: {
+                    day: IDay,
+                    detail: IPhoto[],
+                };
+            } = {};
+
+            let prevDay: IDay | null = null;
+            for (const day of data) {
                 day.count = Number(day.count);
                 day.rows = new Set();
                 // Nothing here
@@ -510,6 +527,17 @@ export default {
                     dayId: day.dayid,
                     day: day,
                 };
+
+                // Special headers
+                if (this.$route.name === 'Thisday' && (!prevDay || Math.abs(prevDay.dayid - day.dayid) > 30)) {
+                    // thisday view with new year title
+                    head.size = 76;
+                    const dateTaken = moment(utils.dayIdToDate(day.dayid));
+                    const text = dateTaken.locale('en-US').fromNow();
+                    head.super = text.charAt(0).toUpperCase() + text.slice(1);
+                }
+    
+                // Add header to list
                 heads[day.dayid] = head;
                 list.push(head);
 
@@ -524,6 +552,9 @@ export default {
                     row.pct = leftNum > this.numCols ? this.numCols : leftNum;
                     row.photos = [];
                 }
+
+                // Continue processing
+                prevDay = day;
             }
 
             // Store globally
@@ -531,12 +562,14 @@ export default {
             this.list = list;
             this.heads = heads;
 
-            // Check preloads 预处理了图片，冗余计算？如果fetchDays能先带一部分数据则先处理一部分，不用每次scroll再请求
-            for (const day of data) {
-                if (day.count && day.detail && day.detail.length > 0) {
-                    this.processDay(day);
-                }
+            // Iterate the preload map
+            // Now the inner detail objects are reactive
+            for (const dayId in preloads) {
+                const preload = preloads[dayId];
+                preload.day.detail = preload.detail;
+                this.processDay(preload.day);
             }
+
             this.loading = false;
             // Fix view height variable
             await this.reflowTimeline();
@@ -1122,26 +1155,32 @@ export default {
 }
 
 .head-row {
-    height: 40px;
     padding-top: 10px;
     padding-left: 3px;
     font-size: 0.9em;
-    font-weight: 600;
+    > div {
+         position: relative;
+         &.super {
+             font-size: 1.3em;
+             font-weight: bold;
+             margin-bottom: 4px;
+         }
+         &.main { font-weight: 600; }
+    }
 
-    >.select {
+    .select {
         position: absolute;
-        left: 5px;
-        top: 50%;
+        left: 0px; top: 50%;
         color: #000000;
         display: none;
-        transform: translateY(-30%);
+        transform: translateY(-50%);
         transition: opacity 0.2s ease;
         border-radius: 50%;
         background-size: 70%;
         cursor: pointer;
     }
 
-    >.name {
+    .name {
         display: block;
         transition: transform 0.2s ease;
         cursor: pointer;
@@ -1149,19 +1188,17 @@ export default {
 
     .hover &,
     &.selected {
-        >.select {
+        .select {
             display: inline-block;
             opacity: 1;
         }
 
-        >.name {
-            transform: translateX(25px);
+        .name {
+            transform: translateX(22px);
         }
     }
 
-    &.selected >.select {
-        opacity: 1;
-    }
+    &.selected .select { opacity: 1; }
 
     @include phone { transform: translateX(8px); }
 }
