@@ -10,8 +10,8 @@
                     {{ item.super }}
                 </div>
                 <div class="main">
-                    <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectHead(item)" />
-                    <span class="name" @click="selectHead(item)">
+                    <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectionManager.selectHead(item)" />
+                    <span class="name" @click="selectionManager.selectHead(item)">
                         {{ item.name || getHeadName(item) }}
                     </span>
                 </div>
@@ -20,7 +20,7 @@
                 <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
                     <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :rowHeight="rowHeight" :key="photo.fileid" />
                     <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
-                        @select="selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
+                        @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
                 </div>
             </div>
         </RecycleScroller>
@@ -43,29 +43,11 @@
                 <span v-if="tick['text']">{{ tick['text'] }}</span>
             </div>
         </div>
-        <!-- Top bar for selections etc -->
-        <div v-if="selection.size > 0" class="top-bar">
-            <div class="icon-container">
-                <Icon icon='material-symbols:close' class="btn text-lg" @click="clearSelection()"></Icon>
-            </div>
-            <div class="text">
-                {{ selection.size }} item(s) selected
-            </div>
-            <div class="icon-container" @click="deleteSelection">
-                <Icon icon='material-symbols:delete-outline' class="btn text-lg"></Icon>
-            </div>
-            <el-dropdown trigger="click">
-                <div class="icon-container">
-                    <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
-                </div>
-                <template #dropdown>
-                    <el-dropdown-menu>
-                        <el-dropdown-item @click="favoriteSelection">Favoriate</el-dropdown-item>
-                        <el-dropdown-item>Action</el-dropdown-item>
-                    </el-dropdown-menu>
-                </template>
-            </el-dropdown>
-        </div>
+        <!-- Managers -->
+        <SelectionManager ref="selectionManager"
+             :selection="selection" :heads="heads"
+             @delete="deleteFromViewWithAnimation"
+             @updateLoading="updateLoading" />
     </div>
 </template>
 
@@ -83,6 +65,7 @@ import * as utils from "./utils";
 import * as dav from "./DavRequest"
 import { IDay, IHeadRow, IPhoto, IRow, IRowType, ITick } from "./types";
 import moment from 'moment';
+import SelectionManager from './components/SelectionManager.vue';
 const router = useRoute()
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
@@ -170,7 +153,8 @@ export default {
         RecycleScroller,
         Icon,
         Folder,
-        Photo
+        Photo,
+        SelectionManager
     },
     data() {
         return {
@@ -231,11 +215,14 @@ export default {
             selection: new Map<number, IPhoto>(),
             /** Flag consts */
             c:c,
-
+            /** selectionManager */
+            selectionManager: SelectionManager,
         }
     },
 
     async mounted() {
+        this.selectionManager = this.$refs.selectionManager as typeof SelectionManager;
+
         // // Wait for one tick before doing anything
         await this.$nextTick();
         // Fit to window
@@ -265,9 +252,12 @@ export default {
         window.removeEventListener("resize", this.handleResizeWithDelay);
     },
     methods: {
+        updateLoading(delta: number) {
+         this.loading += delta;
+        },
         /** Reset all state */
         resetState() {
-            this.clearSelection();
+            (this.selectionManager as any).clearSelection();
             this.loading = 0;
             this.list = [];
             this.numRows = 0;
@@ -923,129 +913,6 @@ export default {
                 photoComponent.openFile(photos, current);
             }
         },
-        /** Add a photo to selection list */
-        selectPhoto(photo: IPhoto, val?: boolean, noUpdate?: boolean) {
-            if (photo.flag & c.FLAG_PLACEHOLDER || photo.flag & c.FLAG_IS_FOLDER) {
-                return; // ignore placeholders
-            }
-            const nval = val ?? !this.selection.has(photo.fileid);
-            if (nval) {
-                photo.flag |= c.FLAG_SELECTED;
-                this.selection.set(photo.fileid, photo);
-            } else {
-                photo.flag &= ~c.FLAG_SELECTED;
-                this.selection.delete(photo.fileid);
-            }
-            if (!noUpdate && photo.d) {
-                this.updateHeadSelected(this.heads[photo.d.dayid]);
-                this.$forceUpdate();
-            }
-        },
-        /** Clear all selected photos */
-        clearSelection(only?: Set<IPhoto>) {
-            const heads = new Set<IHeadRow>();
-            const toClear: IterableIterator<IPhoto> = only || this.selection.values();
-            Array.from(toClear).forEach((photo: IPhoto) => {
-                photo.flag &= ~c.FLAG_SELECTED;
-                if (photo.d) {
-                    heads.add(this.heads[photo.d.dayid]);
-                }
-                this.selection.delete(photo.fileid);
-            })
-            heads.forEach(this.updateHeadSelected);
-            this.$forceUpdate();
-        },
-        /** Select or deselect all photos in a head */
-        selectHead(head: IHeadRow) {
-            head.selected = !head.selected;
-            if (head.day && head.day.rows) {
-                for (const row of head.day.rows) {
-                    if (row.photos) {
-                        for (const photo of row.photos) {
-                            this.selectPhoto(photo, head.selected, true);
-                        }
-                    }
-                }
-            }
-
-            this.$forceUpdate();
-        },
-        /** Check if the day for a photo is selected entirely */
-        updateHeadSelected(head: IHeadRow) {
-            let selected = true;
-            // Check if all photos are selected
-            if (head.day && head.day.rows) {
-                for (const row of head.day.rows) {
-                    if (row.photos) {
-                        for (const photo of row.photos) {
-                            if (!(photo.flag & c.FLAG_SELECTED)) {
-                                selected = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // Update head
-            head.selected = selected;
-        },
-
-        /**
-         * Check if all files selected currently are favorites
-         */
-        allSelectedFavorites() {
-            return Array.from(this.selection.values() as IPhoto[]).every((p) => p.flag & c.FLAG_IS_FAVORITE);
-        },
-
-        /**
-         * Favorite the currently selected photos
-         */
-        async favoriteSelection() {
-            try {
-                const val = !this.allSelectedFavorites();
-                this.loading++;
-                for await (const favIds of dav.favoriteFilesByIds(Array.from(this.selection.keys()), val)) {
-                    console.log(`favIds->`, favIds)
-                    favIds.forEach(id => {
-                        const photo = this.selection.get(id);
-                        if (!photo) {
-                            return;
-                        }
-
-                        if (val) {
-                            photo.flag |= c.FLAG_IS_FAVORITE;
-                        } else {
-                            photo.flag &= ~c.FLAG_IS_FAVORITE;
-                        }
-                    });
-                }
-                this.clearSelection();
-            } finally {
-                this.loading--;
-            }
-        },
-
-        /** Delete all selected photos */
-        async deleteSelection() {
-            if (this.selection.size === 0) {
-                return;
-            }
-
-            this.loading = true;
-            try {
-                const list = [...this.selection];
-                this.loading++;
-
-                for await (const delIds of dav.deleteFilesByIds(Array.from(this.selection.keys()))) {
-                    const delPhotos = delIds.map(id => this.selection.get(id));
-                    await this.deleteFromViewWithAnimation(delPhotos);
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                this.loading--;
-            }
-        },
         /**
          * Delete elements from main view with some animation
          * This function looks horribly slow, probably isn't that bad
@@ -1075,7 +942,7 @@ export default {
             await new Promise(resolve => setTimeout(resolve, 200));
 
             // clear selection at this point
-            this.clearSelection(delPhotos);
+            (this.selectionManager as any).clearSelection(delPhotos);
 
             // Speculate day reflow for animation
             const exitedLeft = new Set<IPhoto>();
@@ -1202,45 +1069,6 @@ export default {
 
     @include phone { transform: translateX(8px); }
 }
-
-
-/** Top bar */
-.top-bar {
-    position: absolute;
-    font-size: 0.9rem;
-    top: 3px;
-    right: 15px;
-    padding: 6px;
-    width: 400px;
-    max-width: calc(100vw - 30px);
-    background-color: #fff;
-    box-shadow: 0 0 2px gray;
-    border-radius: 10px;
-    opacity: 0.95;
-    display: flex;
-    vertical-align: middle;
-    align-items: center;
-    justify-content: space-around;
-    margin-right: 2rem;
-
-    >.text {
-        flex-grow: 1;
-        line-height: 40px;
-        padding-left: 8px;
-    }
-
-    @include phone {
-        top: 35px;
-        right: 15px;
-    }
-}
-
-.top-bar .btn {
-    display: inline-block;
-    margin-right: 3px;
-    cursor: pointer;
-}
-
 .photo-row .photo::before {
     content: "";
     position: absolute;
@@ -1359,31 +1187,4 @@ export default {
     }
 }
 
-.icon-container {
-    display: inline-block;
-    position: relative;
-    margin-bottom: 0.3rem;
-    margin-right: 0.5rem;
-    margin-left: 0.5rem;
-    margin: 0 0.5rem 0.3rem 0.5rem;
-}
-
-.icon-container:hover::before {
-    opacity: 1;
-}
-
-.icon-container::before {
-    content: '';
-    opacity: 0;
-    position: absolute;
-    top: 56%;
-    left: 45%;
-    width: 30px;
-    height: 30px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-    /* 背景在图标下面 */
-    transition: opacity 0.3s;
-}</style>
+</style>

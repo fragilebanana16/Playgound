@@ -61,7 +61,7 @@ export default {
         /** Get URL for image to show */
         getUrl() {
             if (this.data.flag & c.FLAG_PLACEHOLDER) {
-                return '';
+                return errorsvg;
             } else if (this.data.flag & c.FLAG_LOAD_FAIL) {
                 return errorsvg;
             } else if (this.data.flag & c.FLAG_FORCE_RELOAD) {
