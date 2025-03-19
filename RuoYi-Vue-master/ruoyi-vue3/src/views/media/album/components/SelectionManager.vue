@@ -30,7 +30,7 @@ import { c } from "../constants";
 import * as dav from "../DavRequest"
 const baseUrl = '/dev-api';
 export default {
-    name: 'Folder',
+    name: 'SelectionManager',
     components: {
         Icon
     },

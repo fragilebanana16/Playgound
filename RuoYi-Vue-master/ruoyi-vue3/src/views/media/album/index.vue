@@ -9,9 +9,9 @@
                 <div class="super" v-if="item.super !== undefined">
                     {{ item.super }}
                 </div>
-                <div class="main">
+                <div class="main" @click="selectionManager.selectHead(item)">
                     <Icon icon='material-symbols:check-circle-rounded' class="btn text-lg select" @click="selectionManager.selectHead(item)" />
-                    <span class="name" @click="selectionManager.selectHead(item)">
+                    <span class="name">
                         {{ item.name || getHeadName(item) }}
                     </span>
                 </div>
@@ -24,26 +24,13 @@
                 </div>
             </div>
         </RecycleScroller>
-        <!-- Timeline -->
-        <div ref="timelineScroll" class="timeline-scroll" 
-            :class="{
-                'scrolling-recycler': scrollingRecycler,
-                'scrolling-timeline': scrollingTimeline,
-            }" 
-            @mousemove="timelineHover"
-            @touchmove="timelineTouch" @mouseleave="timelineLeave" @mousedown="timelineClick">
-            <span class="cursor st dark:bg-[#ffffff]" ref="cursorSt" :style="{ transform: `translateY(${timelineCursorY}px)` }"></span>
-            <span class="cursor hv border-t-2 border-black dark:border-t-amber-900"
-                :style="{ transform: `translateY(${timelineHoverCursorY}px)` }">
-                  <div class="text"> {{ timelineHoverCursorText }} </div>
-                  <div class="icon"> <Icon icon='material-symbols:unfold-more'></Icon> </div>
-                </span>
-            <div v-for="(tick, index) in timelineTicks" :key="tick['dayId']" class="tick" :class="{ 'dash': !tick['text'] }"
-                :style="{ top: Math.floor((index === 0 ? 10 : 0) + tick['topC']) + 'px' }">
-                <span v-if="tick['text']">{{ tick['text'] }}</span>
-            </div>
-        </div>
+
         <!-- Managers -->
+        <ScrollerManager ref="scrollerManager"
+             :days="days" :heads="heads"
+             :height="scrollerHeight"
+             :rowHeight="rowHeight"
+             :recycler="$refs.recycler" />
         <SelectionManager ref="selectionManager"
              :selection="selection" :heads="heads"
              @delete="deleteFromViewWithAnimation"
@@ -66,6 +53,7 @@ import * as dav from "./DavRequest"
 import { IDay, IHeadRow, IPhoto, IRow, IRowType, ITick } from "./types";
 import moment from 'moment';
 import SelectionManager from './components/SelectionManager.vue';
+import ScrollerManager from './components/ScrollerManager.vue';
 const router = useRoute()
 const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
@@ -73,14 +61,6 @@ const baseUrl = '/dev-api';
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
 const MAX_PHOTO_WIDTH = 175;
 const MIN_COLS = 3;
-// Define API routes
-const API_ROUTES = {
-    DAYS: 'days',
-    DAY: 'days/{dayId}',
-};
-for (const [key, value] of Object.entries(API_ROUTES)) {
-    API_ROUTES[key] = '/apps/memories/api/' + value;
-}
 
 const MOCK_IMG_DATA = [
     "A Sky Full of Stars - Coldplay.jpg",
@@ -154,7 +134,8 @@ export default {
         Icon,
         Folder,
         Photo,
-        SelectionManager
+        SelectionManager,
+        ScrollerManager
     },
     data() {
         return {
@@ -177,38 +158,16 @@ export default {
             days: [],
             /** Computed row height */
             rowHeight: 100,
-            /** Total height of recycler */
-            viewHeight: 1000,
-            /** Total height of timeline */
-            timelineHeight: 100,
-            /** Computed timeline ticks */
-            timelineTicks: [],
-            /** Computed timeline cursor top */
-            timelineCursorY: 0,
-            /** Timeline hover cursor top */
-            timelineHoverCursorY: -5,
-            /** Timeline hover cursor text */
-            timelineHoverCursorText: "",
             /** Current start index */
             currentStart: 0,
             /** Current end index */
             currentEnd: 0,
             /** State for request cancellations */
             state: Math.random(),
-            /** Scrolling recycler currently */
-            scrollingRecycler: false,
-            /** Scrolling recycler timer */
-            scrollingRecyclerTimer: null as number | null,
-            /** Scrolling using the timeline currently */
-            scrollingTimeline: false,
-            /** Scrolling timeline timer */
-            scrollingTimelineTimer: null as number | null,
             /** Resizing timer */
             resizeTimer: null,
-            /** View size reflow timer */
-            reflowTimelineReq: false,
-            /** Is mobile layout */
-            isMobile: false,
+            /** Height of the scroller */
+            scrollerHeight: 100,
             /** Set of dayIds for which images loaded */
             loadedDays: new Set(),
             /** List of selected file ids */
@@ -217,12 +176,14 @@ export default {
             c:c,
             /** selectionManager */
             selectionManager: SelectionManager,
+            /** Scroller manager component */
+            scrollerManager: ScrollerManager,
         }
     },
 
     async mounted() {
-        this.selectionManager = this.$refs.selectionManager as typeof SelectionManager;
-
+        this.selectionManager = this.$refs.selectionManager;
+        this.scrollerManager = this.$refs.scrollerManager;
         // // Wait for one tick before doing anything
         await this.$nextTick();
         // Fit to window
@@ -257,7 +218,7 @@ export default {
         },
         /** Reset all state */
         resetState() {
-            (this.selectionManager as any).clearSelection();
+            this.selectionManager.clearSelection();
             this.loading = 0;
             this.list = [];
             this.numRows = 0;
@@ -265,7 +226,7 @@ export default {
             this.days = [];
             this.currentStart = 0;
             this.currentEnd = 0;
-            this.timelineTicks = [];
+            this.scrollerManager.reset();
             this.state = Math.random();
             this.loadedDays.clear();
         },
@@ -288,17 +249,12 @@ export default {
             }
             let height = e.clientHeight;
             let width = e.clientWidth - 40; // 预留和时间线的间距
-            this.timelineHeight = e.clientHeight;
-
+            this.scrollerHeight = height;
             const recycler = this.$refs.recycler as any;
             recycler.$el.style.height = (height - 4) + 'px';
-            // Mobile devices
-            if (window.innerWidth <= 768) {
-                width -= 4;
-                this.isMobile = true;
-            } else {
+            // Desktop scroller width
+            if (window.innerWidth > 768) {
                 width -= 40;
-                this.isMobile = false;
             }
 
             if (this.days.length === 0) {
@@ -311,7 +267,7 @@ export default {
             this.list.filter(r => r.type !== IRowType.HEAD).forEach(row => {
                 row.size = this.rowHeight;
             });
-            await this.reflowTimeline(true);
+            this.scrollerManager.reflow(true);
         },
 
         /**
@@ -320,14 +276,7 @@ export default {
          * the pixel position of the recycler has changed.
          */
         scrollPositionChange(event) {
-            this.timelineCursorY = event ? event.target.scrollTop * this.timelineHeight / this.viewHeight : 0;
-            this.timelineMoveHoverCursor(this.timelineCursorY);
-            if (this.scrollingRecyclerTimer) window.clearTimeout(this.scrollingRecyclerTimer);
-            this.scrollingRecycler = true;
-            this.scrollingRecyclerTimer = window.setTimeout(() => {
-                this.scrollingRecycler = false;
-                this.scrollingRecyclerTimer = null;
-            }, 1500);
+            this.scrollerManager.recyclerScrolled(event)
         },
 
         /** Trigger when recycler view changes */
@@ -450,7 +399,7 @@ export default {
                 detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
                 rows: new Set()
             }));
-            let url = API_ROUTES.DAYS;
+            let url = '/apps/memories/api/days';
             let params = {};
 
             try {
@@ -562,12 +511,12 @@ export default {
 
             this.loading = false;
             // Fix view height variable
-            await this.reflowTimeline();
+            await this.scrollerManager.reflow();
         },
 
         /** Fetch image data for one dayId */
         async fetchDay(dayId) {
-            // let url = API_ROUTES.DAY;
+            // let url = '/apps/memories/api/days/{dayId}';
             // const params = { dayId };
 
             // Do this in advance to prevent duplicate requests
@@ -608,119 +557,6 @@ export default {
                 this.processDay(day);
             } catch (e) {
                 console.error(e);
-            }
-        },
-        /** Re-create timeline tick data in the next frame */
-        async reflowTimeline(orderOnly = false) {
-            if (this.reflowTimelineReq) {
-                return;
-            }
-            this.reflowTimelineReq = true;
-            await this.$nextTick();
-            this.reflowTimelineNow(orderOnly);
-            this.reflowTimelineReq = false;
-        },
-        /** Recreate the timeline from scratch */
-        recreateTimeline() {
-            // Clear timeline
-            this.timelineTicks = [];
-            // Ticks
-            let currTopRow = 0;
-            let currTopStatic = 0;
-            let prevYear = 9999;
-            let prevMonth = 0;
-            const thisYear = new Date().getFullYear();
-            // Get a new tick
-            const getTick = (day: IDay, text?: string | number): ITick => {
-                return {
-                    dayId: day.dayid,
-                    top: currTopRow,
-                    topS: currTopStatic,
-                    topC: 0,
-                    text: text,
-                };
-            }
-
-            // Itearte over days
-            for (const day of this.days) {
-                if (day.count === 0) {
-                    console.log('skip', day);
-                    continue;
-                }
-                if (Object.values(TagDayID).includes(day.dayid)) {
-                    // Blank dash ticks only
-                    this.timelineTicks.push(getTick(day));
-                } else {
-                    // Make date string
-                    const dateTaken = utils.dayIdToDate(day.dayid);
-
-                    // Create tick if month changed
-                    const dtYear = dateTaken.getUTCFullYear();
-                    const dtMonth = dateTaken.getUTCMonth()
-                    if (Number.isInteger(day.dayid) && (dtMonth !== prevMonth || dtYear !== prevYear)) {
-                        this.timelineTicks.push(getTick(day, (dtYear === prevYear || dtYear === thisYear) ? undefined : dtYear));
-                    }
-                    prevMonth = dtMonth;
-                    prevYear = dtYear;
-                }
-                currTopStatic += this.heads[day.dayid].size;
-                currTopRow += day.rows.size;
-            }
-        },
-        reflowTimelineNow(orderOnly = false) {
-            if (!orderOnly) {
-                this.recreateTimeline();
-            }
-            const recycler: any = this.$refs.recycler;
-            this.viewHeight = recycler.$refs.wrapper.clientHeight;
-
-            // Compute timeline tick positions
-            for (const tick of this.timelineTicks) {
-                tick.topC = (tick.topS + tick.top * this.rowHeight) * this.timelineHeight / this.viewHeight;
-            }
-            // Do another pass to figure out which timeline points are visible
-            // This is not as bad as it looks, it's actually 12*O(n)
-            // because there are only 12 months in a year
-            const minGap = parseFloat(getComputedStyle(this.$refs.cursorSt).fontSize) + (this.isMobile ? 5 : 2);
-            let prevShow = -9999;
-            for (const [idx, tick] of this.timelineTicks.entries()) {
-                // You can't see these anyway, why bother?
-                if (tick.topC < minGap || tick.topC > this.timelineHeight - minGap) {
-                    tick.s = false;
-                    continue;
-                }
-                // Will overlap with the previous tick. Skip anyway.
-                if (tick.topC - prevShow < minGap) {
-                    tick.s = false;
-                    continue;
-                }
-                // This is a labelled tick then show it anyway for the sake of best effort
-                if (tick.text) {
-                    tick.s = true;
-                    prevShow = tick.topC;
-                    continue;
-                }
-                // Lookahead for next labelled tick
-                // If showing this tick would overlap the next one, don't show this one
-                let i = idx + 1;
-                while (i < this.timelineTicks.length) {
-                    if (this.timelineTicks[i].text) {
-                        break;
-                    }
-                    i++;
-                }
-                if (i < this.timelineTicks.length) {
-                    // A labelled tick was found
-                    const nextLabelledTick = this.timelineTicks[i];
-                    if (tick.topC + minGap > nextLabelledTick.topC &&
-                        nextLabelledTick.topC < this.timelineHeight - minGap) { // make sure this will be shown
-                        tick.s = false;
-                        continue;
-                    }
-                }
-                // Show this tick
-                tick.s = true;
-                prevShow = tick.topC;
             }
         },
         /**
@@ -813,7 +649,7 @@ export default {
             // because one row is always removed in that case
             // So just reflow the timeline here
             if (addedRow || spliceCount > 0) {
-                this.reflowTimeline();
+                this.scrollerManager.reflow();
             }
         },
 
@@ -832,77 +668,6 @@ export default {
                 dayId: day.dayid,
                 day: day,
             };
-        },
-
-        /** Handle mouse hover on right timeline */
-        timelineHover(event) {
-            if (event.buttons) {
-                this.timelineClick(event);
-            }
-            this.timelineMoveHoverCursor(event.offsetY);
-        },
-
-        timelineMoveHoverCursor(y) {
-            this.timelineHoverCursorY = y;
-            // Get index of previous tick
-            let idx = this.timelineTicks.findIndex(t => t.topC > y);
-            if (idx >= 1) {
-                idx = idx - 1;
-            } else if (idx === -1 && this.timelineTicks.length > 0) {
-                idx = this.timelineTicks.length - 1;
-            } else {
-                return;
-            }
-            // DayId of current hover
-            const dayId = this.timelineTicks[idx].dayId
-
-            // Special days
-            if (Object.values(TagDayID).includes(dayId)) {
-                this.timelineHoverCursorText = this.getHeadName(this.heads[dayId]);
-                return;
-            }
-
-            const date = utils.dayIdToDate(dayId);
-            this.timelineHoverCursorText = utils.getShortDateStr(date);
-        },
-
-        /** Handle touch on right timeline */
-        timelineTouch(event) {
-            const rect = event.target.getBoundingClientRect();
-            const y = event.targetTouches[0].pageY - rect.top;
-            this.$refs.recycler.scrollToPosition(this.getTimelinePosition(y));
-            event.preventDefault();
-            event.stopPropagation();
-            this.handleTimelineScroll();
-        },
-
-        /** Update that timeline is being used to scroll recycler */
-        handleTimelineScroll() {
-            if (this.scrollingTimelineTimer) window.clearTimeout(this.scrollingTimelineTimer);
-            this.scrollingTimeline = true;
-            this.scrollingTimelineTimer = window.setTimeout(() => {
-                this.scrollingTimeline = false;
-                this.scrollingTimelineTimer = null;
-            }, 1500);
-        },
-
-        /** Handle mouse leave on right timeline */
-        timelineLeave() {
-            this.timelineMoveHoverCursor(this.timelineCursorY);
-        },
-
-        /** Handle mouse click on right timeline */
-        timelineClick(event) {
-            const recycler: any = this.$refs.recycler;
-            recycler.scrollToPosition(this.getTimelinePosition(event.offsetY));
-            this.handleTimelineScroll();
-        },
-
-        /** Get recycler equivalent position from event */
-        getTimelinePosition(y) {
-            const tH = this.viewHeight;
-            const maxH = this.timelineHeight;
-            return y * tH / maxH;
         },
 
         /** Clicking on photo */
@@ -942,7 +707,7 @@ export default {
             await new Promise(resolve => setTimeout(resolve, 200));
 
             // clear selection at this point
-            (this.selectionManager as any).clearSelection(delPhotos);
+            this.selectionManager.clearSelection(delPhotos);
 
             // Speculate day reflow for animation
             const exitedLeft = new Set<IPhoto>();
@@ -982,7 +747,7 @@ export default {
             });
 
             // Reflow timeline
-            this.reflowTimeline();
+            this.scrollerManager.reflow();
         },
     },
 }
@@ -1087,104 +852,6 @@ export default {
 
 .photo-row .photo:hover::before {
     opacity: 1;
-}
-
-.timeline-scroll {
-    overflow-y: clip;
-    position: absolute;
-    height: 100%;
-    width: 36px;
-    top: 0;
-    right: 0;
-    cursor: ns-resize;
-    opacity: 0;
-    transition: opacity .2s ease-in-out;
-    z-index: 1;
-
-    &:hover, &.scrolling-recycler {
-        opacity: 1;
-    }
-    // Hide ticks on mobile unless hovering
-    @include phone {
-        &:not(.scrolling-timeline) {
-            .cursor.hv {
-                left: 15px;
-                 border: none;
-                 box-shadow: 0 0 5px -3px #000;
-                 height: 30px;
-                 border-radius: 15px;
-                > .text { display: none; }
-                > .icon { display: block; transform: translate(-3px, 5px);}
-            }
-            > .tick { opacity: 0; }
-        }
-        .cursor.st { display: none; }
-    }
-
-    >.tick {
-        pointer-events: none;
-        position: absolute;
-        font-size: 0.75em;
-        font-weight: 600;
-        opacity: 0.95;
-        right: 7px;
-        transform: translateY(-50%);
-        z-index: 1;
-
-        &.dash {
-            height: 4px;
-            width: 4px;
-            border-radius: 50%;
-            background-color: #000;
-            opacity: 0.2;
-            display: block;
-
-            @include phone {
-                display: none;
-            }
-        }
-
-        @include phone {
-            background-color: #fff;
-            padding: 0px 4px;
-            border-radius: 4px;
-        }
-    }
-
-    >.cursor {
-        position: absolute;
-        pointer-events: none;
-        right: 0;
-        background-color: #000;
-        min-width: 100%;
-        min-height: 1.5px;
-        will-change: transform;
-
-        &.st {
-            font-size: 0.75em;
-            opacity: 0;
-        }
-
-        &.hv {
-            background-color: #fff;
-            padding: 2px 5px;
-            border-top: 2px solid #000;
-            border-radius: 2px;
-            width: auto;
-            white-space: nowrap;
-            z-index: 100;
-            font-size: 0.95em;
-            font-weight: 600;
-            > .icon {
-                display: none;
-                transform: translateX(-5px);
-            }
-        }
-    }
-
-    &:hover>.cursor.st {
-        opacity: 1;
-    }
 }
 
 </style>
