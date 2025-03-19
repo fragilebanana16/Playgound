@@ -27,9 +27,8 @@
 
         <!-- Managers -->
         <ScrollerManager ref="scrollerManager"
-             :days="days" :heads="heads"
+             :rows="list"
              :height="scrollerHeight"
-             :rowHeight="rowHeight"
              :recycler="$refs.recycler" />
         <SelectionManager ref="selectionManager"
              :selection="selection" :heads="heads"
@@ -267,7 +266,7 @@ export default {
             this.list.filter(r => r.type !== IRowType.HEAD).forEach(row => {
                 row.size = this.rowHeight;
             });
-            this.scrollerManager.reflow(true);
+            this.scrollerManager.reflow();
         },
 
         /**

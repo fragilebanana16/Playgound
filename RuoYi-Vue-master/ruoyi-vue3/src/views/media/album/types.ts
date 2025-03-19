@@ -81,12 +81,10 @@ export enum IRowType {
 export type ITick = {
     /** Day ID */
     dayId: number;
-    /** Top row at this */
+    /** Display top position */
     top: number;
-    /** Static distance from top (for headers) */
-    topS: number;
-    /** Count row distance from top (dynamic) */
-    topC: number;
+     /** Y coordinate on recycler */
+    y: number;
     /** Text if any (e.g. year) */
     text?: string | number;
     /** Whether this tick should be shown */
