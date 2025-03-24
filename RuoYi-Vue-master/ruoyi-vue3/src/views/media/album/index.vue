@@ -16,8 +16,8 @@
                     </span>
                 </div>
             </div>
-            <div v-else class="photo-row" :style="{ height: item.size + 'px' }">
-                <div class="photo" v-for="(photo, index) in item.photos" :key="index" :style="{ width: rowHeight + 'px' }">
+            <div v-else class="photo-row" :style="{ height: item.size + 'px', width: rowWidth + 'px' }">
+                <div class="photo" v-for="(photo, index) in item.photos" :key="index" :style="{ width: (photo.dispWp * 100) + '%' }">
                     <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
                     <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
                         @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
@@ -53,13 +53,13 @@ import { IDay, IHeadRow, IPhoto, IRow, IRowType, ITick } from "./types";
 import moment from 'moment';
 import SelectionManager from './components/SelectionManager.vue';
 import ScrollerManager from './components/ScrollerManager.vue';
+import justifiedLayout from "justified-layout";
 const router = useRoute()
-const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 const baseUrl = '/dev-api';
 const SCROLL_LOAD_DELAY = 100; // Delay in loading data when scrolling
-const MAX_PHOTO_WIDTH = 175;
-const MIN_COLS = 3;
+const DESKTOP_ROW_HEIGHT = 200; // Height of row on desktop
+ const MOBILE_NUM_COLS = 3; // Number of columns on phone
 
 const MOCK_IMG_DATA = [
     "A Sky Full of Stars - Coldplay.jpg",
@@ -150,13 +150,17 @@ export default {
             /** Counter of rows */
             numRows: 0,
             /** Computed number of columns */
-            numCols: 5,
+            numCols: 0,
+            /** Keep all images square */
+            squareMode: false,
             /** Header rows for dayId key */
             heads: {} as { [dayid: number]: IHeadRow },
             /** Original days response */
             days: [],
             /** Computed row height */
             rowHeight: 100,
+            /** Computed row width */
+            rowWidth: 100,
             /** Current start index */
             currentStart: 0,
             /** Current end index */
@@ -247,25 +251,23 @@ export default {
                 return;
             }
             let height = e.clientHeight;
-            let width = e.clientWidth - 40; // 预留和时间线的间距
+            this.rowWidth = e.clientWidth - 40; // 预留和时间线的间距
             this.scrollerHeight = height;
             const recycler = this.$refs.recycler as any;
             recycler.$el.style.height = (height - 4) + 'px';
-            // Desktop scroller width
-            if (window.innerWidth > 768) {
-                width -= 40;
+            if (window.innerWidth <= 768) {
+                // Mobile
+                this.numCols = MOBILE_NUM_COLS;
+                this.rowHeight = this.rowWidth / this.numCols;
+                this.squareMode = true;
+            } else {
+                // Desktop
+                this.rowWidth -= 40;
+                this.rowHeight = DESKTOP_ROW_HEIGHT;
+                this.squareMode = false;
+                // As a heuristic, assume all images are 4:3 landscape
+                this.numCols = Math.floor(this.rowWidth / (this.rowHeight * 4 / 3));
             }
-
-            if (this.days.length === 0) {
-                // Don't change cols if already initialized
-                this.numCols = Math.max(MIN_COLS, Math.floor(width / MAX_PHOTO_WIDTH));
-            }
-            this.rowHeight = Math.floor(width / this.numCols);
-
-            // Set heights of rows
-            this.list.filter(r => r.type !== IRowType.HEAD).forEach(row => {
-                row.size = this.rowHeight;
-            });
             this.scrollerManager.reflow();
         },
 
@@ -294,9 +296,12 @@ export default {
                 if (row.pct && !row.photos.length) {
                     row.photos = new Array(row.pct);
                     for (let j = 0; j < row.pct; j++) {
+                        // Any row that has placeholders has ONLY placeholders
+                        // so we can calculate the display width
                         row.photos[j] = {
                             flag: c.FLAG_PLACEHOLDER,
                             fileid: `${row.dayId}-${i}-${j}`,
+                            dispWp: 1 / this.numCols,
                         };
                     }
                     delete row.pct;
@@ -341,7 +346,16 @@ export default {
                 this.fetchDay(item.dayId);
             }
         },
-
+        /** Store the current scroll position to restore later */
+        getScrollY() {
+            const recycler = this.$refs.recycler as any;
+            return recycler.$el.scrollTop
+        },
+        /** Restore the stored scroll position */
+        setScrollY(y: number) {
+            const recycler = this.$refs.recycler as any;
+            recycler.scrollToPosition(y);
+        },
         /** Get query string for API calls */
         appendQuery(url) {
             const query = new URLSearchParams();
@@ -535,8 +549,25 @@ export default {
                     isfavorite: boolean;
                     isfolder: boolean;
                     name: string;
+                    w: number;
+                    h: number;
                 };
-
+                    const commonImageSizes = [
+                    { w: 1920, h: 1080 }, // 16:9
+                    { w: 1280, h: 720}, // 16:9
+                    { w: 800, h: 600 }, // 4:3
+                    { w: 1024, h: 768 }, // 4:3
+                    { w: 640, h: 480 }, // 4:3
+                    { w: 1080, h: 1920 }, // 9:16
+                    { w: 720, h: 1280 }, // 9:16
+                    { w: 600, h: 800 }, // 3:4
+                    { w: 768, h: 1024 }, // 3:4
+                    { w: 480, h: 640 }, // 3:4
+                ];
+                function getRandomImageSize() {
+                    const randomIndex = Math.floor(Math.random() * commonImageSizes.length);
+                    return commonImageSizes[randomIndex];
+                }
                 function getRandomElements(arr, count) {
                     const shuffled = [...arr].sort(() => Math.random() - 0.5);
                     return shuffled.slice(0, count);
@@ -545,7 +576,12 @@ export default {
                 randomArray.forEach((img, index) => {
                     const fileid = `001${index + 1}`;
                     const url = `${prefix}${img}`;
-                    data.push({ fileid, url, isvideo: index % 3 === 0, isfolder: index % 5 === 0, name: 'folder' + index / 5, isfavorite: index % 6 === 0 });
+                    let {w, h} = getRandomImageSize()
+                    const isfolder = index % 5 === 0
+                    if (isfolder) {
+                        w = h
+                    }
+                    data.push({ w, h ,fileid, url, isvideo: index % 3 === 0, isfolder, name: 'folder' + index / 5, isfavorite: index % 6 === 0 });
                 });
 
                 if (this.state !== startState) return;
@@ -567,6 +603,20 @@ export default {
         processDay(day) {
             const dayId = day.dayid;
             const data = day.detail;
+
+            // Create justified layout with correct params
+            const justify = justifiedLayout(day.detail.map(p => {
+                return {
+                    width: (this.squareMode ? null : p.w) || this.rowHeight,
+                    height: (this.squareMode ? null : p.h) || this.rowHeight,
+                };
+            }), {
+                containerWidth: this.rowWidth,
+                containerPadding: 0,
+                boxSpacing: 0,
+                targetRowHeight: this.rowHeight,
+            });
+
             const head = this.heads[dayId];
             this.loadedDays.add(dayId);
             // Reset rows including placeholders
@@ -579,29 +629,44 @@ export default {
                 head.day.rows.clear();
             }
 
-            // Check if some row was added
-            let addedRow = false;
+            // Check if some rows were added
+            let addedRows: IRow[] = [];
+    
+            // Check if row height changed
+            let rowSizeDelta = 0;
 
             // Get index of header O(n)
             const headIdx = this.list.findIndex(item => item.id === head.id);
             let rowIdx = headIdx + 1;
+            // Store the scroll position in case we change any rows
+            const scrollY = this.getScrollY();
+    
+            // Previous justified row
+            let prevJustifyTop = justify['boxes'][0]?.top || 0;
 
             // Add all rows
             let dataIdx = 0;
             while (dataIdx < data.length) {
                 // Check if we ran out of rows
                 if (rowIdx >= this.list.length || this.list[rowIdx].type === IRowType.HEAD) {
-                    addedRow = true;
-                    this.list.splice(rowIdx, 0, this.getBlankRow(day));
+                 const newRow = this.getBlankRow(day);
+                 addedRows.push(newRow);
+                 rowSizeDelta += newRow.size;
+                 this.list.splice(rowIdx, 0, newRow);
                 }
 
-                const row = this.list[rowIdx];
-
                 // Go to the next row
-                if (row.photos.length >= this.numCols) {
+                const jbox = justify['boxes'][dataIdx];
+                if (jbox.top !== prevJustifyTop) {
+                    prevJustifyTop = jbox.top;
                     rowIdx++;
                     continue;
                 }
+
+                // Set row height
+                const row = this.list[rowIdx];
+                rowSizeDelta += jbox.height - row.size;
+                row.size = jbox.height;
 
                 // Add the photo to the row
                 const photo = data[dataIdx];
@@ -623,16 +688,26 @@ export default {
                     photo.flag |= this.c.FLAG_IS_FOLDER;
                     delete photo.isfolder;
                 }
-                this.list[rowIdx].photos.push(photo);
+
+                // Get aspect ratio
+                photo.dispWp = jbox.width / this.rowWidth;
+
                 dataIdx++;
+                this.list[rowIdx].photos.push(photo);
 
                 // Add row to day
                 head.day?.rows.add(row);
             }
+
+            // Rows that were removed
+            const removedRows: IRow[] = [];
+            let headRemoved = false;
+
             // No rows, splice everything including the header
             if (head.day.rows.size === 0) {
-                this.list.splice(headIdx, 1);
+                removedRows.push(...this.list.splice(headIdx, 1));
                 rowIdx = headIdx - 1;
+                headRemoved = true;
                 delete this.heads[dayId];
             }
 
@@ -642,13 +717,38 @@ export default {
                 spliceCount++;
             }
             if (spliceCount > 0) {
-                this.list.splice(rowIdx + 1, spliceCount);
+                removedRows.push(...this.list.splice(rowIdx + 1, spliceCount));
             }
+
+            // Update size delta for removed rows
+            for (const row of removedRows) {
+                if (row.size) {
+                  rowSizeDelta -= row.size;
+                }
+            }
+
             // This will be true even if the head is being spliced
             // because one row is always removed in that case
             // So just reflow the timeline here
-            if (addedRow || spliceCount > 0) {
-                this.scrollerManager.reflow();
+            debugger
+            if (rowSizeDelta !== 0) {
+                if (headRemoved) {
+                    // If the head was removed, that warrants a reflow
+                    // since months or years might disappear!
+                    this.scrollerManager.reflow();
+                } else {
+                    // Otherwise just adjust the visible ticks
+                    this.scrollerManager.adjust();
+                }
+    
+                // Scroll to the same actual position if the added rows
+                // were above the current scroll position
+                const recycler: any = this.$refs.recycler;
+                const midIndex = (recycler.$_startIndex + recycler.$_endIndex) / 2;
+                if (midIndex > headIdx) {
+                    // todo: what the hell is happening here?
+                    // this.setScrollY(scrollY + rowSizeDelta);
+                }
             }
         },
 
@@ -744,9 +844,6 @@ export default {
             exitedLeft.forEach((photo) => {
                 photo.flag &= ~c.FLAG_ENTER_RIGHT;
             });
-
-            // Reflow timeline
-            this.scrollerManager.reflow();
         },
     },
 }

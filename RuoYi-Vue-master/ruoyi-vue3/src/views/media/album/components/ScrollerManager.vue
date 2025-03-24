@@ -25,6 +25,8 @@ import * as utils from "../utils";
 import { IDay, IHeadRow, IRow, IRowType, ITick } from '../types';
 import { c, TagDayID } from "../constants";
 import * as dav from "../DavRequest"
+
+
 export default {
     name: 'ScrollerManager',
     components: {
@@ -76,6 +78,8 @@ export default {
             reflowRequest: false,
             /** Flag consts */
             c: c,
+            /** Tick adjust timer */
+            adjustTimer: null as number | null
         }
     },
     mounted() {
@@ -93,7 +97,7 @@ export default {
         },
         /** Recycler scroll event, must be called by timeline */
         recyclerScrolled(event?: any) {
-            this.cursorY = event ? event.target.scrollTop * this.height / this.recyclerHeight : 0;
+            this.cursorY = utils.roundHalf(event ? event.target.scrollTop * this.height / this.recyclerHeight : 0);
             this.moveHoverCursor(this.cursorY);
             if (this.scrollingRecyclerTimer) window.clearTimeout(this.scrollingRecyclerTimer);
             this.scrollingRecycler = true;
@@ -101,6 +105,11 @@ export default {
                 this.scrollingRecycler = false;
                 this.scrollingRecyclerTimer = null;
             }, 1500);
+        },
+        setTickTop(tick: ITick) {
+         const extraY = this.recyclerBefore?.clientHeight || 0;
+         tick.topF = (extraY + tick.y) * (this.height / this.recyclerHeight);
+         tick.top = utils.roundHalf(tick.topF);
         },
         /** Re-create timeline tick data in the next frame */
         async reflow() {
@@ -114,19 +123,17 @@ export default {
         },
         /** Re-create tick data */
         reflowNow() {
-            // Recreate ticks data
-            this.recreate();
-            // Get height of recycler
+            // Refresh height of recycler
             this.recyclerHeight = this.recycler.$refs.wrapper.clientHeight;
 
-            // // Static extra height at top (before slot)
-            // const extraY = this.recyclerBefore?.clientHeight || 0;
+            // Recreate ticks data
+            this.recreate();
 
-            // Compute tick positions
-            for (const tick of this.ticks) {
-                tick.top = (tick.y) * (this.height / this.recyclerHeight);
-            }
-
+            // Recompute which ticks are visible
+            this.computeVisibleTicks();
+        },
+        /** Mark ticks as visible or invisible */
+        computeVisibleTicks() {
             // Do another pass to figure out which points are visible
             // This is not as bad as it looks, it's actually 12*O(n)
             // because there are only 12 months in a year
@@ -177,6 +184,46 @@ export default {
                 prevShow = tick.top;
             }
         },
+        /**
+         * Update tick positions without truncating the list
+         * This is much cheaper than reflowing the whole thing
+         */
+        adjust() {
+            if (this.adjustTimer) return;
+            this.adjustTimer = window.setTimeout(() => {
+                this.adjustTimer = null;
+                this.adjustNow();
+            }, 300); 
+        },
+        /** Do adjustment synchrnously */
+        adjustNow() {
+         // Refresh height of recycler
+         this.recyclerHeight = this.recycler.$refs.wrapper.clientHeight;
+         // Start with the first tick. Walk over all rows counting the
+         // y position. When you hit a row with the tick, update y and
+         // top values and move to the next visible tick.
+         let tickId = 0; // regardless of whether it's visible or not
+         let y = 0;
+         for (const row of this.rows) {
+            // Check if tick is valid
+            if (tickId >= this.ticks.length) {
+                    return;
+            }
+            // Check if we hit the next tick
+            const tick = this.ticks[tickId];
+             if (tick.dayId === row.dayId) {
+                 tick.y = y;
+                 this.setTickTop(tick);
+ 
+                 // Get the next visible tick
+                 tickId++;
+                 while (tickId < this.ticks.length && !this.ticks[tickId].s) {
+                     tickId++;
+                 }
+             }
+             y += row.size;
+         }
+        },
         /** Recreate from scratch */
         recreate() {
             // Clear
@@ -190,14 +237,18 @@ export default {
 
             // Get a new tick
             const getTick = (dayId: number, text?: string | number): ITick => {
-                return {
+                const tick = {
                     dayId,
                     y: y,
                     text,
+                    topF: 0,
                     top: 0,
                     s: false,
                 };
+                this.setTickTop(tick);
+                return tick
             }
+
             // Itearte over rows
             for (const row of this.rows) {
                 if (row.type === IRowType.HEAD) {
@@ -212,7 +263,8 @@ export default {
                         const dtYear = dateTaken.getUTCFullYear();
                         const dtMonth = dateTaken.getUTCMonth()
                         if (Number.isInteger(row.dayId) && (dtMonth !== prevMonth || dtYear !== prevYear)) {
-                            this.ticks.push(getTick(row.dayId, (dtYear === prevYear || dtYear === thisYear) ? undefined : dtYear));
+                            const text = (dtYear === prevYear || dtYear === thisYear) ? undefined : dtYear;
+                            this.ticks.push(getTick(row.dayId, text));
                         }
                         prevMonth = dtMonth;
                         prevYear = dtYear;
@@ -224,10 +276,10 @@ export default {
         },
         /** Change actual position of the hover cursor */
         moveHoverCursor(y: number) {
-            this.hoverCursorY = y;
+            this.hoverCursorY = utils.roundHalf(y);
 
             // Get index of previous tick
-            let idx = this.ticks.findIndex(t => t.top >= y);
+            let idx = utils.binarySearch(this.ticks, y, 'topF');
             if (idx === 0) {
              // use this tick
             } else if (idx >= 1) {
@@ -237,7 +289,9 @@ export default {
             } else {
                 return;
             }
-
+            if(!this.ticks[idx]){
+                return
+            }
             // DayId of current hover
             const dayId = this.ticks[idx].dayId
 

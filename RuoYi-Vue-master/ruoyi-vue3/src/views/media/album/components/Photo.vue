@@ -1,5 +1,5 @@
 <template>
-    <div class="p-outer" :class="{
+    <div class="p-outer fill-block" :class="{
         'selected': (data.flag & c.FLAG_SELECTED),
         // 'p-loading': !(data.flag & c.FLAG_LOADED),
         'leaving': (data.flag & c.FLAG_LEAVING),

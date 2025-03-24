@@ -46,3 +46,45 @@ export function genFileInfo(obj) {
     })
     return fileInfo
 }
+
+/**
+  * Round a number to N decimal places
+  * @param num Number to round
+  * @param places Number of decimal places
+  */
+ export function round(num, places) {
+    const pow = Math.pow(10, places);
+    return Math.round(num * pow) / pow;
+}
+
+/**
+ * Round to nearest 0.5. Useful for pixels. .5的倍数
+ * @param num Number to round
+ */
+export function roundHalf(num) {
+    return Math.round(num * 2) / 2;
+}
+
+export function binarySearch(arr, elem, key) {
+    let minIndex = 0;
+    let maxIndex = arr.length - 1;
+    let currentIndex;
+    let currentElement;
+
+    while (minIndex <= maxIndex) {
+        currentIndex = (minIndex + maxIndex) / 2 | 0;
+        currentElement = key ? arr[currentIndex][key] : arr[currentIndex];
+
+        if (currentElement < elem) {
+            minIndex = currentIndex + 1;
+        }
+        else if (currentElement > elem) {
+            maxIndex = currentIndex - 1;
+        }
+        else {
+            return currentIndex;
+        }
+    }
+
+    return minIndex;
+}
