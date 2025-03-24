@@ -11,11 +11,8 @@
         <Icon v-if="data.flag & c.FLAG_IS_VIDEO" icon='iconamoon:folder-video-fill'
             class="text-xl text-white icon-video-white"></Icon>
         <Icon v-if="data.flag & c.FLAG_IS_FAVORITE" icon='uis:favorite' class="text-white icon-starred"></Icon>
-        <div class="img-outer" :style="{
-            width: rowHeight + 'px',
-            height: rowHeight + 'px',
-        }">
-            <img @click="click(collection, data.url)" @contextmenu="contextmenu" @touchstart="touchstart"
+        <div class="img-outer fill-block">
+            <img class="fill-block" @click="click(collection, data.url)" @contextmenu="contextmenu" @touchstart="touchstart"
                 @touchend="touchend" @touchmove="touchend" @touchcancel="touchend" :src="getUrl()" :key="data.fileid"
                 @load="data.flag |= c.FLAG_LOADED" @error="handleImageError" />
         </div>
@@ -40,10 +37,6 @@ export default {
             /** @type {IPhoto[]} */
             type: Object,
             required: true
-        },
-        rowHeight: {
-            type: Number,
-            required: true,
         },
         day: {
             /** @type {IDay} */
@@ -194,6 +187,12 @@ export default {
 }
 </script>
 <style lang="scss">
+.fill-block {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 .viewer-download,
 .viewer-delete {
     color: #fff;
@@ -339,15 +338,26 @@ img {
 /* Actual image */
 div.img-outer {
     padding: 2px;
+    @media (max-width: 768px) { padding: 1px; }
+
     transition: transform 0.1s ease-in-out;
     background-clip: content-box, padding-box;
-
+    
     .selected > & {
         // 父元素是 class 为 selected 的元素，并且 .img-outer 是该 selected 元素的 直接 子元素，实测.selected  &也能触发
         transform: scale(0.9); 
     }
-
-    .p-loading & {
-        background-color: #fff;
-    }
+    > img {
+         background-clip: content-box;
+         object-fit: cover;
+         cursor: pointer;
+         transform: translateZ(0);
+ 
+         -webkit-tap-highlight-color: transparent;
+         -webkit-touch-callout: none;
+         user-select: none;
+ 
+         .selected > & { box-shadow: 0 0 3px 2px var(--color-primary); }
+         .p-loading > & { display: none; }
+     }
 }</style>

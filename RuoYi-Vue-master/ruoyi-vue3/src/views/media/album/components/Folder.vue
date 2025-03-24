@@ -1,17 +1,17 @@
 <template>
-    <div class="folder dark:bg-[#636463]" @click="openFolder(data.fileid)" v-bind:class="{
+    <div class="folder fill-block dark:bg-[#636463]" @click="openFolder(data.fileid)"
+        v-bind:class="{
         hasPreview: previewFileInfos.length > 0,
         onePreview: previewFileInfos.length === 1,
-    }" v-bind:style="{
-    width: rowHeight + 'px',
-    height: rowHeight + 'px',
-}">
-        <div class="big-icon">
+    }">
+        <div class="big-icon fill-block">
             <Icon icon='entypo:folder' class="text-xl text-white icon-folder"></Icon>
             <div class="name">{{ data.name }}</div>
         </div>
-        <div class="previews">
-            <img v-for="info of previewFileInfos" :key="info.id" :src="info.url" />
+        <div class="previews fill-block">
+            <div class="img-outer" v-for="info of previewFileInfos" :key="info.fileid">
+                <img class="fill-block" :key="info.fileid" :src="info.url" />
+            </div>
         </div>
     </div>
 </template>
@@ -34,10 +34,6 @@ export default {
             /** @type {IFolder} */
             type: Object,
             required: true
-        },
-        rowHeight: {
-            type: Number,
-            required: true,
         }
     },
     data() {
@@ -63,6 +59,13 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+// Fill all available space
+.fill-block {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 .folder {
     cursor: pointer;
 
@@ -97,8 +100,6 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
     transition: opacity 0.2s ease-in-out;
 
     .folder.hasPreview & {
@@ -133,32 +134,35 @@ export default {
     width: calc(100% - 4px);
     top: 2px;
     left: 2px;
-}
+    @media (max-width: 768px) { padding: 1px; }
 
-.previews img {
     padding: 0;
-    width: 50%;
-    height: 50%;
     border-radius: 0;
     display: inline-block;
     filter: brightness(50%);
     transition: filter 0.2s ease-in-out;
 
-    img {
+    > .img-outer {
         padding: 0;
+        margin: 0;
         width: 50%;
         height: 50%;
         display: inline-block;
         transition: filter 0.2s ease-in-out;
         filter: brightness(50%);
 
-        .folder:hover & {
-            filter: brightness(100%);
-        }
-
         .folder.onePreview & {
             width: 100%;
             height: 100%;
+        }
+        > img {
+            &.p-loading, &.p-load-fail {
+                 display: none;
+            }
+             
+            .folder:hover & {
+                filter: brightness(100%);
+            }
         }
     }
 }</style>

@@ -17,9 +17,9 @@
                 </div>
             </div>
             <div v-else class="photo-row" :style="{ height: rowHeight + 'px' }">
-                <div class="photo" v-for="photo of item.photos" :key="photo.fileid">
-                    <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :rowHeight="rowHeight" :key="photo.fileid" />
-                    <Photo v-else :data="photo" :rowHeight="rowHeight" :day="item.day" :collection="item.photos"
+                <div class="photo" v-for="(photo, index) in item.photos" :key="index" :style="{ width: rowHeight + 'px' }">
+                    <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
+                    <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
                         @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
                 </div>
             </div>
@@ -783,6 +783,7 @@ export default {
     position: relative;
     cursor: pointer;
     vertical-align: top;
+    height: 100%;
 }
 
 .head-row {
