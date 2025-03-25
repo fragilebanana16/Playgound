@@ -88,3 +88,22 @@ export function binarySearch(arr, elem, key) {
 
     return minIndex;
 }
+
+/**
+  * Convert server-side flags to bitmask
+  * @param {IPhoto} photo Photo to process
+  */
+ export function convertFlags(photo) {
+    if (photo.isvideo) {
+        photo.flag |= c.FLAG_IS_VIDEO;
+        delete photo.isvideo;
+    }
+    if (photo.isfavorite) {
+        photo.flag |= c.FLAG_IS_FAVORITE;
+        delete photo.isfavorite;
+    }
+    if (photo.isfolder) {
+        photo.flag |= this.c.FLAG_IS_FOLDER;
+        delete photo.isfolder;
+    }
+}

@@ -690,19 +690,7 @@ export default {
                 }
 
                 // Flag conversion
-                if (photo.isvideo) {
-                    photo.flag |= c.FLAG_IS_VIDEO;
-                    delete photo.isvideo;
-                }
-                if (photo.isfavorite) {
-                    photo.flag |= c.FLAG_IS_FAVORITE;
-                    delete photo.isfavorite;
-                }
-                if (photo.isfolder) {
-                    photo.flag |= this.c.FLAG_IS_FOLDER;
-                    delete photo.isfolder;
-                }
-
+                utils.convertFlags(photo);
                 // Get aspect ratio
                 photo.dispWp = utils.round(100 * jbox.width / this.rowWidth, 2);
 
