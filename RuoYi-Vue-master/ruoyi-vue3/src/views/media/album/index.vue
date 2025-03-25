@@ -226,7 +226,6 @@ export default {
             this.list = [];
             this.numRows = 0;
             this.heads = {};
-            this.days = [];
             this.currentStart = 0;
             this.currentEnd = 0;
             this.scrollerManager.reset();
@@ -272,7 +271,7 @@ export default {
                 } else {
                     // As a heuristic, assume all images are 4:3 landscape
                     this.rowHeight = DESKTOP_ROW_HEIGHT;
-                    this.numCols = Math.floor(this.rowWidth / (this.rowHeight * 4 / 3));
+                    this.numCols = Math.ceil(this.rowWidth / (this.rowHeight * 4 / 3));
                 }
             }
             this.scrollerManager.reflow();
@@ -308,7 +307,7 @@ export default {
                         row.photos[j] = {
                             flag: c.FLAG_PLACEHOLDER,
                             fileid: `${row.dayId}-${i}-${j}`,
-                            dispWp: 1 / this.numCols,
+                            dispWp: utils.round(100 / this.numCols, 2, true),
                         };
                     }
                     delete row.pct;
@@ -517,7 +516,6 @@ export default {
             }
 
             // Store globally
-            this.days = data;
             this.list = list;
             this.heads = heads;
 
@@ -593,7 +591,7 @@ export default {
 
                 if (this.state !== startState) return;
                 // *************** mock data ********************
-                const day = this.days.find(d => d.dayid === dayId);
+                const day = this.heads[dayId].day;
                 day.detail = data;
                 day.count = data.length;
                 this.processDay(day);
@@ -692,7 +690,7 @@ export default {
                 // Flag conversion
                 utils.convertFlags(photo);
                 // Get aspect ratio
-                photo.dispWp = utils.round(100 * jbox.width / this.rowWidth, 2);
+                photo.dispWp = utils.round(100 * jbox.width / this.rowWidth, 2, true);
 
                 dataIdx++;
                 this.list[rowIdx].photos.push(photo);
@@ -732,14 +730,13 @@ export default {
             // This will be true even if the head is being spliced
             // because one row is always removed in that case
             // So just reflow the timeline here
-            debugger
             if (rowSizeDelta !== 0) {
                 if (headRemoved) {
-                    // If the head was removed, that warrants a reflow
-                    // since months or years might disappear!
+                    // If the head was removed, we need a reflow,
+                    // or adjust isn't going to work right
                     this.scrollerManager.reflow();
                 } else {
-                    // Otherwise just adjust the visible ticks
+                    // Otherwise just adjust the ticks
                     this.scrollerManager.adjust();
                 }
     

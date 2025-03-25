@@ -123,6 +123,9 @@ export default {
         },
         /** Re-create tick data */
         reflowNow() {
+            if (!this.recycler.$refs.wrapper) {
+                return
+            }
             // Refresh height of recycler
             this.recyclerHeight = this.recycler.$refs.wrapper.clientHeight;
 
@@ -201,8 +204,8 @@ export default {
          this.recyclerHeight = this.recycler.$refs.wrapper.clientHeight;
          // Start with the first tick. Walk over all rows counting the
          // y position. When you hit a row with the tick, update y and
-         // top values and move to the next visible tick.
-         let tickId = 0; // regardless of whether it's visible or not
+         // top values and move to the next tick.
+         let tickId = 0;
          let y = 0;
          for (const row of this.rows) {
             // Check if tick is valid
@@ -214,12 +217,7 @@ export default {
              if (tick.dayId === row.dayId) {
                  tick.y = y;
                  this.setTickTop(tick);
- 
-                 // Get the next visible tick
                  tickId++;
-                 while (tickId < this.ticks.length && !this.ticks[tickId].s) {
-                     tickId++;
-                 }
              }
              y += row.size;
          }

@@ -1,4 +1,6 @@
 import { camelCase, isNumberStr } from '@/utils'
+import { c } from "./constants";
+
 /** Get JS date object from dayId */
 export function dayIdToDate(dayId){
     return new Date(Number(dayId)*86400*1000);
@@ -51,10 +53,12 @@ export function genFileInfo(obj) {
   * Round a number to N decimal places
   * @param num Number to round
   * @param places Number of decimal places
+  * @param floor If true, round down instead of to nearest
   */
- export function round(num, places) {
+ export function round(num, places, floor=false) {
     const pow = Math.pow(10, places);
-    return Math.round(num * pow) / pow;
+    const int = num * pow;
+    return (floor ? Math.floor : Math.round)(int) / pow;
 }
 
 /**
@@ -103,7 +107,7 @@ export function binarySearch(arr, elem, key) {
         delete photo.isfavorite;
     }
     if (photo.isfolder) {
-        photo.flag |= this.c.FLAG_IS_FOLDER;
+        photo.flag |= c.FLAG_IS_FOLDER;
         delete photo.isfolder;
     }
 }
