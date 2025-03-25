@@ -258,15 +258,22 @@ export default {
             if (window.innerWidth <= 768) {
                 // Mobile
                 this.numCols = MOBILE_NUM_COLS;
-                this.rowHeight = this.rowWidth / this.numCols;
+                this.rowHeight = Math.floor(this.rowWidth / this.numCols);
                 this.squareMode = true;
             } else {
                 // Desktop
                 this.rowWidth -= 40;
                 this.rowHeight = DESKTOP_ROW_HEIGHT;
-                this.squareMode = false;
-                // As a heuristic, assume all images are 4:3 landscape
-                this.numCols = Math.floor(this.rowWidth / (this.rowHeight * 4 / 3));
+                this.squareMode = false; // todo: can be set with localStorage.setItem
+                if (this.squareMode) {
+                 // Set columns first, then height
+                 this.numCols = Math.max(3, Math.floor(this.rowWidth / DESKTOP_ROW_HEIGHT));
+                 this.rowHeight = Math.floor(this.rowWidth / this.numCols);
+                } else {
+                    // As a heuristic, assume all images are 4:3 landscape
+                    this.rowHeight = DESKTOP_ROW_HEIGHT;
+                    this.numCols = Math.floor(this.rowWidth / (this.rowHeight * 4 / 3));
+                }
             }
             this.scrollerManager.reflow();
         },
@@ -615,6 +622,7 @@ export default {
                 containerPadding: 0,
                 boxSpacing: 0,
                 targetRowHeight: this.rowHeight,
+                targetRowHeightTolerance: 0.1,
             });
 
             const head = this.heads[dayId];
