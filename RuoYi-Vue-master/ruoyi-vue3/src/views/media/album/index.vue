@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div v-else class="photo-row" :style="{ height: item.size + 'px', width: rowWidth + 'px' }">
-                <div class="photo" v-for="(photo, index) in item.photos" :key="index" :style="{ width: (photo.dispWp * 100) + '%' }">
+                <div class="photo" v-for="(photo, index) in item.photos" :key="index" :style="{ width: photo.dispWp + '%' }">
                     <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
                     <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
                         @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
@@ -673,8 +673,14 @@ export default {
 
                 // Set row height
                 const row = this.list[rowIdx];
-                rowSizeDelta += jbox.height - row.size;
-                row.size = jbox.height;
+                const jH = Math.round(jbox.height);
+                const delta = jH - row.size;
+                // If the difference is too small, it's not worth risking an adjustment
+                // especially on square layouts on mobile
+                if (Math.abs(delta) > 5) {
+                    rowSizeDelta += delta;
+                    row.size = jH;
+                }
 
                 // Add the photo to the row
                 const photo = data[dataIdx];
@@ -698,7 +704,7 @@ export default {
                 }
 
                 // Get aspect ratio
-                photo.dispWp = jbox.width / this.rowWidth;
+                photo.dispWp = utils.round(100 * jbox.width / this.rowWidth, 2);
 
                 dataIdx++;
                 this.list[rowIdx].photos.push(photo);
