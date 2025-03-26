@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div v-else class="photo-row" :style="{ height: item.size + 'px', width: rowWidth + 'px' }">
-                <div class="photo" v-for="(photo, index) in item.photos" :key="index" :style="{ width: photo.dispWp + '%' }">
+                <div class="photo" v-for="photo in item.photos" :key="photo.fileid" :style="{ width: photo.dispWp + '%' }">
                     <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
                     <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
                         @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
@@ -311,14 +311,6 @@ export default {
                         };
                     }
                     delete row.pct;
-                }
-                // Force reload all loaded images
-                if ((i < this.currentStart || i > this.currentEnd) && row.photos) {
-                    for (const photo of row.photos) {
-                        if (photo.flag & c.FLAG_LOADED) {
-                            photo.flag = (photo.flag & ~c.FLAG_LOADED) | c.FLAG_FORCE_RELOAD; // Reload only if already loaded
-                        }
-                    }
                 }
             }
 

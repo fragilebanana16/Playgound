@@ -1,7 +1,7 @@
 <template>
     <div class="p-outer fill-block" :class="{
         'selected': (data.flag & c.FLAG_SELECTED),
-        // 'p-loading': !(data.flag & c.FLAG_LOADED),
+        'placeholder': (data.flag & c.FLAG_PLACEHOLDER),
         'leaving': (data.flag & c.FLAG_LEAVING),
         'exit-left': (data.flag & c.FLAG_EXIT_LEFT),
         'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
@@ -14,7 +14,7 @@
         <div class="img-outer fill-block">
             <img class="fill-block" @click="click(collection, data.url)" @contextmenu="contextmenu" @touchstart="touchstart"
                 @touchend="touchend" @touchmove="touchend" @touchcancel="touchend" :src="getUrl()" :key="data.fileid"
-                @load="data.flag |= c.FLAG_LOADED" @error="handleImageError" />
+                @error="handleImageError" />
         </div>
     </div>
 </template>
@@ -165,7 +165,7 @@ export default {
         },
         handleImageError(event) {
             event.target.src = errorsvg
-            this.data.flag |= (c.FLAG_LOADED | c.FLAG_LOAD_FAIL);
+            this.data.flag |= c.FLAG_LOAD_FAIL;
         },
         touchstart() {
             this.touchTimer = setTimeout(() => {
@@ -309,9 +309,7 @@ img {
         box-shadow: 0 0 6px 2px #eee;
     }
 
-    .p-loading & {
-        opacity: 0;
-    }
+    .p-outer.placeholder > & { display: none; }
 }
 
 .icon-checkmark {

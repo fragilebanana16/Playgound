@@ -10,13 +10,17 @@
         </div>
         <div class="previews fill-block">
             <div class="img-outer" v-for="info of previewFileInfos" :key="info.fileid">
-                <img class="fill-block" :key="info.fileid" :src="info.url" />
+                <img class="fill-block" :class="{ 'error': info.flag & c.FLAG_LOAD_FAIL }"
+                :key="info.fileid" :src="info.url" 
+                @error="info.flag |= c.FLAG_LOAD_FAIL"/>
             </div>
         </div>
     </div>
 </template>
 <script>
 import { Icon } from '@iconify/vue'
+import { c } from "./constants";
+
 const baseUrl = '/dev-api';
 const previewArr = [
     "A Sky Full of Stars - Coldplay.jpg", "After All - Elton John,Charlie Puth.jpg", "Attention - Charlie Puth.jpg",
@@ -39,6 +43,8 @@ export default {
     data() {
         return {
             previewFileInfos: [],
+            /** Flag consts */
+            c:c,
         }
     },
     mounted() {
@@ -156,13 +162,8 @@ export default {
             height: 100%;
         }
         > img {
-            &.p-loading, &.p-load-fail {
-                 display: none;
-            }
-             
-            .folder:hover & {
-                filter: brightness(100%);
-            }
+            &.error { display: none; }
+            .folder:hover & { filter: brightness(100%); }
         }
     }
 }</style>
