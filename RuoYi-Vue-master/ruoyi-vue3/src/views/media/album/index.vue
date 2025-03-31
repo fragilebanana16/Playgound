@@ -224,7 +224,6 @@ export default {
             this.selectionManager.clearSelection();
             this.loading = 0;
             this.list = [];
-            this.numRows = 0;
             this.heads = {};
             this.currentStart = 0;
             this.currentEnd = 0;
@@ -462,7 +461,7 @@ export default {
             let prevDay: IDay | null = null;
             for (const day of data) {
                 day.count = Number(day.count);
-                day.rows = new Set();
+                day.rows = [];
                 // Nothing here
                 if (day.count === 0) {
                     continue;
@@ -470,7 +469,7 @@ export default {
 
                 // Add header to list
                 const head: IHeadRow = {
-                    id: ++this.numRows,
+                    id: `${day.dayid}-head`,
                     size: 40,
                     type: IRowType.HEAD,
                     selected: false,
@@ -494,9 +493,8 @@ export default {
                 // Add rows
                 const nrows = Math.ceil(day.count / this.numCols);
                 for (let i = 0; i < nrows; i++) {
-                    const row = this.getBlankRow(day);
+                    const row = this.addRow(day);
                     list.push(row);
-                    day.rows.add(row);
                     // Add placeholders wtf?
                     const leftNum = (day.count - i * this.numCols);
                     row.pct = leftNum > this.numCols ? this.numCols : leftNum;
@@ -514,9 +512,7 @@ export default {
             // Iterate the preload map
             // Now the inner detail objects are reactive
             for (const dayId in preloads) {
-                const preload = preloads[dayId];
-                preload.day.detail = preload.detail;
-                this.processDay(preload.day);
+                this.processDay(Number(dayId), preloads[dayId].detail);
             }
 
             this.loading = false;
@@ -536,17 +532,8 @@ export default {
             this.loadedDays.add(dayId);
 
             // ******************* [Do it later] *******************
-            // // Construct URL
-            // const url = this.appendQuery(baseUrl)
-            // // Attach response to head and process it
-            // const processResponse = (response: IPhoto[]) => {
-            //     if (!response) return;
-            //     head.day.detail = response;
-            //     head.day.count = response.length;
-            //     this.processDay(head.day);
-            // }
             // // Look for cache
-            // processResponse(await utils.getCachedData(url));
+            // this.processDay(dayId, await utils.getCachedData(url));
             // ******************* [Do it later] *******************
 
             try {
@@ -623,10 +610,7 @@ export default {
                 // // *************** verify: no need ********************
 
                 // *************** mock data ********************
-                const day = this.heads[dayId].day;
-                day.detail = data;
-                day.count = data.length;
-                this.processDay(day);
+                this.processDay(dayId, data);
             } catch (e) {
                 console.error(e);
             }
@@ -637,9 +621,21 @@ export default {
          *
          * @param {any} day Day object
          */
-        processDay(day) {
-            const dayId = day.dayid;
-            const data = day.detail;
+        processDay(dayId: number, data: IPhoto[])  {
+            const head = this.heads[dayId];
+            const day = head.day;
+            this.loadedDays.add(dayId);
+    
+            // Filter out items we don't want to show at all
+            // Note: flags are not converted yet
+            // if (!this.config_showHidden) {
+            //     // Hidden folders
+            //     data = data.filter((p) => !(p.isfolder && (<IFolder>p).name.startsWith('.')));
+            // }
+    
+            // Set and make reactive
+            day.count = data.length;
+            day.detail = data;
 
             // Create justified layout with correct params
             const justify = justifiedLayout(day.detail.map(p => {
@@ -655,16 +651,11 @@ export default {
                 targetRowHeightTolerance: 0.1,
             });
 
-            const head = this.heads[dayId];
-            this.loadedDays.add(dayId);
             // Reset rows including placeholders
             if (head.day?.rows) {
                 for (const row of head.day.rows) {
                     row.photos = [];
                 }
-            }
-            if (head.day) {
-                head.day.rows.clear();
             }
 
             // Check if some rows were added
@@ -687,7 +678,7 @@ export default {
             while (dataIdx < data.length) {
                 // Check if we ran out of rows
                 if (rowIdx >= this.list.length || this.list[rowIdx].type === IRowType.HEAD) {
-                 const newRow = this.getBlankRow(day);
+                 const newRow = this.addRow(day);
                  addedRows.push(newRow);
                  rowSizeDelta += newRow.size;
                  this.list.splice(rowIdx, 0, newRow);
@@ -723,12 +714,10 @@ export default {
                 utils.convertFlags(photo);
                 // Get aspect ratio
                 photo.dispWp = utils.round(100 * jbox.width / this.rowWidth, 2, true);
-
                 dataIdx++;
-                this.list[rowIdx].photos.push(photo);
 
-                // Add row to day
-                head.day?.rows.add(row);
+                // Add photo to row
+                row.photos.push(photo);
             }
 
             // Rows that were removed
@@ -736,7 +725,7 @@ export default {
             let headRemoved = false;
 
             // No rows, splice everything including the header
-            if (head.day.rows.size === 0) {
+            if (data.length === 0) {
                 removedRows.push(...this.list.splice(headIdx, 1));
                 rowIdx = headIdx - 1;
                 headRemoved = true;
@@ -752,10 +741,12 @@ export default {
                 removedRows.push(...this.list.splice(rowIdx + 1, spliceCount));
             }
 
-            // Update size delta for removed rows
+            // Update size delta for removed rows and remove from day
             for (const row of removedRows) {
                 if (row.size) {
                   rowSizeDelta -= row.size;
+                  const idx = head.day.rows.indexOf(row);
+                  if (idx >= 0) head.day.rows.splice(idx, 1);
                 }
             }
 
@@ -783,21 +774,25 @@ export default {
             }
         },
 
-        /** Get a new blank row */
-        getBlankRow(day) {
+        /** Add and get a new blank photos row */
+        addRow(day) {
             let rowType = IRowType.PHOTOS;
             if (day.dayid === TagDayID.FOLDERS) {
                 rowType = IRowType.FOLDERS;
             }
 
-            return {
-                id: ++this.numRows,
+            const row = {
+                id: `${day.dayid}-${day.rows.length}`,
                 photos: [],
                 type: rowType,
                 size: this.rowHeight,
                 dayId: day.dayid,
                 day: day,
             };
+
+            // Add to day
+            day.rows.push(row);
+            return row;
         },
 
         /** Clicking on photo */
@@ -860,7 +855,7 @@ export default {
             for (const day of updatedDays) {
                 day.detail = (day.detail ?? []).filter(p => !delPhotosSet.has(p));
                 day.count = day.detail.length;
-                this.processDay(day);
+                this.processDay(day.dayid, day.detail.filter(p => !delPhotosSet.has(p)));
             }
 
             // Enter from right all photos that exited left

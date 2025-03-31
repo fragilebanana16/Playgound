@@ -11,8 +11,8 @@ export type IDay = {
     dayid: number;
     /** Number of photos in this day */
     count: number;
-    /** Set of rows in the day */
-    rows?: Set<IRow>;
+    /** Rows in the day */
+    rows?: IRow[];
     /** List of photos for this day */
     detail?: IPhoto[];
     /** WebDAV fileInfos, fetched before viewer open */
@@ -57,7 +57,7 @@ export interface IFolder extends IPhoto {
 
 export type IRow = {
     /** Vue Recycler identifier */
-    id?: number;
+    id?: string;
     /** Day ID */
     dayId: number;
     /** Refrence to day object */
