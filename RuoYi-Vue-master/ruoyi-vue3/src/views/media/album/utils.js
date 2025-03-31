@@ -111,3 +111,24 @@ export function binarySearch(arr, elem, key) {
         delete photo.isfolder;
     }
 }
+
+/** Cache store */
+let cacheStorage;
+caches.open(`memories-cache`).then((cache) => { cacheStorage = cache });
+
+/** Get data from the cache */
+export async function getCachedData(url) {
+    if (!cacheStorage) return;
+    const cachedResponse = await cacheStorage.match(url);
+    console.log(`hit cache: ${cachedResponse && cachedResponse.ok}`)
+    if (!cachedResponse || !cachedResponse.ok) return false;
+    return await cachedResponse.json();
+}
+
+/** Store data in the cache */
+export async function cacheData(url, data) {
+    const response = new Response(JSON.stringify(data));
+    response.headers.set('Content-Type', 'application/json');
+    debugger
+    await cacheStorage.put(url, response);
+}

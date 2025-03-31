@@ -19,7 +19,7 @@
 </template>
 <script>
 import { Icon } from '@iconify/vue'
-import { c } from "./constants";
+import { c } from "../constants";
 
 const baseUrl = '/dev-api';
 const previewArr = [
