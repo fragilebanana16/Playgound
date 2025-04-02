@@ -3,8 +3,6 @@
         'selected': (data.flag & c.FLAG_SELECTED),
         'placeholder': (data.flag & c.FLAG_PLACEHOLDER),
         'leaving': (data.flag & c.FLAG_LEAVING),
-        'exit-left': (data.flag & c.FLAG_EXIT_LEFT),
-        'enter-right': (data.flag & c.FLAG_ENTER_RIGHT),
     }">
         <Icon icon='material-symbols:check-circle-rounded' v-if="!(data.flag & c.FLAG_PLACEHOLDER)"
             class="icon-checkmark select text-lg" @click="toggleSelect"></Icon>
@@ -57,9 +55,6 @@ export default {
                 return errorsvg;
             } else if (this.data.flag & c.FLAG_LOAD_FAIL) {
                 return errorsvg;
-            } else if (this.data.flag & c.FLAG_FORCE_RELOAD) {
-                this.data.flag &= ~c.FLAG_FORCE_RELOAD;
-                return undefined;
             } else {
                 return this.data.url
             }
@@ -245,28 +240,6 @@ export default {
         transition: all 0.2s ease-in;
         transform: scale(0.9);
         opacity: 0;
-    }
-
-    &.exit-left {
-        transition: all 0.2s ease-in;
-        transform: translateX(-20%);
-        opacity: 0.4;
-    }
-
-    &.enter-right {
-        animation: enter-right 0.2s ease-out forwards;
-    }
-}
-
-@keyframes enter-right {
-    from {
-        transform: translateX(20%);
-        opacity: 0.4;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
     }
 }
 

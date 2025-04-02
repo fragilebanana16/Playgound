@@ -17,7 +17,12 @@
                 </div>
             </div>
             <div v-else class="photo-row" :style="{ height: item.size + 'px', width: rowWidth + 'px' }">
-                <div class="photo" v-for="photo in item.photos" :key="photo.fileid" :style="{ width: photo.dispWp + '%' }">
+                <div class="photo" v-for="photo in item.photos" :key="photo.fileid" 
+                        :style="{
+                             height: photo.dispH ? photo.dispH + 'px' : undefined,
+                             width: photo.dispWp * rowWidth + 'px',
+                             transform: 'translateX(' + photo.dispXp * rowWidth + 'px) translateY(' + photo.dispY + 'px)',
+                         }">
                     <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
                     <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
                         @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
@@ -306,7 +311,9 @@ export default {
                         row.photos[j] = {
                             flag: c.FLAG_PLACEHOLDER,
                             fileid: `${row.dayId}-${i}-${j}`,
-                            dispWp: utils.round(100 / this.numCols, 2, true),
+                            dispWp: utils.round(1 / this.numCols, 4, true),
+                            dispXp: utils.round(j / this.numCols, 4, true),
+                            dispY: 0,
                         };
                     }
                     delete row.pct;
@@ -470,6 +477,7 @@ export default {
                 // Add header to list
                 const head: IHeadRow = {
                     id: `${day.dayid}-head`,
+                    num: -1,
                     size: 40,
                     type: IRowType.HEAD,
                     selected: false,
@@ -624,6 +632,8 @@ export default {
          * @param isAnimating prevents glitches due to height changes
          */
         processDay(dayId: number, data: IPhoto[], isAnimating=false)  {
+            if (!data) return;
+
             const head = this.heads[dayId];
             const day = head.day;
             this.loadedDays.add(dayId);
@@ -639,6 +649,11 @@ export default {
             day.count = data.length;
             day.detail = data;
 
+            // Reset rows including placeholders
+            for (const row of head.day.rows || []) {
+                row.photos = [];
+            }
+
             // Create justified layout with correct params
             const justify = justifiedLayout(day.detail.map(p => {
                 return {
@@ -652,14 +667,6 @@ export default {
                 targetRowHeight: this.rowHeight,
                 targetRowHeightTolerance: 0.1,
             });
-
-            // Reset rows including placeholders
-            if (head.day?.rows) {
-                for (const row of head.day.rows) {
-                    row.photos = [];
-                }
-            }
-
             // Check if some rows were added
             let addedRows: IRow[] = [];
     
@@ -715,7 +722,32 @@ export default {
                 // Flag conversion
                 utils.convertFlags(photo);
                 // Get aspect ratio
-                photo.dispWp = utils.round(100 * jbox.width / this.rowWidth, 2, true);
+                const setPos = () => {
+                    photo.dispWp = utils.round(jbox.width / this.rowWidth, 4, true);
+                    photo.dispXp = utils.round(jbox.left / this.rowWidth, 4, true);
+                    photo.dispY = 0;
+                    photo.dispH = 0;
+                    photo.dispRowNum = row.num;
+                };
+                if (photo.dispWp !== undefined) { // photo already displayed: animate
+                    window.setTimeout(setPos, 50);
+                    if (photo.dispRowNum !== undefined &&
+                        photo.dispRowNum !== row.num &&
+                        photo.dispRowNum >= 0 &&
+                        photo.dispRowNum < day.rows.length
+                    ) { // Row change animation
+                        const start = Math.min(photo.dispRowNum, row.num);
+                        const end = Math.max(photo.dispRowNum, row.num);
+                        const sizeDelta = day.rows.slice(start, end).reduce((acc, r) => {
+                            acc += r.size;
+                            return acc;
+                        }, 0);
+                        photo.dispY = sizeDelta * (photo.dispRowNum < row.num ? -1 : 1);
+                        photo.dispH = day.rows[photo.dispRowNum].size;
+                    }
+                } else {
+                    setPos();
+                }
                 dataIdx++;
 
                 // Add photo to row
@@ -788,6 +820,7 @@ export default {
 
             const row = {
                 id: `${day.dayid}-${day.rows.length}`,
+                num: day.rows.length,
                 photos: [],
                 type: rowType,
                 size: this.rowHeight,
@@ -810,8 +843,6 @@ export default {
         },
         /**
          * Delete elements from main view with some animation
-         * This function looks horribly slow, probably isn't that bad
-         * in all practical scenarios.
          *
          * This is also going to update day.detail for you and make
          * a call to processDay so just pass it the list of ids to
@@ -839,41 +870,10 @@ export default {
             // clear selection at this point
             this.selectionManager.clearSelection(delPhotos);
 
-            // Speculate day reflow for animation
-            const exitedLeft = new Set<IPhoto>();
-            for (const day of updatedDays) {
-                let nextExit = false;
-                for (const row of day.rows ?? []) {
-                    for (const photo of row.photos ?? []) {
-                        if (photo.flag & c.FLAG_LEAVING) {
-                            nextExit = true;
-                        } else if (nextExit) {
-                            photo.flag |= c.FLAG_EXIT_LEFT;
-                            exitedLeft.add(photo);
-                        }
-                    }
-                }
-            }
-            // wait for 200ms
-            await new Promise(resolve => setTimeout(resolve, 200));
-
             for (const day of updatedDays) {
                 const newDetail = (day.detail ?? []).filter(p => !delPhotosSet.has(p));
                 this.processDay(day.dayid, newDetail, true);
             }
-
-            // Enter from right all photos that exited left
-            exitedLeft.forEach((photo) => {
-                photo.flag &= ~c.FLAG_EXIT_LEFT;
-                photo.flag |= c.FLAG_ENTER_RIGHT;
-            });
-
-            // wait for 200ms
-            await new Promise(resolve => setTimeout(resolve, 200));
-            // Clear enter right flags
-            exitedLeft.forEach((photo) => {
-                photo.flag &= ~c.FLAG_ENTER_RIGHT;
-            });
         },
     },
 }
@@ -906,12 +906,14 @@ export default {
 }
 
 .photo-row>.photo {
-    display: inline-block;
-    position: relative;
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
     cursor: pointer;
-    vertical-align: top;
     height: 100%;
-    transition: width 0.2s ease-in-out; // reflow justification
+    transition: width 0.2s ease-in-out,
+                height 0.2s ease-in-out,
+                transform 0.2s ease-in-out; // reflow
 }
 
 .head-row {
