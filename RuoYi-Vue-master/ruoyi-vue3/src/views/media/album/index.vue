@@ -5,7 +5,7 @@
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
             <div v-if="item.type === 0" class="head-row" :class="{
                 'selected': item.selected,
-            }" :style="{ height: item.size + 'px' }">
+            }" :style="{ height: item.size + 'px' }" :key="item.id">
                 <div class="super" v-if="item.super !== undefined">
                     {{ item.super }}
                 </div>
@@ -16,18 +16,21 @@
                     </span>
                 </div>
             </div>
-            <div v-else class="photo-row" :style="{ height: item.size + 'px', width: rowWidth + 'px' }">
-                <div class="photo" v-for="photo in item.photos" :key="photo.fileid" 
-                        :style="{
-                             height: photo.dispH ? photo.dispH + 'px' : undefined,
-                             width: photo.dispWp * rowWidth + 'px',
-                             transform: 'translateX(' + photo.dispXp * rowWidth + 'px) translateY(' + photo.dispY + 'px)',
-                         }">
-                    <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
-                    <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
-                        @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
+            <!-- <template v-else>本身不会生成 DOM 元素，只会将它包裹的内容插入到父元素中 -->
+            <template v-else>
+                <div class="photo-row" :style="{ height: item.size + 'px', width: rowWidth + 'px' }">
+                    <div class="photo" v-for="photo in item.photos" :key="photo.fileid" 
+                            :style="{
+                                height: photo.dispH ? photo.dispH + 'px' : undefined,
+                                width: photo.dispWp * rowWidth + 'px',
+                                transform: 'translateX(' + photo.dispXp * rowWidth + 'px) translateY(' + photo.dispY + 'px)',
+                            }">
+                        <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
+                        <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
+                            @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
+                    </div>
                 </div>
-            </div>
+            </template>
         </RecycleScroller>
 
         <!-- Managers -->
@@ -196,12 +199,10 @@ export default {
         await this.$nextTick();
         // Fit to window
         await this.handleResize();
-        // Get data
-        await this.fetchDays();
-
         // Timeline recycler init
         this.$refs.recycler.$el.addEventListener('scroll', this.scrollPositionChange, false);
-        this.scrollPositionChange();
+        // Get data
+        await this.fetchDays();
     },
 
     watch: {
@@ -419,6 +420,10 @@ export default {
             let url = '/apps/memories/api/days';
             let params = {};
 
+            // Try cache first
+            let cache: IDay[];
+            const cacheUrl = window.location.pathname + 'api/days';
+
             try {
                 // try {
                 // this.loading++;
@@ -427,6 +432,13 @@ export default {
                 // if (this.$route.name === 'ThisDay') {
                 //     data = await dav.getOnThisDayData();
                 // } else {
+                //  // Try the cache
+                //  cache = await utils.getCachedData(cacheUrl);
+                //  if (cache) {
+                //      await this.processDays(cache);
+                //      this.loading--;
+                //  }
+                //  // Get from network
                 //     data = (await axios.get<IDay[]>(generateUrl(this.appendQuery(url), params))).data;
                 // }
                 // mock data
@@ -435,6 +447,10 @@ export default {
                 }
                 // mock data
 
+                // // Put back into cache
+                // utils.cacheData(cacheUrl, data);
+    
+                // Make sure we're still on the same page
                 // if (this.state !== startState) return;
                 // await this.processDays(data);
                 // } finally {
@@ -448,6 +464,7 @@ export default {
             }
             finally {
                 this.loading--;
+                // if (!cache) this.loading--;
             }
         },
         /** Process the data for days call including folders */
@@ -516,6 +533,7 @@ export default {
             // Store globally
             this.list = list;
             this.heads = heads;
+            this.loadedDays.clear();
 
             // Iterate the preload map
             // Now the inner detail objects are reactive
@@ -526,6 +544,7 @@ export default {
             this.loading = false;
             // Fix view height variable
             await this.scrollerManager.reflow();
+            this.scrollPositionChange();
         },
 
         /** Fetch image data for one dayId */
@@ -604,16 +623,13 @@ export default {
                 // ******************* [Do it later] *******************
 
                 // // *************** verify: no need ********************
-                // // Check if the response has any delta whatsoever
-                // // Comparing the set of fileid+etag is good enough
+                // // Check if the response has any delta
                 // if (head.day.detail?.length) {
-                //     const tags = new Set<string>(data.map((photo) => photo.etag + photo.fileid));
-                //     if (head.day.detail &&
-                //         tags.size === head.day.count &&
-                //         head.day.detail.every((p) => tags.has(p.etag + p.fileid))
-                //     ) {
-                //         return;
-                //     }
+                //  if (head.day.detail.length === data.length &&
+                //   head.day.detail.every((p, i) => p.fileid === data[i].fileid && p.etag === data[i].etag)
+                //   ) {
+                //       return;
+                //   }
                 // }
                 // // *************** verify: no need ********************
 
@@ -905,7 +921,7 @@ export default {
     width: calc(100% + 20px);
 }
 
-.photo-row>.photo {
+.recycler .photo {
     display: block;
     position: absolute;
     top: 0; left: 0;
