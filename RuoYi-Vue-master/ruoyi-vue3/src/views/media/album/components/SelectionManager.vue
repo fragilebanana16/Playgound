@@ -10,17 +10,24 @@
         <div class="icon-container" @click="deleteSelection">
             <Icon icon='material-symbols:delete-outline' class="btn text-lg"></Icon>
         </div>
-        <el-dropdown trigger="click">
-            <div class="icon-container">
-                <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
-            </div>
-            <template #dropdown>
-                <el-dropdown-menu>
-                    <el-dropdown-item @click="favoriteSelection">Favoriate</el-dropdown-item>
-                    <el-dropdown-item>Action</el-dropdown-item>
-                </el-dropdown-menu>
+        <v-menu offset-y>
+            <template v-slot:activator="{ props }">
+                <div class="icon-container" v-bind="props">
+                    <Icon icon='material-symbols:more-horiz' class="btn text-lg"></Icon>
+                </div>
             </template>
-        </el-dropdown>
+            <v-list>
+                <v-list-item class="v-list-item" @click="favoriteSelection">
+                    <v-list-item-title class="v-list-item-title">Favorite</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>Action</v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title>Action</v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
     </div>
 </template>
 <script lang="ts">
@@ -242,5 +249,11 @@ export default {
     z-index: -1;
     /* 背景在图标下面 */
     transition: opacity 0.3s;
+}
+.v-list-item {
+  min-height: 2.2rem;
+  .v-list-item-title {
+    font-size: 0.8rem;
+  }
 }
 </style>
