@@ -20,26 +20,30 @@
                 <v-list-item class="v-list-item" @click="favoriteSelection">
                     <v-list-item-title class="v-list-item-title">Favorite</v-list-item-title>
                 </v-list-item>
-                <v-list-item>
-                    <v-list-item-title>Action</v-list-item-title>
+                <v-list-item class="v-list-item" @click="editDateSelection">
+                    <v-list-item-title class="v-list-item-title">EditDate</v-list-item-title>
                 </v-list-item>
                 <v-list-item>
                     <v-list-item-title>Action</v-list-item-title>
                 </v-list-item>
             </v-list>
         </v-menu>
+
+        <EditDate ref="editDate" />
     </div>
 </template>
 <script lang="ts">
 import { Icon } from '@iconify/vue'
 import { IHeadRow, IPhoto } from '../types';
+import EditDate from "./EditDate.vue";
 import { c } from "../constants";
 import * as dav from "../DavRequest"
 const baseUrl = '/dev-api';
 export default {
     name: 'SelectionManager',
     components: {
-        Icon
+        Icon,
+        EditDate,
     },
     props: {
         selection: {
@@ -60,6 +64,12 @@ export default {
     mounted() {
     },
     methods: {
+        /**
+         * Open the edit date dialog
+         */
+        async editDateSelection() {
+            (<any>this.$refs.editDate).open(Array.from(this.selection.values()));
+        },
         /** Clear all selected photos */
         clearSelection(only?: Set<IPhoto>) {
             const heads = new Set<IHeadRow>();
