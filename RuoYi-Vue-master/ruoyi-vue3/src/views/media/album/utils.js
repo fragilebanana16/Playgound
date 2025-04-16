@@ -14,13 +14,15 @@ export function getShortDateStr(date) {
     });
 }
 /** Get long date string with optional year if same as current */
-export function getLongDateStr(date, skipYear=false) {
+export function getLongDateStr(date, skipYear=false, time=false) {
     return date.toLocaleDateString("en-US", {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
         year: (skipYear && date.getUTCFullYear() === new Date().getUTCFullYear()) ? undefined : 'numeric',
         timeZone: 'UTC',
+        hour: time ? 'numeric' : undefined,
+        minute: time ? 'numeric' : undefined,
     });
 }
 
