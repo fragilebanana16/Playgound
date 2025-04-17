@@ -406,17 +406,20 @@ export default {
 
         /** Fetch timeline main call */
         async fetchDays() {
-            const data = Array.from({ length: 5 }, (_, index) => ({
-                id: '00' + index,
-                dayid: index * 1000,
-                // const today = new Date();
-                // const epoch = new Date(0); // 1970年1月1日
-                // const diffTime = today - epoch; // 计算天数差以毫秒为单位
-                // const dayid = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // 转换为天数
-                count: 16, // 这里要和fetchDay的每天数量一致，否则recycle高度和timeline高度不匹配
-                detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
-                rows: new Set()
-            }));
+            const data = Array.from({ length: 5 }, (_, index) => {
+                const today = new Date();
+                const epoch = new Date(0); // January 1, 1970
+                const diffTime = Math.floor((today.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24)); // Difference in days
+                const yearInterval = Math.floor(Math.random() * 30 + 365) * index; // Increment by 1 year for each index
+                const dayid = diffTime + yearInterval;
+                return {
+                    id: '00' + index,
+                    dayid: dayid,
+                    count: 16, // 这里要和fetchDay的每天数量一致，否则recycle高度和timeline高度不匹配
+                    detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
+                    rows: new Set()
+                }}
+            );
             let url = '/apps/memories/api/days';
             let params = {};
 
@@ -580,6 +583,7 @@ export default {
                     name: string;
                     w: number;
                     h: number;
+                    datetaken: number;
                 };
                     const commonImageSizes = [
                     { w: 1920, h: 1080 }, // 16:9
@@ -603,14 +607,15 @@ export default {
                 }
                 const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
                 randomArray.forEach((img, index) => {
-                    const fileid = `001${index + 1}`;
+                    const fileid = `fileid${index * Math.random() + 1}`;
                     const url = `${prefix}${img}`;
                     let {w, h} = getRandomImageSize()
                     const isfolder = index % 5 === 0
                     if (isfolder) {
                         w = h
                     }
-                    data.push({ w, h ,fileid, url, isvideo: index % 3 === 0, isfolder, name: 'folder' + index / 5, isfavorite: index % 6 === 0 });
+                    const randomHourInMs = Math.floor(Math.random() * 24) * 60 * 60 * 1000
+                    data.push({ w, h ,fileid, url, isvideo: index % 3 === 0, isfolder, name: 'folder' + index / 5, isfavorite: index % 6 === 0, datetaken: dayId * 24 * 60 * 60 * 1000 + randomHourInMs });
                 });
 
                 if (this.state !== startState) return;

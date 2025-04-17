@@ -2,34 +2,63 @@
     <v-dialog v-model="isDialogOpen" max-width="560px">
         <div class="container">
             <v-card>
-                <v-card-title>
-                    <span class="head">Edit Date/Time</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-form>
-                        <div v-if="photos.length === 1 && longDateStr">
+                <div v-if="longDateStr">
+                    <v-card-title>
+                        <span class="head">Edit Date/Time</span>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-form>
+                            <span v-if="photos.length > 1">
+                                [Newest]
+                            </span>
                             {{ longDateStr }}
-                            <div class="fields">
+                            <div class="fields memories__editdate__fields">
                                 <v-text-field label="Year" v-model="year" type="number" class="field"
-                                    persistent-placeholder></v-text-field>
+                                    @input="newestChange()" persistent-placeholder></v-text-field>
                                 <v-text-field label="Month" v-model="month" type="number" class="field"
-                                    persistent-placeholder></v-text-field>
+                                    @input="newestChange()" persistent-placeholder></v-text-field>
                                 <v-text-field label="Day" v-model="day" type="number" class="field"
-                                    persistent-placeholder></v-text-field>
+                                    @input="newestChange()" persistent-placeholder></v-text-field>
                                 <v-text-field label="Hour" v-model="hour" type="number" class="field"
-                                    persistent-placeholder></v-text-field>
+                                    @input="newestChange()" persistent-placeholder></v-text-field>
                                 <v-text-field label="Minute" v-model="minute" type="number" class="field"
-                                    persistent-placeholder></v-text-field>
+                                    @input="newestChange()" persistent-placeholder></v-text-field>
                             </div>
-                        </div>
-                    </v-form>
-                </v-card-text>
 
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" @click="save">Save</v-btn>
-                    <v-btn @click="close">Cancel</v-btn>
-                </v-card-actions>
+                            <div v-if="photos.length > 1" class="oldest">
+                                <span v-if="photos.length > 1">
+                                    [Oldest]
+                                </span>
+                                {{ longDateStrLast }}
+                                <div class="fields memories__editdate__fields">
+                                    <v-text-field label="Year" v-model="yearLast" type="number" class="field"
+                                        persistent-placeholder></v-text-field>
+                                    <v-text-field label="Month" v-model="monthLast" type="number" class="field"
+                                        persistent-placeholder></v-text-field>
+                                    <v-text-field label="Day" v-model="dayLast" type="number" class="field"
+                                        persistent-placeholder></v-text-field>
+                                    <v-text-field label="Hour" v-model="hourLast" type="number" class="field"
+                                        persistent-placeholder></v-text-field>
+                                    <v-text-field label="Minute" v-model="minuteLast" type="number" class="field"
+                                        persistent-placeholder></v-text-field>
+                                </div>
+                            </div>
+                            <div v-if="processing">
+                                {{ `Processing ... ${photosDone}/${photos.length}` }}
+                            </div>
+                        </v-form>
+                    </v-card-text>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" @click="save">Save</v-btn>
+                        <v-btn @click="close">Cancel</v-btn>
+                    </v-card-actions>
+                </div>
+
+                <div v-else>
+                    {{ `Loading data ... ${photosDone}/${photos.length}` }}
+                </div>
             </v-card>
         </div>
     </v-dialog>
@@ -37,21 +66,29 @@
 <script lang="ts">
 import { IPhoto } from '../types';
 import * as utils from "../utils";
+import * as dav from "../DavRequest"
 
 export default {
     name: 'EditDate',
-    props: {
-    },
     data() {
         return {
             photos: [] as IPhoto[],
             longDateStr: '',
             dialog: false,
-            year: '',
-            month: '',
-            day: '',
-            hour: '',
-            minute: '',
+            year: '0',
+            month: '0',
+            day: '0',
+            hour: '0',
+            minute: '0',
+            photosDone: 0,
+            processing: false,
+            longDateStrLast: '',
+            yearLast: '0',
+            monthLast: '0',
+            dayLast: '0',
+            hourLast: '0',
+            minuteLast: '0',
+            secondLast: '0',
         };
     },
     computed: {
@@ -59,27 +96,50 @@ export default {
             get() {
                 return this.photos && this.photos.length > 0;
             },
-            set(value) {
+            set() {
                 this.photos = [];
             }
         }
     },
     methods: {
-        open(photos: IPhoto[]) {
+        async open(photos: IPhoto[]) {
             this.photos = photos;
             if (photos.length === 0) {
                 return;
             }
+            this.photosDone = 0;
+            this.longDateStr = '';
 
-            //  const res = await axios.get<any>(generateUrl(INFO_API_URL, { id: this.photos[0].fileid }));
-            const res = { data: { datetaken: "2023-10-01" } }; // Mock response for testing
-            if (typeof res.data.datetaken !== "string") {
-                console.error("Invalid date");
-                return;
+            const calls = photos.map((p) => async () => {
+                try {
+                    // const res = await axios.get<any>(generateUrl(INFO_API_URL, { id: p.fileid }));
+                    const res = { data: { datetaken: p.datetaken } }; // Mock response for testing
+                    if (typeof res.data.datetaken !== "string") {
+                        console.error("Invalid date for", p.fileid);
+                        return;
+                    }
+
+                    p.datetaken = Date.parse(res.data.datetaken + " UTC");
+                } catch (error) {
+                    console.error('Failed to get date info for', p.fileid, error);
+                } finally {
+                    this.photosDone++;
+                }
+            });
+
+            for await (const _ of dav.runInParallel(calls, 10)) {
+                // nothing to do
             }
 
-            const utcEpoch = Date.parse(res.data.datetaken + " UTC");
-            const date = new Date(utcEpoch);
+            // Remove photos without datetaken
+            this.photos = this.photos.filter((p) => p.datetaken !== undefined);
+
+            // Sort photos by datetaken descending
+            this.photos.sort((a, b) => b.datetaken - a.datetaken);
+
+            // Get date of newest photo
+            let date = new Date(this.photos[0].datetaken);
+            debugger
             this.year = date.getUTCFullYear().toString();
             this.month = (date.getUTCMonth() + 1).toString();
             this.day = date.getUTCDate().toString();
@@ -88,32 +148,155 @@ export default {
             this.second = date.getUTCSeconds().toString();
 
             this.longDateStr = utils.getLongDateStr(date, false, true);
+
+            // Get date of oldest photo
+            if (this.photos.length > 1) {
+                date = new Date(this.photos[this.photos.length - 1].datetaken);
+                this.yearLast = date.getUTCFullYear().toString();
+                this.monthLast = (date.getUTCMonth() + 1).toString();
+                this.dayLast = date.getUTCDate().toString();
+                this.hourLast = date.getUTCHours().toString();
+                this.minuteLast = date.getUTCMinutes().toString();
+                this.secondLast = date.getUTCSeconds().toString();
+                this.longDateStrLast = utils.getLongDateStr(date, false, true);
+            }
         },
         close() {
             this.photos = [];
         },
-        save() {
-            // Pad zeros to the left
-            this.year = this.year.padStart(4, '0');
-            this.month = this.month.padStart(2, '0');
-            this.day = this.day.padStart(2, '0');
-            this.hour = this.hour.padStart(2, '0');
-            this.minute = this.minute.padStart(2, '0');
-            this.second = this.second.padStart(2, '0');
-
+        async saveOne() {
             // Make PATCH request to update date
             try {
-                //  const res = await axios.patch<any>(generateUrl(EDIT_API_URL, { id: this.photos[0].fileid }), {
-                //      date: `${this.year}:${this.month}:${this.day} ${this.hour}:${this.minute}:${this.second}`,
-                //  });
-                const res = { data: { message: "Date updated successfully" } }; // Mock response for testing
-                console.log(`${this.year}:${this.month}:${this.day} ${this.hour}:${this.minute}:${this.second}`);
+                this.processing = true;
+                // const res = await axios.patch<any>(generateUrl(EDIT_API_URL, { id: this.photos[0].fileid }), {
+                //     date: this.getExifFormat(this.getDate()),
+                // });
+                console.log(`saveOne->`,this.getDate())
                 this.close();
             } catch (e) {
                 if (e.response?.data?.message) {
                     console.error(e.response.data.message);
                 }
+            } finally {
+                this.processing = false;
             }
+        },
+        async saveMany() {
+            if (this.processing) {
+                return;
+            }
+    
+            // Get difference between newest and oldest date
+            const date = new Date(this.photos[0].datetaken);
+            const dateLast = new Date(this.photos[this.photos.length - 1].datetaken);
+            const diff = date.getTime() - dateLast.getTime();
+    
+            // Get new difference between newest and oldest date
+            const dateNew = this.getDate();
+            const dateLastNew = this.getDateLast();
+            const diffNew = dateNew.getTime() - dateLastNew.getTime();
+    
+            // Validate if the old is still old
+            if (diffNew < 0) {
+                console.error("The newest date must be newer than the oldest date");
+                return;
+            }
+    
+            // Mark processing
+            this.processing = true;
+            this.photosDone = 0;
+    
+            // Create PATCH requests
+            const calls = this.photos.map((p) => async () => {
+                try {
+                    const pDate = new Date(p.datetaken);
+                    const offset = date.getTime() - pDate.getTime();
+                    const pDateNew = new Date(dateNew.getTime() - offset * (diffNew / diff));
+                    // const res = await axios.patch<any>(generateUrl(EDIT_API_URL, { id: p.fileid }), {
+                    //     date: this.getExifFormat(pDateNew),
+                    // });
+                    console.log(`saveMany->`,pDateNew)
+                } catch (e) {
+                    if (e.response?.data?.message) {
+                        console.error(e.response.data.message);
+                    }
+                } finally {
+                    this.photosDone++;
+                }
+            });
+    
+            for await (const _ of dav.runInParallel(calls, 10)) {
+                // nothing to do
+            }
+            this.processing = false;
+            this.close();
+        },
+        async save() {
+            if (this.photos.length === 0) {
+                return;
+            }
+    
+            if (this.photos.length === 1) {
+                return await this.saveOne();
+            }
+    
+            return await this.saveMany();
+        },
+        newestChange(time = false) {
+            // if no input time is false
+            if (this.photos.length === 0) {
+                return;
+            }
+
+            // Set the last date to have the same offset to newest date
+            // what for?
+            try {
+                const date = new Date(this.photos[0].datetaken);
+                const dateLast = new Date(this.photos[this.photos.length - 1].datetaken);
+
+                const dateNew = this.getDate();
+                const offset = dateNew.getTime() - date.getTime();
+                const dateLastNew = new Date(dateLast.getTime() + offset);
+
+                this.yearLast = dateLastNew.getUTCFullYear().toString();
+                this.monthLast = (dateLastNew.getUTCMonth() + 1).toString();
+                this.dayLast = dateLastNew.getUTCDate().toString();
+
+                if (time) {
+                    this.hourLast = dateLastNew.getUTCHours().toString();
+                    this.minuteLast = dateLastNew.getUTCMinutes().toString();
+                    this.secondLast = dateLastNew.getUTCSeconds().toString();
+                }
+            } catch (error) { }
+        },
+        getExifFormat(date: Date) {
+            const year = date.getUTCFullYear().toString().padStart(4, "0");
+            const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
+            const day = date.getUTCDate().toString().padStart(2, "0");
+            const hour = date.getUTCHours().toString().padStart(2, "0");
+            const minute = date.getUTCMinutes().toString().padStart(2, "0");
+            const second = date.getUTCSeconds().toString().padStart(2, "0");
+            return `${year}:${month}:${day} ${hour}:${minute}:${second}`;
+        },
+        getDate() {
+            const dateNew = new Date();
+            dateNew.setUTCFullYear(parseInt(this.year));
+            dateNew.setUTCMonth(parseInt(this.month) - 1);
+            dateNew.setUTCDate(parseInt(this.day));
+            dateNew.setUTCHours(parseInt(this.hour));
+            dateNew.setUTCMinutes(parseInt(this.minute));
+            dateNew.setUTCSeconds(parseInt(this.second));
+            return dateNew;
+        },
+        getDateLast() {
+            const dateLast = new Date();
+            dateLast.setUTCFullYear(parseInt(this.yearLast));
+            dateLast.setUTCMonth(parseInt(this.monthLast) - 1);
+            dateLast.setUTCDate(parseInt(this.dayLast));
+            dateLast.setUTCHours(parseInt(this.hourLast));
+            dateLast.setUTCMinutes(parseInt(this.minuteLast));
+            dateLast.setUTCSeconds(parseInt(this.secondLast));
+            return dateLast;
         }
     }
 };
@@ -129,7 +312,6 @@ export default {
 }
 
 .fields {
-    margin-top: 5px;
     display: flex;
 
     .field {
@@ -138,6 +320,10 @@ export default {
         margin-right: 0.2rem;
     }
 }
+
+.oldest {
+     margin-top: 10px;
+ }
 
 .buttons {
     margin-top: 10px;
@@ -148,3 +334,10 @@ export default {
     }
 }
 </style>
+<style lang="scss">
+ .memories__editdate__fields label {
+     font-size: 0.8em;
+     padding: 0 !important;
+     padding-left: 3px !important;
+ }
+ </style>
