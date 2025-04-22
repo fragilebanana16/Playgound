@@ -56,7 +56,7 @@ export default {
             } else if (this.data.flag & c.FLAG_LOAD_FAIL) {
                 return errorsvg;
             } else {
-                return this.data.url
+                return this.data.url ? this.data.url : errorsvg;
             }
         },
         getCurrentImage() {
