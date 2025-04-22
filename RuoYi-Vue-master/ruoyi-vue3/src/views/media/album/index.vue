@@ -21,7 +21,7 @@
                 <div class="photo-row" :style="{ height: item.size + 'px', width: rowWidth + 'px' }">
                     <div class="photo" v-for="photo in item.photos" :key="photo.fileid" 
                             :style="{
-                                height: photo.dispH ? photo.dispH + 'px' : undefined,
+                                height: (photo.dispH || item.size) + 'px',
                                 width: photo.dispWp * rowWidth + 'px',
                                 transform: 'translateX(' + photo.dispXp * rowWidth + 'px) translateY(' + photo.dispY + 'px)',
                             }">
@@ -39,7 +39,7 @@
              :height="scrollerHeight"
              :recycler="$refs.recycler" />
         <SelectionManager ref="selectionManager"
-             :selection="selection" :heads="heads"
+             :selection="selection" :heads="heads" @refresh="refresh"
              @delete="deleteFromViewWithAnimation"
              @updateLoading="updateLoading" />
     </div>
@@ -195,20 +195,13 @@ export default {
     async mounted() {
         this.selectionManager = this.$refs.selectionManager;
         this.scrollerManager = this.$refs.scrollerManager;
-        // // Wait for one tick before doing anything
-        await this.$nextTick();
-        // Fit to window
-        await this.handleResize();
-        // Timeline recycler init
-        this.$refs.recycler.$el.addEventListener('scroll', this.scrollPositionChange, false);
-        // Get data
-        await this.fetchDays();
+        this.createState();
     },
 
     watch: {
-        $route(from, to) {
+        async $route(from, to) {
             console.log('route changed', from, to)
-            this.resetState();
+            await this.refresh();
             this.fetchDays();
         },
     },
@@ -222,8 +215,36 @@ export default {
         window.removeEventListener("resize", this.handleResizeWithDelay);
     },
     methods: {
+        /** Recreate everything */
+        async refresh(preservePosition = false) {
+            // // Get current scroll position
+            // const origScroll = (<any>this.$refs.recycler).$el.scrollTop;
+    
+            // // Reset state
+            // await this.resetState();
+            // await this.createState();
+    
+            // // Restore scroll position
+            // if (preservePosition) {
+            //     (<any>this.$refs.recycler).scrollToPosition(origScroll);
+            // }
+        },
         updateLoading(delta: number) {
          this.loading += delta;
+        },
+        /** Create new state */
+        async createState() {
+            // Wait for one tick before doing anything
+            await this.$nextTick();
+
+            // Fit to window
+            this.handleResize();
+
+            // Timeline recycler init
+            (this.$refs.recycler as any).$el.addEventListener('scroll', this.scrollPositionChange, false);
+
+            // Get data
+            await this.fetchDays();
         },
         /** Reset all state */
         resetState() {

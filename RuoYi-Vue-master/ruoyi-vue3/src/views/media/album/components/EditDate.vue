@@ -43,7 +43,7 @@
                                         persistent-placeholder></v-text-field>
                                 </div>
                             </div>
-                            <div v-if="processing">
+                            <div v-if="processing" class="info-pad">
                                 {{ `Processing ... ${photosDone}/${photos.length}` }}
                             </div>
                         </v-form>
@@ -114,12 +114,12 @@ export default {
                 try {
                     // const res = await axios.get<any>(generateUrl(INFO_API_URL, { id: p.fileid }));
                     const res = { data: { datetaken: p.datetaken } }; // Mock response for testing
-                    if (typeof res.data.datetaken !== "string") {
+                    if (typeof res.data.datetaken !== "number") {
                         console.error("Invalid date for", p.fileid);
                         return;
                     }
 
-                    p.datetaken = Date.parse(res.data.datetaken + " UTC");
+                    p.datetaken = res.data.datetaken * 1000;
                 } catch (error) {
                     console.error('Failed to get date info for', p.fileid, error);
                 } finally {
@@ -139,7 +139,6 @@ export default {
 
             // Get date of newest photo
             let date = new Date(this.photos[0].datetaken);
-            debugger
             this.year = date.getUTCFullYear().toString();
             this.month = (date.getUTCMonth() + 1).toString();
             this.day = date.getUTCDate().toString();
@@ -172,10 +171,11 @@ export default {
                 //     date: this.getExifFormat(this.getDate()),
                 // });
                 console.log(`saveOne->`,this.getDate())
+                this.$emit('refresh', true);
                 this.close();
             } catch (e) {
                 if (e.response?.data?.message) {
-                    console.error(e.response.data.message);
+                    console.error(e);
                 }
             } finally {
                 this.processing = false;
@@ -192,9 +192,18 @@ export default {
             const diff = date.getTime() - dateLast.getTime();
     
             // Get new difference between newest and oldest date
-            const dateNew = this.getDate();
-            const dateLastNew = this.getDateLast();
-            const diffNew = dateNew.getTime() - dateLastNew.getTime();
+            let dateNew: Date;
+            let dateLastNew: Date;
+            let diffNew: number;
+    
+            try {
+                dateNew = this.getDate();
+                dateLastNew = this.getDateLast();
+                diffNew = dateNew.getTime() - dateLastNew.getTime();
+            } catch (e) {
+                console.error(e);
+                return;
+            }
     
             // Validate if the old is still old
             if (diffNew < 0) {
@@ -209,16 +218,22 @@ export default {
             // Create PATCH requests
             const calls = this.photos.map((p) => async () => {
                 try {
-                    const pDate = new Date(p.datetaken);
+                    let pDate = new Date(p.datetaken);
+ 
+                    // Fallback to start date if invalid date
+                    if (isNaN(pDate.getTime())) {
+                        pDate = date;
+                    }
                     const offset = date.getTime() - pDate.getTime();
-                    const pDateNew = new Date(dateNew.getTime() - offset * (diffNew / diff));
+                    const scale = diff > 0 ? (diffNew / diff) : 0;
+                    const pDateNew = new Date(dateNew.getTime() - offset * scale);
                     // const res = await axios.patch<any>(generateUrl(EDIT_API_URL, { id: p.fileid }), {
                     //     date: this.getExifFormat(pDateNew),
                     // });
                     console.log(`saveMany->`,pDateNew)
                 } catch (e) {
                     if (e.response?.data?.message) {
-                        console.error(e.response.data.message);
+                        console.error(e);
                     }
                 } finally {
                     this.photosDone++;
@@ -229,6 +244,7 @@ export default {
                 // nothing to do
             }
             this.processing = false;
+            this.$emit('refresh', true);
             this.close();
         },
         async save() {
@@ -280,22 +296,51 @@ export default {
         },
         getDate() {
             const dateNew = new Date();
-            dateNew.setUTCFullYear(parseInt(this.year));
-            dateNew.setUTCMonth(parseInt(this.month) - 1);
-            dateNew.setUTCDate(parseInt(this.day));
-            dateNew.setUTCHours(parseInt(this.hour));
-            dateNew.setUTCMinutes(parseInt(this.minute));
-            dateNew.setUTCSeconds(parseInt(this.second));
+            const year = parseInt(this.year, 10);
+            const month = parseInt(this.month, 10) - 1;
+            const day = parseInt(this.day, 10);
+            const hour = parseInt(this.hour, 10);
+            const minute = parseInt(this.minute, 10);
+            const second = parseInt(this.second, 10) || 0;
+    
+            if (isNaN(year)) throw new Error("Invalid year");
+            if (isNaN(month)) throw new Error("Invalid month");
+            if (isNaN(day)) throw new Error("Invalid day");
+            if (isNaN(hour)) throw new Error("Invalid hour");
+            if (isNaN(minute)) throw new Error("Invalid minute");
+            if (isNaN(second)) throw new Error("Invalid second");
+    
+            dateNew.setUTCFullYear(year);
+            dateNew.setUTCMonth(month);
+            dateNew.setUTCDate(day);
+            dateNew.setUTCHours(hour);
+            dateNew.setUTCMinutes(minute);
+            dateNew.setUTCSeconds(second);
             return dateNew;
         },
         getDateLast() {
             const dateLast = new Date();
-            dateLast.setUTCFullYear(parseInt(this.yearLast));
-            dateLast.setUTCMonth(parseInt(this.monthLast) - 1);
-            dateLast.setUTCDate(parseInt(this.dayLast));
-            dateLast.setUTCHours(parseInt(this.hourLast));
-            dateLast.setUTCMinutes(parseInt(this.minuteLast));
-            dateLast.setUTCSeconds(parseInt(this.secondLast));
+            const dateNew = new Date();
+            const year = parseInt(this.yearLast, 10);
+            const month = parseInt(this.monthLast, 10) - 1;
+            const day = parseInt(this.dayLast, 10);
+            const hour = parseInt(this.hourLast, 10);
+            const minute = parseInt(this.minuteLast, 10);
+            const second = parseInt(this.secondLast, 10) || 0;
+    
+            if (isNaN(year)) throw new Error("Invalid last year");
+            if (isNaN(month)) throw new Error("Invalid last month");
+            if (isNaN(day)) throw new Error("Invalid last day");
+            if (isNaN(hour)) throw new Error("Invalid last hour");
+            if (isNaN(minute)) throw new Error("Invalid last minute");
+            if (isNaN(second)) throw new Error("Invalid last second");
+    
+            dateNew.setUTCFullYear(year);
+            dateNew.setUTCMonth(month);
+            dateNew.setUTCDate(day);
+            dateNew.setUTCHours(hour);
+            dateNew.setUTCMinutes(minute);
+            dateNew.setUTCSeconds(second);
             return dateLast;
         }
     }
@@ -333,6 +378,16 @@ export default {
         display: inline-block;
     }
 }
+.info-pad {
+     margin-top: 6px;
+     margin-bottom: 2px;
+ 
+     &.warn {
+         color: #f44336;
+         font-size: 0.8em;
+         line-height: 1em;
+     }
+ }
 </style>
 <style lang="scss">
  .memories__editdate__fields label {

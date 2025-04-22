@@ -131,6 +131,5 @@ export async function getCachedData(url) {
 export async function cacheData(url, data) {
     const response = new Response(JSON.stringify(data));
     response.headers.set('Content-Type', 'application/json');
-    debugger
     await cacheStorage.put(url, response);
 }

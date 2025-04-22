@@ -29,7 +29,7 @@
             </v-list>
         </v-menu>
 
-        <EditDate ref="editDate" />
+        <EditDate ref="editDate" @refresh="refresh"/>
     </div>
 </template>
 <script lang="ts">
@@ -64,7 +64,10 @@ export default {
     mounted() {
     },
     methods: {
-        /**
+        refresh(value) {
+            this.$emit('refresh', value);
+        },
+         /**
          * Open the edit date dialog
          */
         async editDateSelection() {

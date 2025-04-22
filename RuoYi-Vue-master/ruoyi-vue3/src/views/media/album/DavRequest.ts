@@ -1,4 +1,4 @@
-import { IFileInfo } from './types';
+import { IFileInfo, IPhoto, IDay } from './types';
 import { genFileInfo } from './utils'
 /**
  * Get file infos for list of files given Ids
@@ -175,9 +175,10 @@ export async function* deleteFilesByIds(fileIds: number[]) {
     // Query for photos
     let data: IPhoto[] = [];
     try {
-        const res = await axios.post<IPhoto[]>(generateUrl('/apps/memories/api/days/BODY'), {
-            body_ids: Object.keys(diffs).join(','),
-        });
+        // const res = await axios.post<IPhoto[]>(generateUrl('/apps/memories/api/days/BODY'), {
+        //     body_ids: Object.keys(diffs).join(','),
+        // });
+        const res = {data: []} // mock data
         data = res.data;
     } catch (e) {
         throw e;
@@ -200,7 +201,7 @@ export async function* deleteFilesByIds(fileIds: number[]) {
 
         // Add to last day
         const day = ans[ans.length - 1];
-        day.detail.push(photo);
+        (day.detail ??= []).push(photo);
         day.count++;
     }
 
