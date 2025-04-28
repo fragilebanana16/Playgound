@@ -1,7 +1,7 @@
 <template>
     <div class="album-container" ref="container" :v-loading="loading > 0">
         <!-- size-field look for item, item-size="300"-->
-        <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }"
+        <RecycleScroller ref="recycler" class="recycler" :items="list" size-field="size" key-field="id" v-slot="{ item }" :key="state"
             :emit-update="true" @update="scrollChange" @resize="handleResizeWithDelay">
             <div v-if="item.type === 0" class="head-row" :class="{
                 'selected': item.selected,
@@ -217,17 +217,17 @@ export default {
     methods: {
         /** Recreate everything */
         async refresh(preservePosition = false) {
-            // // Get current scroll position
-            // const origScroll = (<any>this.$refs.recycler).$el.scrollTop;
+            // Get current scroll position
+            const origScroll = (<any>this.$refs.recycler).$el.scrollTop;
     
-            // // Reset state
-            // await this.resetState();
-            // await this.createState();
+            // Reset state
+            await this.resetState();
+            await this.createState();
     
-            // // Restore scroll position
-            // if (preservePosition) {
-            //     (<any>this.$refs.recycler).scrollToPosition(origScroll);
-            // }
+            // Restore scroll position
+            if (preservePosition) {
+                (<any>this.$refs.recycler).scrollToPosition(origScroll);
+            }
         },
         updateLoading(delta: number) {
          this.loading += delta;
