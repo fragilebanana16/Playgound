@@ -25,7 +25,7 @@
                                 width: photo.dispWp * rowWidth + 'px',
                                 transform: 'translateX(' + photo.dispXp * rowWidth + 'px) translateY(' + photo.dispY + 'px)',
                             }">
-                        <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" />
+                        <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" :isMock="isMock" />
                         <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
                             @select="selectionManager.selectPhoto" @delete="deleteFromViewWithAnimation" @clickImg="clickPhoto" />
                     </div>
@@ -62,6 +62,9 @@ import moment from 'moment';
 import SelectionManager from './components/SelectionManager.vue';
 import ScrollerManager from './components/ScrollerManager.vue';
 import justifiedLayout from "justified-layout";
+import useUserStore from '../../../store/modules/user'
+import { generateImage } from "@/utils/mock"
+
 const router = useRoute()
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
 const ServerUrl = '/dev-api';
@@ -146,6 +149,7 @@ export default {
     },
     data() {
         return {
+            isMock: false,
             images: [
                 "https://picsum.photos/200/200",
                 "https://picsum.photos/300/200",
@@ -627,9 +631,14 @@ export default {
                     return shuffled.slice(0, count);
                 }
                 const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
+
+                this.isMock = await useUserStore().getInfo().then((res) => {
+                    return res.user.userName === 'mock'
+                })
+
                 randomArray.forEach((img, index) => {
                     const fileid = `fileid${index * Math.random() + 1}`;
-                    const url = `${prefix}${img}`;
+                    let url = this.isMock ? generateImage() : `${prefix}${img}`;
                     let {w, h} = getRandomImageSize()
                     const isfolder = index % 5 === 0
                     if (isfolder) {

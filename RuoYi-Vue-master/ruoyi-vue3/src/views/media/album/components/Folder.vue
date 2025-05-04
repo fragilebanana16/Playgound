@@ -20,6 +20,7 @@
 <script>
 import { Icon } from '@iconify/vue'
 import { c } from "../constants";
+import { generateImage } from "@/utils/mock"
 
 const baseUrl = '/dev-api';
 const previewArr = [
@@ -38,7 +39,11 @@ export default {
             /** @type {IFolder} */
             type: Object,
             required: true
-        }
+        },
+        isMock: {
+            type: Boolean,
+            default: false
+        },
     },
     data() {
         return {
@@ -54,7 +59,9 @@ export default {
             const shuffled = [...arr].sort(() => Math.random() - 0.5);
             return shuffled.slice(0, count);
         }
-        this.previewFileInfos = getRandomElements(previewArr, 4).map((url, index) => { return { id: index, url: prefix + url }; });
+
+        this.previewFileInfos = getRandomElements(previewArr, 4).map((url, index) => { return { id: index, url: this.isMock ?
+            generateImage() : prefix + url }; });
     },
     methods: {
         /** Open album folder :IFolder*/

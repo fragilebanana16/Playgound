@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import axios from 'axios'
 
 // 登录方法
 export function login(username, password, code, uuid) {
@@ -33,10 +34,14 @@ export function register(data) {
 
 // 获取用户详细信息
 export function getInfo() {
-  return request({
-    url: '/getInfo',
-    method: 'get'
-  })
+  if (import.meta.env.MODE === 'mock') {
+    return axios.get('/mock/info.json').then(rsp => rsp.data)
+  } else {
+    return request({
+      url: '/getInfo',
+      method: 'get'
+    })
+  }
 }
 
 // 退出方法
