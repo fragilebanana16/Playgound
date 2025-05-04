@@ -63,7 +63,7 @@ import SelectionManager from './components/SelectionManager.vue';
 import ScrollerManager from './components/ScrollerManager.vue';
 import justifiedLayout from "justified-layout";
 import useUserStore from '../../../store/modules/user'
-import { generateImage } from "@/utils/mock"
+import { generateImage } from "../../../utils/mock"
 
 const router = useRoute()
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
