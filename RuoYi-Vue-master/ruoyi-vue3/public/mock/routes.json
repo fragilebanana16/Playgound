@@ -175,6 +175,34 @@
             ]
         },
         {
+            "name": "Other",
+            "path": "/other",
+            "hidden": false,
+            "redirect": "noRedirect",
+            "component": "Layout",
+            "alwaysShow": true,
+            "meta": {
+                "title": "实用工具",
+                "icon": "tool",
+                "noCache": false,
+                "link": null
+            },
+            "children": [
+                {
+                    "name": "Map",
+                    "path": "map",
+                    "hidden": false,
+                    "component": "other/map/index",
+                    "meta": {
+                        "title": "Map",
+                        "icon": "#",
+                        "noCache": false,
+                        "link": null
+                    }
+                }
+            ]
+        },
+        {
             "name": "System",
             "path": "/system",
             "hidden": false,
