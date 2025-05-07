@@ -22,8 +22,8 @@
                     <div class="photo" v-for="photo in item.photos" :key="photo.fileid" 
                             :style="{
                                 height: (photo.dispH || item.size) + 'px',
-                                width: photo.dispWp * rowWidth + 'px',
-                                transform: 'translateX(' + photo.dispXp * rowWidth + 'px) translateY(' + photo.dispY + 'px)',
+                                width: (photo.dispWp * rowWidth) + 'px',
+                                transform: `translate(${photo.dispXp*rowWidth}px, ${photo.dispY}px`,
                             }">
                         <Folder v-if="photo.flag & c.FLAG_IS_FOLDER" :data="photo" :key="photo.fileid" :isMock="isMock" />
                         <Photo v-else :data="photo" :day="item.day" :collection="item.photos"
@@ -39,7 +39,7 @@
              :height="scrollerHeight"
              :recycler="$refs.recycler" />
         <SelectionManager ref="selectionManager"
-             :selection="selection" :heads="heads" @refresh="refresh"
+             :selection="selection" :heads="heads" @refresh="softRefresh"
              @delete="deleteFromViewWithAnimation"
              @updateLoading="updateLoading" />
     </div>
@@ -218,18 +218,15 @@ export default {
     },
     methods: {
         /** Recreate everything */
-        async refresh(preservePosition = false) {
-            // Get current scroll position
-            const origScroll = (<any>this.$refs.recycler).$el.scrollTop;
-    
+        async refresh() {
             // Reset state
             await this.resetState();
             await this.createState();
-    
-            // Restore scroll position
-            if (preservePosition) {
-                (<any>this.$refs.recycler).scrollToPosition(origScroll);
-            }
+        },
+        /** Re-process days */
+        async softRefresh() {
+            this.selectionManager.clearSelection();
+            await this.fetchDays(true);
         },
         updateLoading(delta: number) {
          this.loading += delta;
@@ -344,9 +341,19 @@ export default {
                 }
             }
 
+            // Check if this was requested by a refresh
+            const force = this.currentEnd === -1;
+
             // Make sure we don't do this too often
             this.currentStart = startIndex;
             this.currentEnd = endIndex;
+
+            // Check if this was requested specifically
+            if (force) {
+                this.loadScrollChanges(startIndex, endIndex);
+                return;
+            }
+
             setTimeout(() => {
                 // Get the overlapping range between startIndex and
                 // currentStart and endIndex and currentEnd.
@@ -428,7 +435,7 @@ export default {
         },
 
         /** Fetch timeline main call */
-        async fetchDays() {
+        async fetchDays(noCache=false) {
             const data = Array.from({ length: 5 }, (_, index) => {
                 const today = new Date();
                 const epoch = new Date(0); // January 1, 1970
@@ -449,7 +456,8 @@ export default {
             // Try cache first
             let cache: IDay[];
             const cacheUrl = window.location.pathname + 'api/days';
-
+            // Make sure to refresh scroll later
+            this.currentEnd = -1;
             try {
                 // try {
                 // this.loading++;
@@ -459,7 +467,7 @@ export default {
                 //     data = await dav.getOnThisDayData();
                 // } else {
                 //  // Try the cache
-                //  cache = await utils.getCachedData(cacheUrl);
+                //  cache = noCache ? null : (await utils.getCachedData(cacheUrl));
                 //  if (cache) {
                 //      await this.processDays(cache);
                 //      this.loading--;
@@ -540,9 +548,16 @@ export default {
                 // Add header to list
                 heads[day.dayid] = head;
                 list.push(head);
+                // Dummy rows for placeholders
+                let nrows = Math.ceil(day.count / this.numCols);
 
+                // Check if already loaded - we can learn
+                let prevRows: IRow[] | null = null;
+                if (this.loadedDays.has(day.dayid)) {
+                    prevRows = this.heads[day.dayid]?.day.rows;
+                    nrows = prevRows?.length || nrows;
+                }
                 // Add rows
-                const nrows = Math.ceil(day.count / this.numCols);
                 for (let i = 0; i < nrows; i++) {
                     const row = this.addRow(day);
                     list.push(row);
@@ -550,6 +565,12 @@ export default {
                     const leftNum = (day.count - i * this.numCols);
                     row.pct = leftNum > this.numCols ? this.numCols : leftNum;
                     row.photos = [];
+
+                    // Learn from existing row
+                    if (prevRows && i < prevRows.length) {
+                        row.size = prevRows[i].size;
+                        row.photos = prevRows[i].photos;
+                    }
                 }
 
                 // Continue processing
