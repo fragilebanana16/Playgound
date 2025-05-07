@@ -45,12 +45,12 @@ export default {
 
       plotLocations();
     });
-    const coords = ref(null);
-    const fetchCoords = ref(null);
-    const geoMarker = ref(null); // current location marker
-    const geoError = ref(null);
-    const geoErrorMsg = ref(null);
-    const starLocations = ref([
+    const coords = shallowRef(null);
+    const fetchCoords = shallowRef(null);
+    const geoMarker = shallowRef(null); // current location marker
+    const geoError = shallowRef(null);
+    const geoErrorMsg = shallowRef(null);
+    const starLocations = shallowRef([
       { lat: 39.9042, lng: 116.4074, name: "Beijing" }, // 北京
       { lat: 31.2304, lng: 121.4737, name: "Shanghai" }, // 上海
       { lat: 23.1291, lng: 113.2644, name: "Guangzhou" }, // 广州
@@ -121,7 +121,7 @@ export default {
         .marker([coords.lat, coords.lng], { icon: createCustomMarker('red', 35) })
         .addTo(map);
 
-      // geoMarker.value.bindPopup("You are Here!").openPopup();
+      geoMarker.value.bindPopup("You are Here!").openPopup();
 
       // set map view to current location
       map.setView([coords.lat, coords.lng], 10);
@@ -169,27 +169,26 @@ export default {
       // 更新当前定位的 Marker 大小
       if (geoMarker.value) {
         geoMarker.value.setIcon(createCustomMarker('red', newSize));
-        
-        // if (geoMarker.value && map.hasLayer(geoMarker.value) && geoMarker.value.getPopup()) {
-        //   geoMarker.value.getPopup().update(); // 更新 Popup 的位置
-        // }
+        if (geoMarker.value && map.hasLayer(geoMarker.value) && geoMarker.value.getPopup()) {
+          geoMarker.value.getPopup().update(); // 更新 Popup 的位置
+        }
       } 
       // 更新搜索结果的 Marker 大小
       if (resultMarker.value) {
         resultMarker.value.setIcon(createCustomMarker('blue', newSize));
       }
-      // if (starLocations.value) {
-      //   // 更新 starLocations 的 Marker 大小
-      //   starLocations.value.forEach((location) => {
-      //     if (location.marker) {
-      //       location.marker.setIcon(createCustomMarker('yellow', newSize - 10));
-      //       if (location.marker && map.hasLayer(location.marker) && location.marker.getPopup()) {
-      //         debugger
-      //         location.marker.getPopup().update(); // 更新 Popup 的位置
-      //       }
-      //     }
-      //   });
-      // }
+      if (starLocations.value) {
+        // 更新 starLocations 的 Marker 大小
+        starLocations.value.forEach((location) => {
+          if (location.marker) {
+            location.marker.setIcon(createCustomMarker('yellow', newSize - 10));
+            if (location.marker && map.hasLayer(location.marker) && location.marker.getPopup()) {
+              debugger
+              location.marker.getPopup().update(); // 更新 Popup 的位置
+            }
+          }
+        });
+      }
     }
 
     const createCustomMarker = (type, size) => {
