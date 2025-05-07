@@ -118,6 +118,14 @@ export function binarySearch(arr, elem, key) {
 let staticCache = null;
 const cacheName = `memories-cache`;
 openCache().then((cache) => { staticCache = cache });
+
+// Clear all caches except the current one
+caches.keys().then((keys) => {
+    keys.filter((key) => key.startsWith('memories-') && key !== cacheName).forEach((key) => {
+        caches.delete(key);
+    });
+});
+
 /** Open the cache */
 export async function openCache() {
     return await caches.open(cacheName);

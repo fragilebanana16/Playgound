@@ -57,7 +57,7 @@ export default {
     data() {
         return {
             /** Height of the entire photo view */
-            recyclerHeight: 0,
+            recyclerHeight: 100,
             /** Computed ticks */
             ticks: [],
             /** Computed cursor top */
@@ -100,8 +100,11 @@ export default {
             // Ignore if not initialized
             if (!this.ticks.length) return;
 
+            // Get the scroll position
+            const scroll = this.recycler?.$el?.scrollTop || 0;
+
             // Move hover cursor to px position
-            this.cursorY = utils.roundHalf(event ? event.target.scrollTop * this.height / this.recyclerHeight : 0);
+            this.cursorY = utils.roundHalf(scroll * this.height / this.recyclerHeight);
             this.moveHoverCursor(this.cursorY);
 
             // Show the scroller for some time
