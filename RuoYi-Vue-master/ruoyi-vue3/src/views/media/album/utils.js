@@ -115,13 +115,18 @@ export function binarySearch(arr, elem, key) {
 }
 
 /** Cache store */
-let cacheStorage;
-caches.open(`memories-cache`).then((cache) => { cacheStorage = cache });
+let staticCache = null;
+const cacheName = `memories-cache`;
+openCache().then((cache) => { staticCache = cache });
+/** Open the cache */
+export async function openCache() {
+    return await caches.open(cacheName);
+}
 
 /** Get data from the cache */
 export async function getCachedData(url) {
-    if (!cacheStorage) return;
-    const cachedResponse = await cacheStorage.match(url);
+    const cache = staticCache || await openCache();
+    const cachedResponse = await cache.match(url);
     console.log(`hit cache: ${cachedResponse && cachedResponse.ok}`)
     if (!cachedResponse || !cachedResponse.ok) return false;
     return await cachedResponse.json();
@@ -129,7 +134,8 @@ export async function getCachedData(url) {
 
 /** Store data in the cache */
 export async function cacheData(url, data) {
+    const cache = staticCache || await openCache();
     const response = new Response(JSON.stringify(data));
     response.headers.set('Content-Type', 'application/json');
-    await cacheStorage.put(url, response);
+    await cache.put(url, response);
 }

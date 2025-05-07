@@ -97,8 +97,14 @@ export default {
         },
         /** Recycler scroll event, must be called by timeline */
         recyclerScrolled(event?: any) {
+            // Ignore if not initialized
+            if (!this.ticks.length) return;
+
+            // Move hover cursor to px position
             this.cursorY = utils.roundHalf(event ? event.target.scrollTop * this.height / this.recyclerHeight : 0);
             this.moveHoverCursor(this.cursorY);
+
+            // Show the scroller for some time
             if (this.scrollingRecyclerTimer) window.clearTimeout(this.scrollingRecyclerTimer);
             this.scrollingRecycler = true;
             this.scrollingRecyclerTimer = window.setTimeout(() => {
@@ -123,9 +129,8 @@ export default {
         },
         /** Re-create tick data */
         reflowNow() {
-            if (!this.recycler.$refs.wrapper) {
-                return
-            }
+            // Ignore if not initialized
+            if (!this.recycler?.$refs.wrapper) return;
             // Refresh height of recycler
             this.recyclerHeight = this.recycler.$refs.wrapper.clientHeight;
 

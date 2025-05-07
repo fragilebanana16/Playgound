@@ -167,8 +167,6 @@ export default {
             squareMode: false,
             /** Header rows for dayId key */
             heads: {} as { [dayid: number]: IHeadRow },
-            /** Original days response */
-            days: [],
             /** Computed row height */
             rowHeight: 100,
             /** Computed row width */
