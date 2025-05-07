@@ -38,6 +38,9 @@ netstat -ano | findstr :8081
  -  Cannot read properties of null (reading 'nextSibling') 
 通常需要将页面用div包裹
 
+前端截至
+https://github.com/pulsejet/memories/commits/vue3-2/?since=2022-10-16&until=2022-10-19&before=addb60d9af4946d0793ebc68fdeb197517464f07+70
+refactor: viewerManager 2fb8578e2857410b85f448a7de569ef02ea9f056
 
 【BUG】
                             提交                                    |                    描述                    |                原因                 |             状态           |
