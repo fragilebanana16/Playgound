@@ -70,7 +70,7 @@ hdriLoader.load(hdrTextureURL, function (texture) {
 });
 
 // load model
-new GLTFLoader(loadingManager).load('models/girl.glb', (gltf) => {
+new GLTFLoader(loadingManager).load('models/floorPlan.glb', (gltf) => {
   const mesh = gltf.scene;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -84,11 +84,11 @@ new GLTFLoader(loadingManager).load('models/girl.glb', (gltf) => {
       // child.material.envMapIntensity = 1;
     }
 
-    mixer = new THREE.AnimationMixer(gltf.scene);
-    mixer.clipAction( gltf.animations[0]).play();
+    // mixer = new THREE.AnimationMixer(gltf.scene);
+    // mixer.clipAction( gltf.animations[0]).play();
   });
   // mesh.position.y = 0.9;
-  mesh.scale.set(0.06,0.06,0.06);
+  mesh.scale.set(1.06,1.06,1.06);
   scene.add(mesh);
 });
 
