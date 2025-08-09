@@ -1,18 +1,50 @@
-ADD
-shift + a 
+#### 相机：
+ctrl + 小键盘的0: 设置当前视角为相机视角
 
-DUPLICATE
-shift + d
+#### 移动到对象：
+小键盘的「.」: 缩放到目标对象
 
-Edit Mode:
-a : select all that belongs to one
-alt + a : unselect all 
-alt +lclick: select group
-select points and e:  exclude
+#### UV编辑
+- **选择对象**
+  - `Tab`：切换到编辑模式
+  - **选择后执行以下操作**
+    - Ctrl E： mark seam，a选择全部
+    - `U`：UV展开
+    - `/`：仅显示当前对象
 
-camera
-ctrl + numpad0
+#### 编辑模式
+- **选择**
+  - 选面Ctrl + L，自动选择连接的面，Ctrl +或-增量或减量选择
+  - Alt + a: 全部取消选择
+#### 编辑模式
+- **快捷键**
+  - `L`：选中链接区域
+  - `C`：圆形选择
+  - `Ctrl + R`：环形切割（创建新顶点）
+  - `Ctrl + B`：斜角（选择边缘后鼠标滚轮调整）ctrl shift b ？
+  - `Alt + M`：按距离合并顶点（可能是M
+  - `G + Ctrl`：捕捉并对齐旋转方向
+  - `Ctrl + E`：标记接缝
 
-MOVE TO OBJECT
-numpad .
+#### 雕刻模式
+- **基础操作**
+  - `Shift + Alt + 左键单击`：选择环形
+  - `Shift + 左键单击`：平滑快捷键
 
+- **体素操作**
+  - 使用体素（Voxel）增加面密度
+    - 在雕刻模式下按`R`，移动鼠标
+    - 按`Ctrl + R`确认
+    - 或在菜单中选择：[Data] → [Remesh]
+
+#### 笔刷调整
+- **调整笔刷大小：** `F`
+- **调整笔刷强度：** `Shift + F`
+
+#### 选区调整
+- **扩大/缩小选区：** `Ctrl + + / -`
+- **选择最后选中的目标：** `Ctrl + L`
+
+#### 其他操作
+- **重复最后一次操作：** `Shift + R`
+- 物体模式：Ctrl L 最后一个选目标，选择modifier可将最后一个应用给所有之前所选
