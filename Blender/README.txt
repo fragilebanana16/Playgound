@@ -48,3 +48,7 @@ ctrl + 小键盘的0: 设置当前视角为相机视角
 #### 其他操作
 - **重复最后一次操作：** `Shift + R`
 - 物体模式：Ctrl L 最后一个选目标，选择modifier可将最后一个应用给所有之前所选
+
+#### 优化拓扑
+- M： Merge By Distance
+- 编辑模式：选择，右键Tris to Quads，三角转为四边，Mesh - Faces - Tris to Quads
