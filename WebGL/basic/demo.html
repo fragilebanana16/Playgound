@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GLSLCanvas 离线示例</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="glslCanvas"></canvas>
+
+  <!-- 引入本地 glslCanvas 脚本 -->
+  <script src="./glslCanvas.js"></script>
+
+  <!-- 初始化并加载着色器 -->
+  <script>
+    const canvas = document.getElementById('glslCanvas');
+    const sandbox = new GlslCanvas(canvas);
+
+    const fragShader = `
+      precision mediump float;
+      uniform float u_time;
+      uniform vec2 u_resolution;
+
+      void main() {
+        vec2 st = gl_FragCoord.xy / u_resolution.xy;
+        vec3 color = vec3(st.x, st.y, abs(sin(u_time)));
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    sandbox.load(fragShader);
+  </script>
+</body>
+</html>
