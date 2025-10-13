@@ -6,3 +6,6 @@ OfflineVersion 本地直接运行版本 three.js-r147是最后一个支持js非�
 
 https://gitee.com/mirrors/three.js 镜像
 
+#### 离线版加载跨域文件（NeedHttp后缀）
+OfflineVersion目录下cmd执行 python -m http.server 8000，打开http://localhost:8000
+
