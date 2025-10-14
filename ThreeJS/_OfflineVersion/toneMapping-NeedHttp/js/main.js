@@ -13,6 +13,15 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// gui
+var gui = new dat.GUI();
+var params = {
+  exposure: 1.0
+};
+gui.add(params, 'exposure', 0.1, 10.0).onChange(function(value) {
+  renderer.toneMappingExposure = value;
+});
+
 // 创建立方体
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshNormalMaterial(); // 不依赖光照
@@ -43,3 +52,5 @@ function animate() {
   renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
