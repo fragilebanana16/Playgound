@@ -22,6 +22,7 @@ scene.add(cube);
 const rgbeLoader = new THREE.RGBELoader();
 
 rgbeLoader.load('/toneMapping-NeedHttp/sunny_prairie_expanse_2k.hdr', function (texture) {
+  texture.mapping = THREE.EquirectangularReflectionMapping;
   scene.background = texture;
 });
 
