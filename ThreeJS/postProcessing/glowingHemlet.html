@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>当前目录下cmd启动服务器</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <!-- Three.js Core -->
+  <script src="../three.js-r147/three.js-r147/build/three.js"></script>
+
+  <!-- Addons -->
+  <script src="../three.js-r147/three.js-r147/examples/js/controls/OrbitControls.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/shaders/CopyShader.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/postprocessing/Pass.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  <script src="../three.js-r147/three.js-r147/examples/js/libs/stats.min.js"></script>
+  <script src="../_OfflineVersion/libs/dat.gui.min.js"></script>
+
+  <script>
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000);
+    document.body.appendChild(renderer.domElement);
+
+    // Scene & Camera
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.5, 3);
+
+    // Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    // Light
+    const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambient);
+    const directional = new THREE.DirectionalLight(0xffffff, 1);
+    directional.position.set(5, 10, 5);
+    scene.add(directional);
+
+    // Stats
+    const stats = new Stats();
+    document.body.appendChild(stats.dom);
+
+    // GUI
+
+    const bloomParams = {
+      strength: 1.5,
+      threshold: 0.1,
+      radius: 0.5
+    };
+
+    // GLTF Loader
+    const loader = new THREE.GLTFLoader();
+    loader.load('../_OfflineVersion/models/DamagedHelmet.gltf', (gltf) => {
+      gltf.scene.scale.set(2, 2, 2);
+      scene.add(gltf.scene);
+    });
+
+    // Postprocessing
+    const composer = new THREE.EffectComposer(renderer);
+    const renderPass = new THREE.RenderPass(scene, camera);
+    const bloomPass = new THREE.UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      bloomParams.strength,
+      bloomParams.radius,
+      bloomParams.threshold
+    );
+
+    composer.addPass(renderPass);
+    composer.addPass(bloomPass);
+
+	// GUI 控制器（使用 dat.GUI）
+	const gui = new dat.GUI(); // 如果你用的是 lil-gui，请改为：new lil.GUI()
+
+	gui.add(bloomParams, 'strength', 0, 3).step(0.01).onChange(v => {
+	  bloomPass.strength = v;
+	});
+
+	gui.add(bloomParams, 'threshold', 0, 1).step(0.01).onChange(v => {
+	  bloomPass.threshold = v;
+	});
+
+	gui.add(bloomParams, 'radius', 0, 1).step(0.01).onChange(v => {
+	  bloomPass.radius = v;
+	});
+
+    // Resize
+    window.addEventListener('resize', () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      composer.setSize(w, h);
+    });
+
+    // Animate
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      stats.update();
+      composer.render();
+    }
+
+    animate();
+  </script>
+</body>
+</html>
