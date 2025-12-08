@@ -23,3 +23,5 @@
 /OpenGL/downloads
 /OpenGL/**/Debug
 /OpenGL/**/.vs
+/OpenGL/**/resources
+/OpenGL/**/x64
