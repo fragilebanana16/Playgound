@@ -21,7 +21,19 @@
 /ThreeJS/three.js-r147/
 
 /OpenGL/downloads
-/OpenGL/**/Debug
+
 /OpenGL/**/.vs
 /OpenGL/**/resources
-/OpenGL/**/x64
+# 忽略目录里的所有内容
+/OpenGL/**/Debug/**
+/OpenGL/**/x64/**
+# 保留目录本身
+!/OpenGL/**/Debug/
+!/OpenGL/**/Debug/**/
+!/OpenGL/**/x64/
+!/OpenGL/**/x64/**/
+# 保留目录里的 .fs .vs文件
+!/OpenGL/**/Debug/*.fs
+!/OpenGL/**/Debug/*.vs
+!/OpenGL/**/x64/*.fs
+!/OpenGL/**/x64/*.vs
