@@ -1,0 +1,44 @@
+导出obj时blender4.2需要勾选copy path导出，这样mtl中包含纹理信息
+
+https://learnopengl-cn.github.io/01%20Getting%20started/01%20OpenGL/
+#### OpenGL到底是什么
+包含了一系列可以操作图形、图像的函数。然而，OpenGL本身并不是一个API，它仅仅是一个由Khronos组织制定并维护的规范
+
+- OpenGL规范严格规定了每个函数该如何执行，以及它们的输出值。至于内部具体每个函数是如何实现的，
+将由OpenGL库的开发者自行决定
+- OpenGL的大多数实现都是由显卡厂商编写
+
+早期的OpenGL使用立即渲染模式，效率太低，从OpenGL3.2开始，规范文档开始废弃立即渲染模式，鼓励开发者在OpenGL的核心模式
+
+从OpenGL3.2开始，规范文档开始废弃立即渲染模式
+
+##### 双缓冲(Double Buffer)
+前缓冲保存着最终输出的图像，会在屏幕上显示；而所有的的渲染指令都会在后缓冲上绘制。
+当所有的渲染指令执行完毕后，我们交换(Swap)前缓冲和后缓冲，这样图像就立即呈显出来glfwSwapBuffers(window);
+
+#### 三角形
+顶点数组对象：Vertex Array Object，VAO
+顶点缓冲对象：Vertex Buffer Object，VBO
+元素缓冲对象：Element Buffer Object，EBO 或 索引缓冲对象 Index Buffer Object，IBO
+
+#### 图形渲染管线（Graphics Pipeline）
+3D坐标转为2D坐标的处理过程由管线管理
+实际上指的是一堆原始图形数据途经一个输送管道，期间经过各种变化处理最终出现在屏幕的过程。
+
+###### 着色器(Shader)：
+图形渲染管线可以被划分为几个阶段，每个阶段将会把前一个阶段的输出作为输入。
+当今大多数显卡都有成千上万的小处理核心，它们在GPU上为每一个（渲染管线）阶段运行各自的小程序，从而在图形渲染管线中快速处理你的数据。
+这个小程序就叫着色器
+
+###### 图元(Primitive)：
+为了让OpenGL知道我们的坐标和颜色值构成的到底是什么，OpenGL需要指定这些数据所表示的渲染类型。
+我们是希望把这些数据渲染成一系列的点？一系列的三角形？还是仅仅是一个长长的线？
+做出的这些提示叫做图元(Primitive)，任何一个绘制指令的调用都将把图元传递给OpenGL。GL_POINTS、GL_TRIANGLES、GL_LINE_STRIP。
+
+###### 顶点缓冲对象(Vertex Buffer Objects, VBO)
+顶点着色器会在GPU上创建内存用于储存顶点数据
+通过VBO管理这个内存，它会在GPU内存（通常被称为显存）中储存大量顶点。
+使用这些缓冲对象的好处是我们可以一次性的发送一大批数据到显卡上，而不是每个顶点发送一次。从CPU把数据发送到显卡相对较慢，所以要尝试尽量一次性发送尽可能多的数据
+##### 绑定
+OpenGL有很多缓冲对象类型，顶点缓冲对象的缓冲类型是GL_ARRAY_BUFFER。OpenGL允许我们同时绑定多个缓冲，只要它们是不同的缓冲类型。
+glBindBuffer(GL_ARRAY_BUFFER, VBO);这一刻起，我们使用的任何（在GL_ARRAY_BUFFER目标上的）缓冲调用都会用来配置当前绑定的缓冲(VBO)

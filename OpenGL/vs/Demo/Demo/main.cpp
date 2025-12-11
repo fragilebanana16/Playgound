@@ -69,7 +69,7 @@ int main()
     }
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    stbi_set_flip_vertically_on_load(true);
+    //stbi_set_flip_vertically_on_load(true);
 
     // configure global opengl state
     // -----------------------------
@@ -81,7 +81,7 @@ int main()
 
     // load models
     // -----------
-    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/backpack/backpack.obj");
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/car/car.obj");
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
