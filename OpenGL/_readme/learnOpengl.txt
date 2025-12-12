@@ -1,3 +1,35 @@
+### 光照
+
+#### 风氏光照模型(Phong Lighting Model)
+
+风氏光照模型的主要结构由3个分量组成：
+
+环境(Ambient)、漫反射(Diffuse)和镜面(Specular)光照
+
+###### 漫反射(Diffuse)
+
+漫反射光照使物体上与光线方向越接近的片段能从光源处获得更多的亮度
+> 漫反射公式
+\( I_{diffuse} = k_d \cdot I_l \cdot \max(0, \mathbf{N} \cdot \mathbf{L}) \)
+
+- 𝑘𝑑：材质的漫反射系数（通常就是物体颜色 objectColor） 
+- 𝐼𝑙：光源颜色/强度（就是 lightColor）  
+- 𝑁：单位化的表面法线向量 
+- 𝐿：单位化的光照方向向量（光源位置 - 片元位置） 
+- max (0 ,𝑁 ⋅ 𝐿 ) ：余弦定律，保证夹角大于 90° 时光照为 0
+
+
+
+#### 基础颜色调制模拟光照
+
+```c
+FragColor = vec4(lightColor * objectColor, 1.0);
+```
+- 不是任何标准光照模型（比如 Lambert 漫反射、Phong、Blinn-Phong）
+- 没有考虑光的位置、方向、法线、衰减等因素
+- 物体的基色被光的颜色调制
+
+
 #### VBO/VAO 的常规流程：生成 → 绑定 → 上传数据 → 设置属性 → 使用 → 解绑
 ##### VBO（顶点缓冲对象）操作流程
 ```c
