@@ -10,6 +10,8 @@
 #include <learnopengl/camera.h>
 
 #include <iostream>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -66,7 +68,7 @@ int main()
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -84,6 +86,12 @@ int main()
     // ------------------------------------
     Shader lightingShader("1.colors.vs", "1.colors.fs");
     Shader lightCubeShader("1.light_cube.vs", "1.light_cube.fs");
+
+    // Setup ImGui binding
+    ImGui::CreateContext();
+    ImGui_ImplGlfwGL3_Init(window, true);
+    // Setup style
+    ImGui::StyleColorsDark();
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -156,6 +164,9 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // 定义颜色变量（初始值）
+    glm::vec3 objectColor(1.0f, 0.5f, 0.31f);
+    glm::vec3 lightColor(0.0f, 0.0f, 1.0f);
 
     // render loop
     // -----------
@@ -176,10 +187,16 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        ImGui_ImplGlfwGL3_NewFrame();
+        bool show_demo_window = true;
+        bool show_another_window = false;
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
         // be sure to activate shader when setting uniforms/drawing objects
+
         lightingShader.use();
-        lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor", 0.0f, 0.0f, 1.0f);
+        lightingShader.setVec3("objectColor", objectColor);
+        lightingShader.setVec3("lightColor", lightColor);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -209,7 +226,41 @@ int main()
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // 1. Show a simple window.
+        // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
+        {
+            // ImGui 窗口
+            ImGui::Begin("Lighting Controls");
 
+            // 使用 ImGui 控件修改颜色
+            ImGui::ColorEdit3("Object Color", (float*)&objectColor);
+            ImGui::ColorEdit3("Light Color", (float*)&lightColor);
+            if (ImGui::Button("Reset"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+            {
+                camera.Yaw = -120.0f;
+                camera.Pitch = 0.0f;
+                camera.Position = glm::vec3(2.4f, 0.0f, 5.0f);
+                camera.UpdateCameraVectors();
+            }
+            //ImGui::SameLine();
+            //ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+            //static float f = 0.0f;
+            //static int counter = 0;
+            //ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
+            //ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
+            //ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+            //ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
+            //ImGui::Checkbox("Another Window", &show_another_window);
+
+     
+        }
+
+        ImGui::Render();
+        ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -222,6 +273,9 @@ int main()
     glDeleteVertexArrays(1, &lightCubeVAO);
     glDeleteBuffers(1, &VBO);
 
+    // Cleanup
+    ImGui_ImplGlfwGL3_Shutdown();
+    ImGui::DestroyContext();
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
@@ -275,12 +329,20 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureMouse) {
+        // 只有当 ImGui 不需要鼠标时，才更新相机
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
+
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureKeyboard) {
+        camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    }
 }
