@@ -7,20 +7,43 @@
 环境(Ambient)、漫反射(Diffuse)和镜面(Specular)光照
 
 ###### 漫反射(Diffuse)
-
 漫反射光照使物体上与光线方向越接近的片段能从光源处获得更多的亮度
-> 漫反射公式
-\( I_{diffuse} = k_d \cdot I_l \cdot \max(0, \mathbf{N} \cdot \mathbf{L}) \)
 
-- 𝑘𝑑：材质的漫反射系数（通常就是物体颜色 objectColor） 
+漫反射公式
+$$
+I_{diffuse} = k_d \cdot I_l \cdot \max(0, \mathbf{N} \cdot \mathbf{L})
+$$
+- kd：材质的漫反射系数（通常就是物体颜色 objectColor） 
 - 𝐼𝑙：光源颜色/强度（就是 lightColor）  
 - 𝑁：单位化的表面法线向量 
 - 𝐿：单位化的光照方向向量（光源位置 - 片元位置） 
 - max (0 ,𝑁 ⋅ 𝐿 ) ：余弦定律，保证夹角大于 90° 时光照为 0
+```c
+vec3 norm = normalize(Normal);              // → 公式里的 N
+vec3 lightDir = normalize(lightPos - FragPos); // → 公式里的 L
 
+float diff = max(dot(norm, lightDir), 0.0); // → 公式里的 max(0, N·L)
 
+vec3 diffuse = diff * lightColor * objectColor; 
+// → k_d * I_l * max(0, N·L)
+```
+#### 镜面(Specular)光照
 
-#### 基础颜色调制模拟光照
+镜面光照也决定于光的方向向量和物体的法向量，但是它也决定于观察方向
+
+$$
+I_{diffuse} = k_d \cdot I_l \cdot \max(0, \mathbf{N} \cdot \mathbf{L})
+$$
+
+```c
+// 镜面（Phong）
+vec3 V = normalize(viewPos  - FragPos);
+vec3 R = reflect(-L, N);
+float specFactor = pow(max(dot(R, V), 0.0), shininess);
+vec3 specular = specFactor * lightColor * specColor;
+```
+
+#### 基础颜色调制模拟光照(Ambient)
 
 ```c
 FragColor = vec4(lightColor * objectColor, 1.0);
