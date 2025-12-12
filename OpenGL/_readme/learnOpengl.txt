@@ -1,3 +1,37 @@
+#### VBO/VAO 的常规流程：生成 → 绑定 → 上传数据 → 设置属性 → 使用 → 解绑
+##### VBO（顶点缓冲对象）操作流程
+```c
+// 生成缓冲对象
+GLuint VBO;
+glGenBuffers(1, &VBO);
+// 绑定缓冲对象
+glBindBuffer(GL_ARRAY_BUFFER, VBO);
+// 上传数据到显存
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+// 设置顶点属性指针
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);
+// 这两处的 0 表示你要描述 位置属性（通常在顶点着色器里写成 layout (location = 0) in vec3 aPos;）
+```
+##### VAO（顶点数组对象）操作流程
+```c
+// 生成 VAO
+GLuint VAO;
+glGenVertexArrays(1, &VAO);
+// 绑定 VAO
+glBindVertexArray(VAO);
+// 绑定并配置 VBO
+// 解绑 VAO
+glBindVertexArray(0);
+```
+使用时
+```c
+glBindVertexArray(VAO);
+glDrawArrays(GL_TRIANGLES, 0, 3);
+glBindVertexArray(0);
+```
+
+#### opengl加载obj的blender转换
 导出obj时blender4.2需要勾选copy path导出，这样mtl中包含纹理信息
 
 https://learnopengl-cn.github.io/01%20Getting%20started/01%20OpenGL/

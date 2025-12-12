@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EmptyWindow", "EmptyWindow\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game\Game.vcxproj", "{C1150DFB-3D4C-4377-BACF-BA699F51C174}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lighting", "Lighting\Lighting.vcxproj", "{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{C1150DFB-3D4C-4377-BACF-BA699F51C174}.Release|x64.Build.0 = Release|x64
 		{C1150DFB-3D4C-4377-BACF-BA699F51C174}.Release|x86.ActiveCfg = Release|Win32
 		{C1150DFB-3D4C-4377-BACF-BA699F51C174}.Release|x86.Build.0 = Release|Win32
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Debug|x64.ActiveCfg = Debug|x64
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Debug|x64.Build.0 = Debug|x64
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Debug|x86.ActiveCfg = Debug|Win32
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Debug|x86.Build.0 = Debug|Win32
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Release|x64.ActiveCfg = Release|x64
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Release|x64.Build.0 = Release|x64
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Release|x86.ActiveCfg = Release|Win32
+		{88B7D88B-BCB4-42DC-81CF-1AC4215BC809}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
