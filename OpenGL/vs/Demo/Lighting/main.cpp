@@ -39,8 +39,17 @@ float lastFrame = 0.0f;
 
 // lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-float intensity = 2.0f; // 强度因子，大于1更亮，小于1更暗
-int shiness = 32; // 反光度
+
+// 材质参数变量
+glm::vec3 materialAmbient = glm::vec3(1.0f, 0.5f, 0.31f);
+glm::vec3 materialDiffuse = glm::vec3(1.0f, 0.5f, 0.31f);
+glm::vec3 materialSpecular = glm::vec3(0.5f, 0.5f, 0.5f);
+float materialShininess = 32.0f;
+
+glm::vec3 lightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
+glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+glm::vec3 lightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
+
 int main()
 {
     // glfw: initialize and configure
@@ -205,10 +214,17 @@ int main()
 
         lightingShader.use();
         lightingShader.setVec3("objectColor", objectColor);
-        lightingShader.setVec3("lightColor", lightColor* intensity);
         lightingShader.setVec3("lightPos", lightPos);
         lightingShader.setVec3("viewPos", camera.Position);
-        lightingShader.setFloat("shiness", shiness);
+        
+        lightingShader.setVec3("material.ambient", materialAmbient);
+        lightingShader.setVec3("material.diffuse", materialDiffuse);
+        lightingShader.setVec3("material.specular", materialSpecular);
+        lightingShader.setFloat("material.shininess", materialShininess);
+
+        lightingShader.setVec3("light.ambient", lightAmbient);
+        lightingShader.setVec3("light.diffuse", lightDiffuse);
+        lightingShader.setVec3("light.specular", lightSpecular);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -257,8 +273,20 @@ int main()
 
             // 修改光源位置
             ImGui::DragFloat3("Light Position", (float*)&lightPos, 0.1f, -10.0f, 10.0f);
-            ImGui::DragFloat("Intensity", (float*)&intensity, 0.01f, 0.0f, 10.0f);
-            ImGui::DragInt("Shiness", (int*)&shiness, 1, 2, 256);
+
+            // 环境光颜色
+            ImGui::ColorEdit3("Ambient", (float*)&materialAmbient);
+            // 漫反射颜色
+            ImGui::ColorEdit3("Diffuse", (float*)&materialDiffuse);
+            // 镜面反射颜色
+            ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
+            // 高光系数
+            ImGui::SliderFloat("Shininess", &materialShininess, 1.0f, 128.0f);
+
+            ImGui::ColorEdit3("L_Ambient", (float*)&lightAmbient);
+            ImGui::ColorEdit3("L_Diffuse", (float*)&lightDiffuse);
+            ImGui::ColorEdit3("L_Specular", (float*)&lightSpecular);
+
             //ImGui::SameLine();
             //ImGui::Text("counter = %d", counter);
             
