@@ -185,12 +185,13 @@ int main()
     // load textures (we now use a utility function to keep the code more organized)
 // -----------------------------------------------------------------------------
     unsigned int diffuseMap = loadTexture(FileSystem::getPath("resources/textures/container2.png").c_str());
+    unsigned int specularMap = loadTexture(FileSystem::getPath("resources/textures/container2_specular.png").c_str());
 
     // shader configuration
     // --------------------
     lightingShader.use();
     lightingShader.setInt("material.diffuse", 0); // 这里的 0 就是纹理单元的编号（GL_TEXTURE0 对应 0，GL_TEXTURE1 对应 1，以此类推
-
+    lightingShader.setInt("material.specular", 1);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -242,6 +243,14 @@ int main()
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
+
+
+        // bind diffuse map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        // bind specular map
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap);
 
         // render the cube
         glBindVertexArray(cubeVAO);
