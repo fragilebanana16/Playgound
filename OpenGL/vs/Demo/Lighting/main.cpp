@@ -374,20 +374,17 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    ImGuiIO& io = ImGui::GetIO();
-    if (!io.WantCaptureMouse) {
-        // 只有当 ImGui 不需要鼠标时，才更新相机
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        // 只有当 ImGui 不需要鼠标时，并且右键被按住时，才更新相机
         camera.ProcessMouseMovement(xoffset, yoffset);
     }
-
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    ImGuiIO& io = ImGui::GetIO();
-    if (!io.WantCaptureKeyboard) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
         camera.ProcessMouseScroll(static_cast<float>(yoffset));
     }
 }
