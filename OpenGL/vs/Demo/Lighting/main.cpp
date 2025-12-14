@@ -49,6 +49,7 @@ float materialShininess = 32.0f;
 glm::vec3 lightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
 glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 glm::vec3 lightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
+glm::vec3 lightEmission = glm::vec3(1.0f, 1.0f, 1.0f);
 
 int main()
 {
@@ -186,12 +187,14 @@ int main()
 // -----------------------------------------------------------------------------
     unsigned int diffuseMap = loadTexture(FileSystem::getPath("resources/textures/container2.png").c_str());
     unsigned int specularMap = loadTexture(FileSystem::getPath("resources/textures/container2_specular.png").c_str());
+    unsigned int emissionMap = loadTexture(FileSystem::getPath("resources/textures/matrix.jpg").c_str());
 
     // shader configuration
     // --------------------
     lightingShader.use();
     lightingShader.setInt("material.diffuse", 0); // 这里的 0 就是纹理单元的编号（GL_TEXTURE0 对应 0，GL_TEXTURE1 对应 1，以此类推
     lightingShader.setInt("material.specular", 1);
+    lightingShader.setInt("material.emission", 2);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -232,6 +235,7 @@ int main()
         lightingShader.setVec3("light.ambient", lightAmbient);
         lightingShader.setVec3("light.diffuse", lightDiffuse);
         lightingShader.setVec3("light.specular", lightSpecular);
+        lightingShader.setVec3("light.emission", lightEmission);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -251,6 +255,9 @@ int main()
         // bind specular map
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
+        // bind emission map
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, emissionMap);
 
         // render the cube
         glBindVertexArray(cubeVAO);
@@ -295,7 +302,8 @@ int main()
             ImGui::ColorEdit3("L_Ambient", (float*)&lightAmbient);
             ImGui::ColorEdit3("L_Diffuse", (float*)&lightDiffuse);
             ImGui::ColorEdit3("L_Specular", (float*)&lightSpecular);
-
+            ImGui::ColorEdit3("L_Emission", (float*)&lightEmission);
+            
             //ImGui::SameLine();
             //ImGui::Text("counter = %d", counter);
             
