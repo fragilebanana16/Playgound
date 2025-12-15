@@ -1,3 +1,46 @@
+### 一个向量如何判断是方向还是位置？（齐次坐标的规则）
+
+- **位置向量 (point)**： 用 (x,y,z,1.0) 表示。
+  - 当 w=1 时，矩阵中的平移部分会对它生效。
+  - 这样才能正确地把点从一个坐标系变换到另一个坐标系。
+- **方向向量 (vector)**： 用 (x,y,z,0.0)表示。
+  - 当 w=0 时，矩阵中的平移部分不会影响它。
+  - 因为方向只表示“指向”，没有具体位置，不应该被平移。
+
+#### ⚙️ 为什么要这样区分
+
+矩阵变换通常写成 4×4 的形式：
+
+$$
+\begin{pmatrix}
+R & T \\
+0 & 1
+\end{pmatrix}
+$$
+
+
+其中 RR 是旋转/缩放，TT 是平移。
+
+- 对位置向量 (x,y,z,1)：
+$$
+\begin{pmatrix} R & T \\ 0 & 1 \end{pmatrix}
+\cdot
+\begin{pmatrix} x \\ y \\ z \\ 1 \end{pmatrix}
+=
+R \cdot \begin{pmatrix} x \\ y \\ z \end{pmatrix} + T
+$$
+→ 平移生效。
+
+- 对方向向量 (x,y,z,0)：
+$$
+\begin{pmatrix} R & T \\ 0 & 1 \end{pmatrix}
+\cdot
+\begin{pmatrix} x \\ y \\ z \\ 0 \end{pmatrix}
+=
+R \cdot \begin{pmatrix} x \\ y \\ z \end{pmatrix}
+$$
+→ 平移部分被消除，只剩旋转/缩放。
+
 ### 光照
 
 #### 风氏光照模型(Phong Lighting Model)
