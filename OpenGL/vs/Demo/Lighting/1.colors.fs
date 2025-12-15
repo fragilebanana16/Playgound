@@ -4,6 +4,7 @@ out vec4 FragColor;
 in vec3 Normal;
 in vec3 FragPos;
 
+uniform float time;
 uniform vec3 viewPos;
 
 struct Material {
@@ -42,11 +43,21 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+	vec4 specTexture = texture(material.specular, TexCoords);
     vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
-        
-	// emission
-    vec3 emission = light.emission * texture(material.emission, TexCoords).rgb;
 	
+	bool isNotBoxFrame = specTexture.r == 0.0 && specTexture.g == 0.0 && specTexture.b == 0.0;
+	
+	// emission
+	float border = 0.08;
+	vec2 animCoords =  TexCoords * (1.0 - 2.0 * border) + vec2(border, border) + vec2(0.0, time * 0.1);
+	animCoords.y = border + fract(animCoords.y - border) * (1.0 - 2.0 * border);
+
+	vec3 emission = vec3(0.0); // 默认没有发光
+	// 判断是否为纯黑
+	if (isNotBoxFrame) {
+		emission = light.emission * texture(material.emission, animCoords).rgb;
+	}
     vec3 result = ambient + diffuse + specular + emission;
     FragColor = vec4(result, 1.0);
 }

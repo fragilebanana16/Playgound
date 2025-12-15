@@ -205,6 +205,7 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        float timeValue = glfwGetTime(); // 返回程序运行的秒数
         // input
         // -----
         processInput(window);
@@ -243,6 +244,7 @@ int main()
 
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
+        lightingShader.setFloat("time", glfwGetTime());
 
         // world transformation
         glm::mat4 model = glm::mat4(1.0f);
@@ -393,7 +395,11 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
         // 只有当 ImGui 不需要鼠标时，并且右键被按住时，才更新相机
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         camera.ProcessMouseMovement(xoffset, yoffset);
+    }
+    else {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }
 
