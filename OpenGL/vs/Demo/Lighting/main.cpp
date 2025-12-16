@@ -245,6 +245,10 @@ int main()
         lightingShader.setVec3("material.specular", materialSpecular);
         lightingShader.setFloat("material.shininess", materialShininess);
 
+        lightingShader.setVec3("light.position", camera.Position);
+        lightingShader.setVec3("light.direction", camera.Front);
+        lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+        lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(25.0f)));
         lightingShader.setVec3("light.ambient", lightAmbient);
         lightingShader.setVec3("light.diffuse", lightDiffuse);
         lightingShader.setVec3("light.specular", lightSpecular);
@@ -312,7 +316,7 @@ int main()
             }
 
             // 修改光源位置
-            ImGui::DragFloat3("Light Direction", (float*)&lightPosition, 0.1f, -10.0f, 10.0f);
+            ImGui::DragFloat3("Light Position", (float*)&lightPosition, 0.1f, -100.0f, 100.0f); // 本次聚光灯边缘光滑设置无效，camera的position就是光源
 
             // 镜面反射颜色
             ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
