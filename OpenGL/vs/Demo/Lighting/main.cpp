@@ -40,7 +40,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightDirection(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPosition(1.2f, 1.0f, 2.0f);
 
 // 材质参数变量
 glm::vec3 materialSpecular = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -239,7 +239,7 @@ int main()
         // be sure to activate shader when setting uniforms/drawing objects
 
         lightingShader.use();
-        lightingShader.setVec3("light.direction", lightDirection);
+        lightingShader.setVec3("light.position", lightPosition);
         lightingShader.setVec3("viewPos", camera.Position);
         
         lightingShader.setVec3("material.specular", materialSpecular);
@@ -250,6 +250,10 @@ int main()
         lightingShader.setVec3("light.specular", lightSpecular);
         lightingShader.setVec3("light.emission", lightEmission);
 
+        // 衰减系数
+        lightingShader.setFloat("light.constant", 1.0f);
+        lightingShader.setFloat("light.linear", 0.09f);
+        lightingShader.setFloat("light.quadratic", 0.032f);
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
@@ -308,7 +312,7 @@ int main()
             }
 
             // 修改光源位置
-            ImGui::DragFloat3("Light Direction", (float*)&lightDirection, 0.1f, -10.0f, 10.0f);
+            ImGui::DragFloat3("Light Direction", (float*)&lightPosition, 0.1f, -10.0f, 10.0f);
 
             // 镜面反射颜色
             ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
