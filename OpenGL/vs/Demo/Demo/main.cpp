@@ -10,6 +10,8 @@
 #include <learnopengl/model.h>
 
 #include <iostream>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -31,6 +33,10 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 // lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+float lightIntensity = 1.0f;
+float materialShininess = 32.0f;
+
 int main()
 {
     // glfw: initialize and configure
@@ -59,7 +65,7 @@ int main()
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -75,7 +81,8 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
-
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // build and compile shaders
     // -------------------------
     Shader ourShader("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/Demo/x64/Debug/1.model_loading.vs", "H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/Demo/x64/Debug/1.model_loading.fs");
@@ -83,6 +90,12 @@ int main()
     // load models
     // -----------
     Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/car/car.obj");
+
+    // Setup ImGui binding
+    ImGui::CreateContext();
+    ImGui_ImplGlfwGL3_Init(window, true);
+    // Setup style
+    ImGui::StyleColorsDark();
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -106,11 +119,30 @@ int main()
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        ImGui_ImplGlfwGL3_NewFrame();
+
+        {
+            ImGui::Begin("Light Controls");
+            ImGui::ColorEdit3("Light Color", (float*)&lightColor);
+            ImGui::SliderFloat3("Light Position", (float*)&lightPos, -10.0f, 10.0f);
+            ImGui::SliderFloat("Light Intensity", &lightIntensity, 0.0f, 10.0f);
+            ImGui::SliderFloat("Shininess", &materialShininess, 1.0f, 128.0f);
+            ImGui::End();
+            ImGui::Render();
+            ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+        }
+
         // don't forget to enable shader before setting uniforms
         ourShader.use();
-        ourShader.setVec3("lightColor", 2.0f, 2.0f, 2.0f);
-        ourShader.setVec3("lightPos", lightPos);
+        ourShader.setVec3("lightColor", lightColor);
+        ourShader.setFloat("lightIntensity", lightIntensity);
+        ourShader.setVec3("light.position", lightPos);
         ourShader.setVec3("viewPos", camera.Position);
+        ourShader.setFloat("light.shininess", materialShininess);
+
+        ourShader.setFloat("light.constant", 1.0f);
+        ourShader.setFloat("light.linear", 0.09f);
+        ourShader.setFloat("light.quadratic", 0.032f);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -184,12 +216,21 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        // 只有当 ImGui 不需要鼠标时，并且右键被按住时，才更新相机
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
+    else {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    }
 }

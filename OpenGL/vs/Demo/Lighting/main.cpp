@@ -316,7 +316,7 @@ int main()
             }
 
             // 修改光源位置
-            ImGui::DragFloat3("Light Position", (float*)&lightPosition, 0.1f, -100.0f, 100.0f); // 本次聚光灯边缘光滑设置无效，camera的position就是光源
+            ImGui::DragFloat3("Light Position", (float*)&lightPosition, 0.1f, -100.0f, 100.0f);
 
             // 镜面反射颜色
             ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
