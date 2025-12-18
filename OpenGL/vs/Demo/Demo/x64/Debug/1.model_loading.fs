@@ -3,6 +3,8 @@ out vec4 FragColor;
 
 in vec2 TexCoords;
 
+uniform bool isEnv;
+uniform sampler2D texture1;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 
@@ -26,6 +28,12 @@ struct Light {
 uniform Light light;
 void main()
 {    
+    if(isEnv) {
+        vec4 floorColor = texture(texture1, TexCoords);
+        FragColor = floorColor;
+		return;
+    }
+	
     vec4 texture = texture(texture_diffuse1, TexCoords);
     // ambient
     vec3 ambient = 0.1 * texture.rgb;
