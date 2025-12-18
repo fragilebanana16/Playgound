@@ -38,6 +38,7 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 float lightIntensity = 1.0f;
 float materialShininess = 32.0f;
+float modelHeight = 1.0f;
 
 int main()
 {
@@ -178,9 +179,9 @@ int main()
     // -------------------------
     Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
     Shader shaderSingleColor("2.stencil_testing.vs", "2.stencil_single_color.fs");
-    //// load models
-    //// -----------
-    //Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/car/car.obj");
+    // load models
+    // -----------
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/car/car.obj");
 
     // Setup ImGui binding
     ImGui::CreateContext();
@@ -218,6 +219,8 @@ int main()
             ImGui::SliderFloat3("Light Position", (float*)&lightPos, -10.0f, 10.0f);
             ImGui::SliderFloat("Light Intensity", &lightIntensity, 0.0f, 10.0f);
             ImGui::SliderFloat("Shininess", &materialShininess, 1.0f, 128.0f);
+            ImGui::SliderFloat("Model Height", (float*)&modelHeight, -10.0f, 10.0f);
+
             ImGui::End();
             ImGui::Render();
             ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
@@ -254,6 +257,7 @@ int main()
             glStencilMask(0x00);
             // floor
             ourShader.setBool("isEnv", true);
+            ourShader.setMat4("model", model);
             glBindVertexArray(planeVAO);
             glBindTexture(GL_TEXTURE_2D, floorTexture);
             glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -274,6 +278,13 @@ int main()
             ourShader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
             ourShader.setBool("isEnv", false);
+
+            // render the loaded model
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.0f, modelHeight, 0.0f)); // translate it down so it's at the center of the scene
+            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+            ourShader.setMat4("model", model);
+            ourModel.Draw(ourShader);
         }
         {
             // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
@@ -282,7 +293,7 @@ int main()
             glDisable(GL_DEPTH_TEST);
             shaderSingleColor.use();
             float scale = 1.02f;
-            // cubes
+            // cubes edge
             glBindVertexArray(cubeVAO);
             glBindTexture(GL_TEXTURE_2D, cubeTexture);
             model = glm::mat4(1.0f);
@@ -296,16 +307,19 @@ int main()
             shaderSingleColor.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
             glBindVertexArray(0);
+
+            // model edge
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.0f, modelHeight, 0.0f)); // translate it down so it's at the center of the scene
+            model = glm::scale(model, glm::vec3(scale, scale, scale));	// it's a bit too big for our scene, so scale it down
+            shaderSingleColor.setMat4("model", model);
+            ourModel.Draw(shaderSingleColor, true);
+
             glStencilMask(0xFF);
             glStencilFunc(GL_ALWAYS, 0, 0xFF);
             glEnable(GL_DEPTH_TEST);
         }
-        //// render the loaded model
-        //model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f)); // translate it down so it's at the center of the scene
-        //model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        //ourShader.setMat4("model", model);
-        //ourModel.Draw(ourShader);
+
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
