@@ -135,6 +135,21 @@ int main()
         -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
          5.0f, -0.5f, -5.0f,  2.0f, 2.0f
     };
+    //y = +0.5
+    //    ^
+    //    |
+    //    |   (0, 0.5, 0)-----------(1, 0.5, 0)
+    //    |    tex(0, 0)               tex(1, 0)
+    //    |
+    //    |       |        两个三角形：
+    //    |       |        T1: 左上 - 左下 - 右下
+    //    |       |        T2 : 左上 - 右下 - 右上
+    //    |
+    //    |   (0, -0.5, 0)----------(1, -0.5, 0)
+    //    |    tex(0, 1)             tex(1, 1)
+    //    |
+    //    +----------------------------->x = +1.0
+
     float transparentVertices[] = {
         // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
         0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
@@ -145,6 +160,38 @@ int main()
         1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
         1.0f,  0.5f,  0.0f,  1.0f,  0.0f
     };
+    // 顶点数据：位置 + 颜色
+    float axisVertices[] = {
+        // X轴 红色
+        0.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
+        4.0f, 0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
+
+        // Y轴 绿色
+        0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f,
+        0.0f, 4.0f, 0.0f,   0.0f, 1.0f, 0.0f,
+
+        // Z轴 蓝色
+        0.0f, 0.0f, 0.0f,   0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 4.0f,   0.0f, 0.0f, 1.0f
+    };
+    // axis
+    unsigned int axisVAO, axisVBO;
+    glGenVertexArrays(1, &axisVAO);
+    glGenBuffers(1, &axisVBO);
+
+    glBindVertexArray(axisVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, axisVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(axisVertices), axisVertices, GL_STATIC_DRAW);
+
+    // 位置属性
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // 颜色属性
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -193,8 +240,8 @@ int main()
     vector<glm::vec3> vegetation
     {
         glm::vec3(-1.5f, 0.0f, -0.48f),
-        glm::vec3(1.5f, 0.0f, 0.51f),
-        glm::vec3(0.0f, 0.0f, 0.7f),
+        glm::vec3(1.5f, 0.0f, 0.6f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(-0.3f, 0.0f, -2.3f),
         glm::vec3(0.5f, 0.0f, -0.6f)
     };
@@ -232,6 +279,13 @@ int main()
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
+        // axis
+        shader.setBool("useTexture", false);
+        glBindVertexArray(axisVAO);
+        glDrawArrays(GL_LINES, 0, 6); // 一共6个顶点，3条线
+        shader.setBool("useTexture", true);
+        glBindVertexArray(0);
+
         // floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
@@ -257,19 +311,8 @@ int main()
 
         for (unsigned int i = 0; i < vegetation.size(); i++)
         {
-            glm::vec3 dir = camera.Position - vegetation[i];
-            float angle = atan2(dir.x, dir.z); // 水平方向角度
-
-            glm::mat4 model = glm::mat4(1.0f);
-
-            // 1. 平移到草的位置
+            model = glm::mat4(1.0f);
             model = glm::translate(model, vegetation[i]);
-
-            // 2. 旋转朝向相机（绕Y轴）
-            model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-
-            // 3. 把草的原点移到底部中心
-            model = glm::translate(model, glm::vec3(0.0f, 1.0f * 0.5f, 0.0f));
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
