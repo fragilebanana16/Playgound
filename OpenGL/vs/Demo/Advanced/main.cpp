@@ -76,6 +76,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
 
     // build and compile shaders
     // -------------------------
@@ -155,12 +156,13 @@ int main()
     float transparentVertices[] = {
         // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
         0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
-        0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
         1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+        0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
 
         0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+        1.0f,  0.5f,  0.0f,  1.0f,  0.0f,
         1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
-        1.0f,  0.5f,  0.0f,  1.0f,  0.0f
+
     };
     // 顶点数据：位置 + 颜色
     float axisVertices[] = {
@@ -327,7 +329,7 @@ int main()
             model = glm::mat4(1.0f);
             model = glm::translate(model, it->second);
             shader.setMat4("model", model);
-            if (index % 2 == 0)
+            if (it->first > 3.0)
             {
                 glBindTexture(GL_TEXTURE_2D, transparentTextureG);
             }
