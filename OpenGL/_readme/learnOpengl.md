@@ -1,4 +1,21 @@
+
+
+### 混合涉及的两种颜色
+
+当你调用
+
+```
+glEnable(GL_BLEND);
+glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+```
+
+之后，混合方程会在 **片段着色器输出的颜色** 和 **当前帧缓冲中已有的颜色** 之间进行计算。
+
+- **片段颜色 (Source Color)**   👉 指的是==片段着色器==（Fragment Shader）输出的颜色值，也就是你刚刚要写入到颜色缓冲的那个颜色。 在混合函数里，它通常叫做 **Source**。
+- **缓冲颜色 (Destination Color)**   👉 指的是颜色缓冲区里==已经存在的颜色值，也就是之前绘制的结果==。 在混合函数里，它通常叫做 **Destination**。
+
 ### 点光源衰减公式
+
 $$
 F_{att} = \frac{1.0}{K_c + K_l \cdot d + K_q \cdot d^2}
 $$

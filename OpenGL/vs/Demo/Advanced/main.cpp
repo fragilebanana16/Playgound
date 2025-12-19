@@ -74,6 +74,8 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // build and compile shaders
     // -------------------------
@@ -233,16 +235,17 @@ int main()
     // -------------
     unsigned int cubeTexture = loadTexture(FileSystem::getPath("resources/textures/marble.jpg").c_str());
     unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/metal.png").c_str());
-    unsigned int transparentTexture = loadTexture(FileSystem::getPath("resources/textures/grass.png").c_str());
+    unsigned int transparentTexture = loadTexture(FileSystem::getPath("resources/textures/window.png").c_str());
+    unsigned int transparentTextureG = loadTexture(FileSystem::getPath("resources/textures/windowG.png").c_str());
 
     // transparent vegetation locations
     // --------------------------------
     vector<glm::vec3> vegetation
     {
-        glm::vec3(-1.5f, 0.0f, -0.48f),
-        glm::vec3(1.5f, 0.0f, 0.6f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(-0.3f, 0.0f, -2.3f),
+        glm::vec3(-1.5f, 0.3f, -0.48f),
+        glm::vec3(1.5f, 0.5f, 0.6f),
+        glm::vec3(0.0f, 0.8f, 0.0f),
+        glm::vec3(-0.3f, 0.1f, -2.3f),
         glm::vec3(0.5f, 0.0f, -0.6f)
     };
 
@@ -282,6 +285,8 @@ int main()
         // axis
         shader.setBool("useTexture", false);
         glBindVertexArray(axisVAO);
+        // 设置线宽
+        glLineWidth(8.0f);
         glDrawArrays(GL_LINES, 0, 6); // 一共6个顶点，3条线
         shader.setBool("useTexture", true);
         glBindVertexArray(0);
@@ -307,13 +312,19 @@ int main()
 
         // vegetation
         glBindVertexArray(transparentVAO);
-        glBindTexture(GL_TEXTURE_2D, transparentTexture);
-
         for (unsigned int i = 0; i < vegetation.size(); i++)
         {
             model = glm::mat4(1.0f);
             model = glm::translate(model, vegetation[i]);
             shader.setMat4("model", model);
+            if (i % 2 == 0)
+            {
+                glBindTexture(GL_TEXTURE_2D, transparentTextureG);
+            }
+            else {
+                glBindTexture(GL_TEXTURE_2D, transparentTexture);
+            }
+
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
 
