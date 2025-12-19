@@ -268,6 +268,15 @@ int main()
         // -----
         processInput(window);
 
+        // sort the transparent windows before rendering
+        // ---------------------------------------------
+        std::map<float, glm::vec3> sorted;
+        for (unsigned int i = 0; i < vegetation.size(); i++)
+        {
+            float distance = glm::length(camera.Position - vegetation[i]);
+            sorted[distance] = vegetation[i];
+        }
+
         // render
         // ------
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -312,12 +321,13 @@ int main()
 
         // vegetation
         glBindVertexArray(transparentVAO);
-        for (unsigned int i = 0; i < vegetation.size(); i++)
+        int index = 0;
+        for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it, ++index)
         {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, vegetation[i]);
+            model = glm::translate(model, it->second);
             shader.setMat4("model", model);
-            if (i % 2 == 0)
+            if (index % 2 == 0)
             {
                 glBindTexture(GL_TEXTURE_2D, transparentTextureG);
             }
