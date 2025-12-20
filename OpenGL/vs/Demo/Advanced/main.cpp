@@ -246,11 +246,11 @@ int main()
 
         shader.use();
         glm::mat4 model = glm::mat4(1.0f);
-        camera.Yaw   += 180.0f; // rotate the camera's yaw 180 degrees around
-        camera.ProcessMouseMovement(0, 0, false); // call this to make sure it updates its camera vectors, note that we disable pitch constrains for this specific case (otherwise we can't reverse camera's pitch values)
+        //camera.Yaw   += 180.0f; // rotate the camera's yaw 180 degrees around
+        //camera.ProcessMouseMovement(0, 0, false); // call this to make sure it updates its camera vectors, note that we disable pitch constrains for this specific case (otherwise we can't reverse camera's pitch values)
         glm::mat4 view = camera.GetViewMatrix();
-        camera.Yaw   -= 180.0f; // reset it back to its original orientation
-        camera.ProcessMouseMovement(0, 0, true); 
+        //camera.Yaw   -= 180.0f; // reset it back to its original orientation
+        //camera.ProcessMouseMovement(0, 0, true); 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
@@ -274,15 +274,32 @@ int main()
 
         // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
         // clear all relevant buffers
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
         glClear(GL_COLOR_BUFFER_BIT);
 
         screenShader.use();
-        glBindVertexArray(quadVAO);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // cubes
+        glBindVertexArray(cubeVAO);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
+        model = glm::mat4(1.0f);
+        screenShader.setMat4("model", model);
+        screenShader.setMat4("view", camera.GetViewMatrix());
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        glBindTexture(GL_TEXTURE_2D, cubeTexture);
+        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // floor
+        glBindVertexArray(planeVAO);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
+        shader.setMat4("model", glm::mat4(1.0f));
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
