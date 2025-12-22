@@ -55,5 +55,5 @@ void main()
 					light.quadratic * (distance * distance));
 					
 	vec3 result = (ambient + diffuse + specular) * attenuation;
-    FragColor = vec4(result, texture.a);
+    FragColor = vec4(result, 1.0);
 }

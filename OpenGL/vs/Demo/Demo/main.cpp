@@ -38,7 +38,7 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 float lightIntensity = 1.0f;
 float materialShininess = 32.0f;
-float modelHeight = 1.0f;
+float modelHeight = -0.48f;
 
 int main()
 {
@@ -86,10 +86,10 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthFunc(GL_LESS);
+    /*glDepthFunc(GL_LESS);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);*/
 
     float cubeVertices[] = {
         // positions          // texture Coords
@@ -178,10 +178,10 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
-    Shader shaderSingleColor("2.stencil_testing.vs", "2.stencil_single_color.fs");
+    //Shader shaderSingleColor("2.stencil_testing.vs", "2.stencil_single_color.fs");
     // load models
     // -----------
-    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/car/car.obj");
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/nanosuit/nanosuit.obj");
 
     // Setup ImGui binding
     ImGui::CreateContext();
@@ -227,13 +227,13 @@ int main()
         }
 
         // set uniforms
-        shaderSingleColor.use();
+        //shaderSingleColor.use();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        shaderSingleColor.setMat4("view", view);
+        //shaderSingleColor.setMat4("view", view);
 
-        shaderSingleColor.setMat4("projection", projection);
+        //shaderSingleColor.setMat4("projection", projection);
         // don't forget to enable shader before setting uniforms
         ourShader.use();
         ourShader.setInt("texture1", 0);
@@ -254,7 +254,7 @@ int main()
         ourShader.setMat4("view", view);
         {
             // draw floor as normal, but don't write the floor to the stencil buffer, we only care about the containers. We set its mask to 0x00 to not write to the stencil buffer.
-            glStencilMask(0x00);
+            //glStencilMask(0x00);
             // floor
             ourShader.setBool("isEnv", true);
             ourShader.setMat4("model", model);
@@ -264,8 +264,8 @@ int main()
             glBindVertexArray(0);
 
             // 1st. render pass, draw objects as normal, writing to the stencil buffer
-            glStencilFunc(GL_ALWAYS, 1, 0xFF);
-            glStencilMask(0xFF);
+    /*        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+            glStencilMask(0xFF);*/
             // cubes
             glBindVertexArray(cubeVAO);
             glActiveTexture(GL_TEXTURE0);
@@ -282,42 +282,42 @@ int main()
             // render the loaded model
             model = glm::mat4(1.0f);
             model = glm::translate(model, glm::vec3(0.0f, modelHeight, 0.0f)); // translate it down so it's at the center of the scene
-            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+            model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
             ourShader.setMat4("model", model);
             ourModel.Draw(ourShader);
         }
         {
             // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
-            glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-            glStencilMask(0x00);
-            glDisable(GL_DEPTH_TEST);
-            shaderSingleColor.use();
-            float scale = 1.02f;
-            // cubes edge
-            glBindVertexArray(cubeVAO);
-            glBindTexture(GL_TEXTURE_2D, cubeTexture);
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -1.0f));
-            model = glm::scale(model, glm::vec3(scale, scale, scale));
-            shaderSingleColor.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-            model = glm::scale(model, glm::vec3(scale, scale, scale));
-            shaderSingleColor.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            glBindVertexArray(0);
+            //glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+            //glStencilMask(0x00);
+            //glDisable(GL_DEPTH_TEST);
+            //shaderSingleColor.use();
+            //float scale = 1.02f;
+            //// cubes edge
+            //glBindVertexArray(cubeVAO);
+            //glBindTexture(GL_TEXTURE_2D, cubeTexture);
+            //model = glm::mat4(1.0f);
+            //model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -1.0f));
+            //model = glm::scale(model, glm::vec3(scale, scale, scale));
+            //shaderSingleColor.setMat4("model", model);
+            //glDrawArrays(GL_TRIANGLES, 0, 36);
+            //model = glm::mat4(1.0f);
+            //model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+            //model = glm::scale(model, glm::vec3(scale, scale, scale));
+            //shaderSingleColor.setMat4("model", model);
+            //glDrawArrays(GL_TRIANGLES, 0, 36);
+            //glBindVertexArray(0);
 
-            // model edge
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0.0f, modelHeight, 0.0f)); // translate it down so it's at the center of the scene
-            model = glm::scale(model, glm::vec3(scale, scale, scale));	// it's a bit too big for our scene, so scale it down
-            shaderSingleColor.setMat4("model", model);
-            ourModel.Draw(shaderSingleColor, true);
+            //// model edge
+            //model = glm::mat4(1.0f);
+            //model = glm::translate(model, glm::vec3(0.0f, modelHeight, 0.0f)); // translate it down so it's at the center of the scene
+            //model = glm::scale(model, glm::vec3(scale, scale, scale));	// it's a bit too big for our scene, so scale it down
+            //shaderSingleColor.setMat4("model", model);
+            //ourModel.Draw(shaderSingleColor, true);
 
-            glStencilMask(0xFF);
-            glStencilFunc(GL_ALWAYS, 0, 0xFF);
-            glEnable(GL_DEPTH_TEST);
+            //glStencilMask(0xFF);
+            //glStencilFunc(GL_ALWAYS, 0, 0xFF);
+            //glEnable(GL_DEPTH_TEST);
         }
 
 
