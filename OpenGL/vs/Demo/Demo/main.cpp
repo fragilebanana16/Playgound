@@ -41,7 +41,8 @@ float lightIntensity = 1.0f;
 float materialShininess = 32.0f;
 float modelHeight = -0.48f;
 float reflectStrength = 0.2f;
-float refractStrength = 0.2f;
+float refractStrength = 0.2f; 
+float ptSize = 0.1f;
 int main()
 {
     // glfw: initialize and configure
@@ -88,6 +89,7 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_PROGRAM_POINT_SIZE); // drawarray point needed
 
     float cubeVertices[] = {
         // positions          // normals           // texture Coords
@@ -301,6 +303,7 @@ int main()
 
         ourShader.setFloat("reflectStrength", reflectStrength);
         ourShader.setFloat("refractStrength", refractStrength);
+        ourShader.setFloat("ptSize", ptSize);
 
         model = glm::mat4(1.0f);
         // view/projection transformations
@@ -363,7 +366,8 @@ int main()
                 ImGui::SliderFloat("Model Height", (float*)&modelHeight, -10.0f, 10.0f);
 
                 ImGui::SliderFloat("Reflect Strength", &reflectStrength, 0.0f, 1.0f);
-                ImGui::SliderFloat("Refract Strength", &refractStrength, 0.0f, 5.0f);
+                ImGui::SliderFloat("Refract Strength", &refractStrength, 0.0f, 5.0f); 
+                ImGui::SliderFloat("ptSize", &ptSize, 0.0f, 20.0f);
                 ImGui::End();
                 ImGui::Render();
                 ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
