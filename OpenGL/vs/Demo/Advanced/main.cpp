@@ -239,7 +239,8 @@ int main()
     // Setup style
     ImGui::StyleColorsDark();
     bool useAnotherSkybox = false;
-    float reflectStrength = 0.2f;   // ≥ı º÷µ
+    float reflectStrength = 0.2f;
+    float refractStrength = 0.2f;
 
     // render loop
     // -----------
@@ -271,7 +272,8 @@ int main()
         shader.setMat4("projection", projection);
         shader.setVec3("cameraPos", camera.Position);
         shader.setFloat("reflectStrength", reflectStrength);
-
+        shader.setFloat("refractStrength", refractStrength);
+        
         // cubes
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
@@ -304,7 +306,8 @@ int main()
         {
             ImGui::Begin("Skybox Settings");
             ImGui::Checkbox("Use Another Skybox", &useAnotherSkybox);
-            ImGui::SliderFloat("Reflect Strength", &reflectStrength, 0.0f, 1.0f);
+            ImGui::SliderFloat("Reflect Strength", &reflectStrength, 0.0f, 1.0f); 
+            ImGui::SliderFloat("Refract Strength", &refractStrength, 0.0f, 5.0f);
             ImGui::End();
             ImGui::Render();
             ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
