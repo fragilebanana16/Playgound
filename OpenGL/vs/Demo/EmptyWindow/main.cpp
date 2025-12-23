@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <learnopengl/shader_m.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -43,6 +44,16 @@ int main()
         return -1;
     }
 
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
+    Shader shader("basic.vs", "basic.fs");
+    shader.use();
+
+    // 在 Core Profile 下：必须绑定 VAO否则 glDrawArrays 会直接 crash 或者不画东西
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -50,6 +61,15 @@ int main()
         // input
         // -----
         processInput(window);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        float t = glfwGetTime(); 
+        // 让 gridSize 在 5~50 之间来回变化 
+        int grid = 20;
+        shader.setInt("gridSize", grid);
+        shader.setFloat("time", t);
+        glDrawArrays(GL_POINTS, 0, grid * grid);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
