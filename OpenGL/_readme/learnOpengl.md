@@ -5,6 +5,7 @@
 | gl_VertexID  | “这是第几个点”，用来生成位置 |
 | gl_PointSize | 控制“这个点有多大”                 |
 | gl_FragCoord.xy | 单位像素，当前片元在屏幕上的像素位置          |
+| gl_FrontFacing | 当前片段是属于正向面的一部分还是背向面的一部分          |
 
 #### Cube示意图
 
