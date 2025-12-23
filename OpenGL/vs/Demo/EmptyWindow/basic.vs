@@ -16,7 +16,7 @@ void main() {
     vPos = vec2(fx, fy);
 	
 	float wave = sin(fx * 10.0 + time * 3.0) * 0.1;
-    gl_Position = vec4(fx, fy + wave, 0.0, 1.0);
+    gl_Position = vec4(fx, fy + wave * 0.4, 0.0, 1.0);
 
     gl_PointSize = 10.0;
 }

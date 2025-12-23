@@ -1,11 +1,22 @@
 #version 330 core
 out vec4 FragColor;
 uniform float time;
+uniform vec2 iResolution;
 
 in vec2 vPos;
 void main() {
-	float r = sin(time + vPos.x * 5.0) * 0.5 + 0.5; 
-	float g = sin(time + vPos.y * 5.0) * 0.5 + 0.5; 
-	float b = sin(time * 0.5) * 0.5 + 0.5; 
-	FragColor = vec4(r, g, b, 1.0);
+	vec2 uv = gl_FragCoord.xy;
+	if (uv.x < iResolution.x * 0.5) {
+		// 左半屏
+		if (uv.y < iResolution.y * 0.5)
+			FragColor = vec4(1, 0, 0, 1);   // 左下：红
+		else
+			FragColor = vec4(0, 1, 0, 1);   // 左上：绿
+	} else {
+		// 右半屏
+		if (uv.y < iResolution.y * 0.5)
+			FragColor = vec4(0, 0, 1, 1);   // 右下：蓝
+		else
+			FragColor = vec4(1, 1, 0, 1);   // 右上：黄
+	}
 }

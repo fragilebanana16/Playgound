@@ -69,6 +69,8 @@ int main()
         int grid = 20;
         shader.setInt("gridSize", grid);
         shader.setFloat("time", t);
+        shader.setVec2("iResolution", glm::vec2(SCR_WIDTH, SCR_HEIGHT));
+
         glDrawArrays(GL_POINTS, 0, grid * grid);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
