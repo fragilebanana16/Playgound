@@ -58,6 +58,7 @@ int main()
     }
 
     glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
     //       2________3
     //       /|      /|
     //    6 /_|____7/ |

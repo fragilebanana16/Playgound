@@ -10,6 +10,8 @@ out vec2 TexCoords;
 
 out VS_OUT {
     vec3 color;
+    vec3 normal;
+    vec3 posView;
 } vs_out;
 
 uniform mat4 model;
@@ -22,5 +24,13 @@ void main()
     Normal = mat3(transpose(inverse(model))) * aNormal;
     TexCoords = aTexCoords;    
 	vs_out.color = aColors;
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+	
+	// 法线转到观察空间
+	mat3 normalMatrix = transpose(inverse(mat3(view * model)));
+    vec3 normalVS = normalize(normalMatrix * aNormal);
+	vs_out.normal = normalVS;
+
+	vec4 posView = view * model * vec4(aPos, 1.0);
+	gl_Position = projection * posView; // 给管线用
+	vs_out.posView = posView.xyz;       // 给 GS/FS 用
 }
