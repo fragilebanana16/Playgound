@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <learnopengl/shader_m.h>
+#include <learnopengl/shader.h>
 #include <learnopengl/camera.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -131,7 +131,7 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glBindVertexArray(0);
 
-    Shader shader("basic.vs", "basic.fs");
+    Shader shader("basic.vs", "basic.fs", "basic.gs");
     shader.use();
 
     // render loop
@@ -162,7 +162,7 @@ int main()
         shader.setMat4("view", view);
 
         glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_LINES, 0, 36);
+        glDrawArrays(GL_POINTS, 0, 36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

@@ -8,8 +8,5 @@ in vec3 FragPos;
 
 void main() {
 	vec2 uv = gl_FragCoord.xy;
-	if(gl_FrontFacing)
-        FragColor = vec4(0.70, 0.90, 0.85, 1);  // 浅青绿
-    else
-        FragColor = vec4(0.95, 0.90, 0.75, 1);  // 米黄
+    FragColor = vec4(0.95, 0.90, 0.0, 1);
 }
