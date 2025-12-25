@@ -39,7 +39,9 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 float lightIntensity = 1.0f;
 float materialShininess = 32.0f;
-float modelHeight = -0.48f;
+float modelX = 0.0f;
+float modelY = -0.48f;
+float modelZ = 0.0f;
 float reflectStrength = 0.2f;
 float refractStrength = 0.2f;
 int main()
@@ -134,15 +136,16 @@ int main()
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
     float planeVertices[] = {
-        // positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+        // positions             // texture Coords
+         5.0f, -0.5f,  10.0f,    1.0f, 0.0f,   // z 改成 10
+        -5.0f, -0.5f,  10.0f,    0.0f, 0.0f,
+        -5.0f, -0.5f, -10.0f,    0.0f, 1.0f,   // z 改成 -10
 
-         5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-        -5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-         5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+         5.0f, -0.5f,  10.0f,    1.0f, 0.0f,
+        -5.0f, -0.5f, -10.0f,    0.0f, 1.0f,
+         5.0f, -0.5f, -10.0f,    1.0f, 1.0f
     };
+
     float skyboxVertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
@@ -232,11 +235,12 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader ourShader("1.model_loading.vs", "1.model_loading.fs");
+    Shader roadShader("road.vs", "road.fs");
     Shader skyboxShader("6.1.skybox.vs", "6.1.skybox.fs");
 
     // load models
     // -----------
-    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/nanosuit/nanosuit.obj");
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/car/car.obj");
 
     // Setup ImGui binding
     ImGui::CreateContext();
@@ -285,6 +289,19 @@ int main()
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        // our road
+        roadShader.use();
+        float t = glfwGetTime();
+        roadShader.setFloat("iTime", t);
+        roadShader.setVec2("iResolution", glm::vec2(SCR_WIDTH, SCR_HEIGHT));
+        // floor
+        roadShader.setMat4("model", model);
+        roadShader.setMat4("projection", projection);
+        roadShader.setMat4("view", view);
+        glBindVertexArray(planeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+
         // don't forget to enable shader before setting uniforms
         ourShader.use();
         ourShader.setInt("texture1", 0);
@@ -302,57 +319,47 @@ int main()
         ourShader.setFloat("reflectStrength", reflectStrength);
         ourShader.setFloat("refractStrength", refractStrength);
 
-        model = glm::mat4(1.0f);
+        //model = glm::mat4(1.0f);
         // view/projection transformations
         projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         view = camera.GetViewMatrix();
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
         {
-            // floor
-            ourShader.setBool("isFloor", true);
-            ourShader.setMat4("model", model);
-            glBindVertexArray(planeVAO);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, floorTexture);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            glBindVertexArray(0);
-            ourShader.setBool("isFloor", false);
-
             // cubes
-            ourShader.setBool("isCube", true);
-            glBindVertexArray(cubeVAO);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, cubeTexture);
-            model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -1.0f));
-            ourShader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-            ourShader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            ourShader.setBool("isCube", false);
+            //ourShader.setBool("isCube", true);
+            //glBindVertexArray(cubeVAO);
+            //glActiveTexture(GL_TEXTURE0);
+            //glBindTexture(GL_TEXTURE_2D, cubeTexture);
+            //model = glm::translate(model, glm::vec3(-2.0f, 0.0f, -1.0f));
+            //ourShader.setMat4("model", model);
+            //glDrawArrays(GL_TRIANGLES, 0, 36);
+            //model = glm::mat4(1.0f);
+            //model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+            //ourShader.setMat4("model", model);
+            //glDrawArrays(GL_TRIANGLES, 0, 36);
+            //ourShader.setBool("isCube", false);
 
             // render the loaded model
             model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0.0f, modelHeight, 0.0f)); // translate it down so it's at the center of the scene
-            model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+            model = glm::translate(model, glm::vec3(modelX, modelY, modelZ)); // translate it down so it's at the center of the scene
+            model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
             ourShader.setMat4("model", model);
             ourModel.Draw(ourShader);
 
-            // draw skybox as last
-            glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-            skyboxShader.use();
-            view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-            skyboxShader.setMat4("view", view);
-            skyboxShader.setMat4("projection", projection);
-            // skybox cube
-            glBindVertexArray(skyboxVAO);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            glBindVertexArray(0);
-            glDepthFunc(GL_LESS); // set depth function back to default
+            //// draw skybox as last
+            //glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+            //skyboxShader.use();
+            //view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+            //skyboxShader.setMat4("view", view);
+            //skyboxShader.setMat4("projection", projection);
+            //// skybox cube
+            //glBindVertexArray(skyboxVAO);
+            //glActiveTexture(GL_TEXTURE1);
+            //glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+            //glDrawArrays(GL_TRIANGLES, 0, 36);
+            //glBindVertexArray(0);
+            //glDepthFunc(GL_LESS); // set depth function back to default
 
             {
                 ImGui::Begin("Light Controls");
@@ -360,7 +367,9 @@ int main()
                 ImGui::SliderFloat3("Light Position", (float*)&lightPos, -10.0f, 10.0f);
                 ImGui::SliderFloat("Light Intensity", &lightIntensity, 0.0f, 10.0f);
                 ImGui::SliderFloat("Shininess", &materialShininess, 1.0f, 128.0f);
-                ImGui::SliderFloat("Model Height", (float*)&modelHeight, -10.0f, 10.0f);
+                ImGui::SliderFloat("Model X", (float*)&modelX, -10.0f, 10.0f);
+                ImGui::SliderFloat("Model Y", (float*)&modelY, -10.0f, 10.0f);
+                ImGui::SliderFloat("Model Z", (float*)&modelZ, -10.0f, 10.0f);
 
                 ImGui::SliderFloat("Reflect Strength", &reflectStrength, 0.0f, 1.0f);
                 ImGui::SliderFloat("Refract Strength", &refractStrength, 0.0f, 5.0f);

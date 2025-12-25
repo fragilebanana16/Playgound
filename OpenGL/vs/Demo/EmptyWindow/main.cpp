@@ -123,7 +123,7 @@ int main()
          -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,     0.0f, 0.0f, 0.0f,
     };
 
-    const int instanceNumber = 1000;
+    const int instanceNumber = 216;
     glm::vec3 translations[instanceNumber];
     
     int index = 0;
