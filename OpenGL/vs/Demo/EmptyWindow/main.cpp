@@ -123,19 +123,22 @@ int main()
          -0.5f,  0.5f,  0.5f,   0.0f,  1.0f,  0.0f,   0.0f, 0.0f,     0.0f, 0.0f, 0.0f,
     };
 
-    glm::vec3 translations[125];
+    const int instanceNumber = 1000;
+    glm::vec3 translations[instanceNumber];
+    
     int index = 0;
     float offset = 0.1f;
-    for (int x = -10; x < 10; x += 4)
+    int sqrtRes = std::cbrt(instanceNumber) / 2;
+    for (int x = -sqrtRes; x < sqrtRes; x += 1)
     {
         glm::vec3 translation;
-        translation.x = (float)x + offset;
-        for (int y = -10; y < 10; y += 4)
+        translation.x = (float)x * 4 + offset;
+        for (int y = -sqrtRes; y < sqrtRes; y += 1)
         {
-            translation.y = (float)y + offset;
-            for (int z = -10; z < 10; z += 4)
+            translation.y = (float)y * 4 + offset;
+            for (int z = -sqrtRes; z < sqrtRes; z += 1)
             {
-                translation.z = (float)z + offset;
+                translation.z = (float)z * 4 + offset;
                 translations[index++] = translation;
             }
         }
@@ -156,6 +159,20 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+
+    // instance
+    unsigned int instanceVBO;
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * instanceNumber, &translations[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glEnableVertexAttribArray(4);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(4, 1);
+
     glBindVertexArray(0);
 
     Shader shader("basic.vs", "basic.fs", "basic.gs");
@@ -188,13 +205,13 @@ int main()
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
 
-        for (unsigned int i = 0; i < 125; i++)
+        for (unsigned int i = 0; i < instanceNumber; i++)
         {
             shader.setVec3(("offsets[" + std::to_string(i) + "]"), translations[i]);
         }
 
         glBindVertexArray(cubeVAO);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 125);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, instanceNumber);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
