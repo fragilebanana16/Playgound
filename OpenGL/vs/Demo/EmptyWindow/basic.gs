@@ -14,8 +14,8 @@ out vec3 fColor;
 
 vec4 explode(vec3 position, vec3 normal)
 {
-    float magnitude = 1.0;
-    vec3 direction = normal * ((sin(time) + 1.0) / 2.0) * magnitude; 
+    float magnitude = 2.0;
+    vec3 direction = normal * ((sin(time / 2.0) + 1.0) / 4.0) * magnitude; 
     return projection * (vec4(position, 1.0) + vec4(direction, 0.0));
 }
 

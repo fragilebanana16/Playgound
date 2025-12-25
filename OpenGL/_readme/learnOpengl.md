@@ -1,4 +1,9 @@
+OpenGL 的规范规定：单个顶点属性比如Mat4最多只能有 4 个分量（vec4）
+
+顶点属性总数有限制（OpenGL Core 至少支持 16 个）
+
 #### 显卡对 `uniform` 数量有限制，数据太多会超出上限
+
 使用 **实例化数组**：用 glVertexAttribDivisor 设置为逐实例更新
 glVertexAttribDivisor(2, 1);将属性除数设置为1，是在告诉OpenGL，处于位置值2的顶点属性是一个实例化数组
 
