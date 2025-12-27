@@ -33,6 +33,8 @@ struct Light {
     float quadratic;
 	
 	bool enableAttenuation;
+	bool useTextureS;
+	bool blinn;
 };
 
 uniform Material material;
@@ -54,10 +56,25 @@ void main()
     vec3 diffuse = light.diffuse * diff * colorD;
 	
     // specular
-    vec3 viewDir = normalize(viewPos - fs_in.FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.specular * spec * colorS;
+	vec3 specular;
+	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
+	vec3 reflectDir = reflect(-lightDir, norm);  
+	if(light.useTextureS){
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+		specular = light.specular * spec * colorS;
+	} else {
+		if(light.blinn)
+		{
+			vec3 halfwayDir = normalize(lightDir + viewDir);  
+			specular = vec3(0.3) * pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
+		}
+		else
+		{
+			vec3 reflectDir = reflect(-lightDir, norm);
+			specular = vec3(0.3) * pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+		}
+
+	}
 	
 	// emission
 	float border = 0.08;

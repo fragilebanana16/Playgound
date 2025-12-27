@@ -53,6 +53,11 @@ glm::vec3 lightEmission = glm::vec3(1.0f, 1.0f, 1.0f);
 
 // 启用衰减
 bool enableAttenuation = true;
+// 启用镜面高光纹理
+bool useTextureS = true;
+// 布林-冯氏模型
+bool blinn = false;
+
 int main()
 {
     // glfw: initialize and configure
@@ -165,14 +170,23 @@ int main()
         glm::vec3(1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
-    // first, configure the cube's VAO (and VBO)
+    float planeVertices[] = {
+        // positions            // normals         // texcoords
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+        -10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+
+         10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
+        -10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,   0.0f, 10.0f,
+         10.0f, -0.5f, -10.0f,  0.0f, 1.0f, 0.0f,  10.0f, 10.0f
+    };
+    
+    // 1.cubeVAO
     unsigned int VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
-
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
     glBindVertexArray(cubeVAO);
 
     // position attribute
@@ -186,22 +200,36 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    // second, configure the light's VAO (VBO stays the same; the vertices are the same for the light object which is also a 3D cube)
+    // 2.lightCubeVAO
     unsigned int lightCubeVAO;
     glGenVertexArrays(1, &lightCubeVAO);
     glBindVertexArray(lightCubeVAO);
 
     // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // 3.plane VAO
+    unsigned int planeVAO, planeVBO;
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glBindVertexArray(0);
+
     // load textures (we now use a utility function to keep the code more organized)
-// -----------------------------------------------------------------------------
     unsigned int diffuseMap = loadTexture(FileSystem::getPath("resources/textures/container2.png").c_str());
     unsigned int specularMap = loadTexture(FileSystem::getPath("resources/textures/container2_specular.png").c_str());
     unsigned int emissionMap = loadTexture(FileSystem::getPath("resources/textures/matrix.jpg").c_str());
+    unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/wood.png").c_str());
 
     // shader configuration
     // --------------------
@@ -241,15 +269,17 @@ int main()
         // be sure to activate shader when setting uniforms/drawing objects
 
         lightingShader.use();
-        lightingShader.setBool("light.enableAttenuation", enableAttenuation);
+        lightingShader.setBool("light.enableAttenuation", enableAttenuation); 
+        lightingShader.setBool("light.useTextureS", useTextureS);
+        lightingShader.setBool("light.blinn", blinn);
         lightingShader.setVec3("light.position", lightPosition);
         lightingShader.setVec3("viewPos", camera.Position);
         
         lightingShader.setVec3("material.specular", materialSpecular);
         lightingShader.setFloat("material.shininess", materialShininess);
 
-        lightingShader.setVec3("light.position", camera.Position);
-        lightingShader.setVec3("light.direction", camera.Front);
+  /*      lightingShader.setVec3("light.position", camera.Position);
+        lightingShader.setVec3("light.direction", camera.Front);*/
         lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
         lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(25.0f)));
         lightingShader.setVec3("light.ambient", lightAmbient);
@@ -264,11 +294,25 @@ int main()
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 model(1.0f);
 
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", view);
+        lightingShader.setMat4("model", model);
         lightingShader.setFloat("time", glfwGetTime());
 
+        // 1.floor
+        glBindVertexArray(planeVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, floorTexture);
+        // 地板只有漫发射
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0); 
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // 2.cubes
         // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -283,7 +327,7 @@ int main()
         glBindVertexArray(cubeVAO);
         for (unsigned int i = 0; i < 10; i++)
         {
-            glm::mat4 model(1.0f);
+            model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
@@ -291,17 +335,16 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        //// also draw the lamp object
-        //lightCubeShader.use();
-        //lightCubeShader.setMat4("projection", projection);
-        //lightCubeShader.setMat4("view", view);
-        //model = glm::mat4(1.0f);
-        //model = glm::translate(model, lightPos);
-        //model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        //lightCubeShader.setMat4("model", model);
-
-        //glBindVertexArray(lightCubeVAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        // also draw the lamp object
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPosition);
+        model = glm::scale(model, glm::vec3(0.04f)); // a smaller cube
+        lightCubeShader.setMat4("model", model);
+        glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // 1. Show a simple window.
         // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
@@ -319,7 +362,7 @@ int main()
             }
 
             // 修改光源位置
-            ImGui::DragFloat3("Light Position", (float*)&lightPosition, 0.1f, -100.0f, 100.0f);
+            ImGui::DragFloat3("Light Position", (float*)&lightPosition, 0.01f, -100.0f, 100.0f);
 
             // 镜面反射颜色
             ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
@@ -330,7 +373,9 @@ int main()
             ImGui::ColorEdit3("L_Specular", (float*)&lightSpecular);
             ImGui::ColorEdit3("L_Emission", (float*)&lightEmission);
 
-            ImGui::Checkbox("Attenuation", &enableAttenuation);
+            ImGui::Checkbox("Attenuation", &enableAttenuation); 
+            ImGui::Checkbox("UseTextureS", &useTextureS); 
+            ImGui::Checkbox("Blinn-Phon", &blinn);
 
             //ImGui::SameLine();
             //ImGui::Text("counter = %d", counter);
