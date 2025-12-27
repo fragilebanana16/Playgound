@@ -4,12 +4,37 @@
 
 glfwWindowHint(GLFW_SAMPLES, 4);设置后并未出现抗锯齿，是因为此前在【Nvidia控制面板】中3D设置选择了【性能】
 
+##### 多重采样抗锯齿(Multisample Anti-aliasing, MSAA)
+传统渲染中，一个像素只有 一个采样点，通常在像素中心，一个像素内部放多个采样点，用这些点的覆盖情况来决定像素最终颜色，从而让边缘更平滑：4x覆盖率更高，所以更容易“认定”像素被图元覆盖，更还原。
+```
+[单采样]        +-------+       [MSAA 4x]      +-------+
+               |       |                      | • / • |
+               |   •   |                      |  /    |
+               |       |                      | •    •|
+               +-------+                      +-------+
+```
+MSAA 只对每个像素运行一次片段着色器，而不是对每个子采样点运行一次，子采样点数量（4x、8x）不会增加片段着色器运行次数
 
-###### OpenGL 的规范规定：单个顶点属性比如Mat4最多只能有 4 个分量（vec4）
+- 片段着色器运行一次 → 得到一个颜色值
+- 这个颜色值被写入所有“被覆盖”的子采样点
+- 最后根据==覆盖率==进行混合
 
-###### 顶点属性总数有限制（OpenGL Core 至少支持 16 个）
+MSAA 的取舍
+- 不增加片段着色器次数
+- 只对子采样点计算：覆盖率 + 深度，用覆盖率来混合颜色 → 得到平滑边缘
 
-###### 显卡对 `uniform` 数量有限制，数据太多会超出上限
+------
+
+
+>  OpenGL 的规范规定：单个顶点属性比如Mat4最多只能有 4 个分量（vec4）
+
+------
+
+>  顶点属性总数有限制（OpenGL Core 至少支持 16 个）
+
+------
+
+#### 显卡对 `uniform` 数量有限制，数据太多会超出上限
 
 使用 **实例化数组**：用 glVertexAttribDivisor 设置为逐实例更新
 glVertexAttribDivisor(2, 1);将属性除数设置为1，是在告诉OpenGL，处于位置值2的顶点属性是一个实例化数组
@@ -194,6 +219,84 @@ $$
 
 环境(Ambient)、漫反射(Diffuse)和镜面(Specular)光照
 
+##### 核心公式
+
+总光照：
+$$
+I=Ia+Id+Is
+$$
+
+- **环境光** Ia**：**
+$$
+Ia=ka⋅La
+$$
+
+- **漫反射** Id**：**
+$$
+Id=kd⋅Ld⋅max⁡(dot(N,L),0)
+$$
+
+- **镜面高光** Is**：**
+$$
+Is=ks⋅Ls⋅[max⁡(dot(R,V),0)]n
+$$
+
+其中
+
+- N：法线方向（单位向量）
+- L：从片元指向光源的方向（单位向量）
+- V：从片元指向相机的方向（单位向量）
+- R：光线相对法线的反射方向（`reflect` 计算）
+- ka,kd,ks：材质环境/漫反射/镜面系数
+- La,Ld,Ls：光源环境/漫反射/镜面颜色
+- n：高光指数（shininess）
+##### 典型计算shader
+```c
+#version 330 core
+
+in vec3 FragPos;
+in vec3 Normal;
+
+out vec4 FragColor;
+
+// 光源
+uniform vec3 lightPos;
+uniform vec3 lightAmbient;
+uniform vec3 lightDiffuse;
+uniform vec3 lightSpecular;
+
+// 视点
+uniform vec3 viewPos;
+
+// 材质 单色或者是纹理
+uniform vec3 materialAmbient;
+uniform vec3 materialDiffuse;
+uniform vec3 materialSpecular;
+uniform float materialShininess;
+
+void main()
+{
+    // 1. 环境光
+    vec3 ambient = lightAmbient * materialAmbient;
+
+    // 2. 漫反射
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
+    vec3 diffuse = lightDiffuse * (diff * materialDiffuse);
+
+    // 3. 镜面高光（Phong：用反射向量 + 视线向量）
+    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, norm); // 注意 lightDir 要取反
+    float specAngle = max(dot(viewDir, reflectDir), 0.0);
+    float spec = pow(specAngle, materialShininess);
+    vec3 specular = lightSpecular * (spec * materialSpecular);
+
+    vec3 result = ambient + diffuse + specular;
+    FragColor = vec4(result, 1.0);
+}
+
+```
 ###### 漫反射(Diffuse)
 漫反射光照使物体上与光线方向越接近的片段能从光源处获得更多的亮度
 
@@ -311,6 +414,8 @@ https://learnopengl-cn.github.io/01%20Getting%20started/01%20OpenGL/
 为了让OpenGL知道我们的坐标和颜色值构成的到底是什么，OpenGL需要指定这些数据所表示的渲染类型。
 我们是希望把这些数据渲染成一系列的点？一系列的三角形？还是仅仅是一个长长的线？
 做出的这些提示叫做图元(Primitive)，任何一个绘制指令的调用都将把图元传递给OpenGL。GL_POINTS、GL_TRIANGLES、GL_LINE_STRIP。
+
+图元就是 GPU 能直接绘制的最基本几何形状，点线面，光栅化前接收==图元==，在光栅化后产生==片段==。片段不是最终像素，它是：光栅化阶段生成的“像素候选者”，包含颜色、深度、纹理坐标等信息。
 
 ###### 顶点缓冲对象(Vertex Buffer Objects, VBO)
 顶点着色器会在GPU上创建内存用于储存顶点数据

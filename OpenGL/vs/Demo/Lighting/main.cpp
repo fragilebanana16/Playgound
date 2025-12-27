@@ -51,6 +51,8 @@ glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 glm::vec3 lightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
 glm::vec3 lightEmission = glm::vec3(1.0f, 1.0f, 1.0f);
 
+// 启用衰减
+bool enableAttenuation = true;
 int main()
 {
     // glfw: initialize and configure
@@ -239,6 +241,7 @@ int main()
         // be sure to activate shader when setting uniforms/drawing objects
 
         lightingShader.use();
+        lightingShader.setBool("light.enableAttenuation", enableAttenuation);
         lightingShader.setVec3("light.position", lightPosition);
         lightingShader.setVec3("viewPos", camera.Position);
         
@@ -322,12 +325,13 @@ int main()
             ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
             // 高光系数
             ImGui::SliderFloat("Shininess", &materialShininess, 1.0f, 128.0f);
-
             ImGui::ColorEdit3("L_Ambient", (float*)&lightAmbient);
             ImGui::ColorEdit3("L_Diffuse", (float*)&lightDiffuse);
             ImGui::ColorEdit3("L_Specular", (float*)&lightSpecular);
             ImGui::ColorEdit3("L_Emission", (float*)&lightEmission);
-            
+
+            ImGui::Checkbox("Attenuation", &enableAttenuation);
+
             //ImGui::SameLine();
             //ImGui::Text("counter = %d", counter);
             
