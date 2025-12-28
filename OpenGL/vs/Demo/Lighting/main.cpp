@@ -57,7 +57,8 @@ bool enableAttenuation = true;
 bool useTextureS = true;
 // 布林-冯氏模型
 bool blinn = false;
-
+// gamma校正
+bool gamma = false;
 int main()
 {
     // glfw: initialize and configure
@@ -257,6 +258,13 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        if (gamma) {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+        }
+        else {
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
+
         // change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
         //lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
         //lightPos.y = sin(glfwGetTime() / 2.0f) * 1.0f;
@@ -271,7 +279,8 @@ int main()
         lightingShader.use();
         lightingShader.setBool("light.enableAttenuation", enableAttenuation); 
         lightingShader.setBool("light.useTextureS", useTextureS);
-        lightingShader.setBool("light.blinn", blinn);
+        lightingShader.setBool("light.blinn", blinn); 
+        lightingShader.setBool("light.gamma", gamma);
         lightingShader.setVec3("light.position", lightPosition);
         lightingShader.setVec3("viewPos", camera.Position);
         
@@ -376,7 +385,8 @@ int main()
             ImGui::Checkbox("Attenuation", &enableAttenuation); 
             ImGui::Checkbox("UseTextureS", &useTextureS); 
             ImGui::Checkbox("Blinn-Phon", &blinn);
-
+            ImGui::Checkbox("Gamma Correct", &gamma);
+            
             //ImGui::SameLine();
             //ImGui::Text("counter = %d", counter);
             
@@ -503,7 +513,7 @@ unsigned int loadTexture(char const* path)
             format = GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
