@@ -73,9 +73,9 @@ glm::vec3 cubePositions[] = {
 };
 
 // 启用衰减
-bool enableAttenuation = true;
+bool enableAttenuation = false;
 // 启用镜面高光纹理
-bool useTextureS = true;
+bool useTextureS = false;
 // 布林-冯氏模型
 bool blinn = false;
 // gamma校正
@@ -266,7 +266,7 @@ int main()
     // shader configuration
     // --------------------
     debugDepthQuad.use();
-    debugDepthQuad.setInt("depthMap", 0);
+    debugDepthQuad.setInt("depthMap", 15);
 
     // shader configuration
     // --------------------
@@ -274,6 +274,7 @@ int main()
     lightingShader.setInt("material.diffuse", 0); // 这里的 0 就是纹理单元的编号（GL_TEXTURE0 对应 0，GL_TEXTURE1 对应 1，以此类推
     lightingShader.setInt("material.specular", 1);
     lightingShader.setInt("material.emission", 2);
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -314,9 +315,9 @@ int main()
         // --------------------------------------------------------------
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
-        float near_plane = 1.0f, far_plane = 7.5f;
+        float near_plane = 1.0f, far_plane = 25.0f;
         lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        lightView = glm::lookAt(camera.Position, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        lightView = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
         // render scene from light's point of view
         simpleDepthShader.use();
@@ -324,8 +325,8 @@ int main()
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
-
-        // render main scene 
+        glActiveTexture(GL_TEXTURE15);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         renderSceneDepth(simpleDepthShader, planeVAO, cubeVAO);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -338,9 +339,16 @@ int main()
         debugDepthQuad.use();
         debugDepthQuad.setFloat("near_plane", near_plane);
         debugDepthQuad.setFloat("far_plane", far_plane);
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE15);
         glBindTexture(GL_TEXTURE_2D, depthMap);
         renderQuad();
+
+        lightingShader.use();
+        lightingShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        lightingShader.setInt("depthMap", 15);
+
+        glActiveTexture(GL_TEXTURE15);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         renderScene(lightingShader, lightCubeShader, planeVAO, cubeVAO, lightCubeVAO, diffuseMap, specularMap, floorTexture);
 
         // 1. Show a simple window.
@@ -557,31 +565,6 @@ void renderScene(
     lightCubeShader.setMat4("model", model);
     glBindVertexArray(lightCubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    // --- 设置光照 shader ---
-    lightingShader.use();
-    lightingShader.setBool("light.enableAttenuation", enableAttenuation);
-    lightingShader.setBool("light.useTextureS", useTextureS);
-    lightingShader.setBool("light.blinn", blinn);
-    lightingShader.setBool("light.gamma", gamma);
-
-    lightingShader.setVec3("light.position", lightPosition);
-    lightingShader.setVec3("viewPos", camera.Position);
-
-    lightingShader.setVec3("material.specular", materialSpecular);
-    lightingShader.setFloat("material.shininess", materialShininess);
-
-    lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-    lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(25.0f)));
-
-    lightingShader.setVec3("light.ambient", lightAmbient);
-    lightingShader.setVec3("light.diffuse", lightDiffuse);
-    lightingShader.setVec3("light.specular", lightSpecular);
-    lightingShader.setVec3("light.emission", lightEmission);
-
-    lightingShader.setFloat("light.constant", 1.0f);
-    lightingShader.setFloat("light.linear", 0.09f);
-    lightingShader.setFloat("light.quadratic", 0.032f);
 
     // --- 绘制光源 cube ---
     lightCubeShader.use();

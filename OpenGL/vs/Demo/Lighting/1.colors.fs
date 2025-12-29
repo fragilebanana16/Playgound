@@ -5,6 +5,7 @@ in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec2 TexCoords;
+	vec4 FragPosLightSpace;
 } fs_in;
 
 uniform float time;
@@ -37,8 +38,25 @@ struct Light {
 	bool blinn;
 };
 
+uniform sampler2D depthMap;
 uniform Material material;
 uniform Light light;
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // 执行透视除法
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    // 变换到[0,1]的范围
+    projCoords = projCoords * 0.5 + 0.5;
+    // 取得最近点的深度(使用[0,1]范围下的fragPosLight当坐标)
+    float closestDepth = texture(depthMap, projCoords.xy).r; 
+    // 取得当前片段在光源视角下的深度
+    float currentDepth = projCoords.z;
+    // 检查当前片段是否在阴影中
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+}
 
 void main()
 {
@@ -103,6 +121,8 @@ void main()
 		emission *= attenuation * intensity;
 	}
     
-    vec3 result = ambient + diffuse + specular + emission;
+	float shadow = ShadowCalculation(fs_in.FragPosLightSpace);   
+	vec3 result = ambient + (1.0 - shadow) * (diffuse + specular); 
+	
     FragColor = vec4(result, 1.0);
 }
