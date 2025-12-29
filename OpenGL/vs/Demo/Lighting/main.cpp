@@ -19,6 +19,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 unsigned int loadTexture(const char* path, bool gammaCorrection);
+void RenderScene(Shader& lightingShader, Shader& lightCubeShader, unsigned int planeVAO, unsigned int cubeVAO, unsigned int lightCubeVAO, 
+    unsigned int diffuseMap, 
+    unsigned int specularMap,
+    unsigned int floorTexture
+);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -50,6 +55,20 @@ glm::vec3 lightAmbient = glm::vec3(0.2f, 0.2f, 0.2f);
 glm::vec3 lightDiffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 glm::vec3 lightSpecular = glm::vec3(1.0f, 1.0f, 1.0f);
 glm::vec3 lightEmission = glm::vec3(1.0f, 1.0f, 1.0f);
+
+// positions all containers
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+};
 
 // 启用衰减
 bool enableAttenuation = true;
@@ -158,19 +177,7 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
-    // positions all containers
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+
     float planeVertices[] = {
         // positions            // normals         // texcoords
          10.0f, -0.5f,  10.0f,  0.0f, 1.0f, 0.0f,  10.0f,  0.0f,
@@ -355,9 +362,13 @@ int main()
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // ---- 渲染场景 ---- 
+        RenderScene( lightingShader, lightCubeShader, planeVAO, cubeVAO, lightCubeVAO, diffuseMap, specularMap, floorTexture );
+
         // 1. Show a simple window.
         // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
         {
+            glDisable(GL_FRAMEBUFFER_SRGB); // 先关闭避免影响ui
             // ImGui 窗口
             ImGui::Begin("Lighting Controls");
 
@@ -425,6 +436,95 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+void RenderScene(
+    Shader& lightingShader,
+    Shader& lightCubeShader,
+    unsigned int planeVAO,
+    unsigned int cubeVAO,
+    unsigned int lightCubeVAO,
+    unsigned int diffuseMap,
+    unsigned int specularMap,
+    unsigned int floorTexture
+)
+{
+    // --- 设置光照 shader ---
+    lightingShader.use();
+    lightingShader.setBool("light.enableAttenuation", enableAttenuation);
+    lightingShader.setBool("light.useTextureS", useTextureS);
+    lightingShader.setBool("light.blinn", blinn);
+    lightingShader.setBool("light.gamma", gamma);
+
+    lightingShader.setVec3("light.position", lightPosition);
+    lightingShader.setVec3("viewPos", camera.Position);
+
+    lightingShader.setVec3("material.specular", materialSpecular);
+    lightingShader.setFloat("material.shininess", materialShininess);
+
+    lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+    lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(25.0f)));
+
+    lightingShader.setVec3("light.ambient", lightAmbient);
+    lightingShader.setVec3("light.diffuse", lightDiffuse);
+    lightingShader.setVec3("light.specular", lightSpecular);
+    lightingShader.setVec3("light.emission", lightEmission);
+
+    lightingShader.setFloat("light.constant", 1.0f);
+    lightingShader.setFloat("light.linear", 0.09f);
+    lightingShader.setFloat("light.quadratic", 0.032f);
+
+    // --- 设置矩阵 ---
+    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
+        (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 view = camera.GetViewMatrix();
+    lightingShader.setMat4("projection", projection);
+    lightingShader.setMat4("view", view);
+
+    // --- 绘制地板 ---
+    glBindVertexArray(planeVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, floorTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glm::mat4 model(1.0f);
+    lightingShader.setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // --- 绘制多个 cube ---
+    glBindVertexArray(cubeVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, diffuseMap);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, specularMap);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    for (unsigned int i = 0; i < 10; i++)
+    {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePositions[i]);
+        float angle = 20.0f * i;
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        lightingShader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+
+    // --- 绘制光源 cube ---
+    lightCubeShader.use();
+    lightCubeShader.setMat4("projection", projection);
+    lightCubeShader.setMat4("view", view);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPosition);
+    model = glm::scale(model, glm::vec3(0.04f));
+    lightCubeShader.setMat4("model", model);
+
+    glBindVertexArray(lightCubeVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
