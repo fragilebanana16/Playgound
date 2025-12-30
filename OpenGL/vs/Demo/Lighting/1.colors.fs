@@ -5,11 +5,11 @@ in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec2 TexCoords;
-	vec4 FragPosLightSpace;
 } fs_in;
 
 uniform float time;
 uniform vec3 viewPos;
+uniform float far_plane;
 
 struct Material {
     sampler2D diffuse;
@@ -38,42 +38,25 @@ struct Light {
 	bool blinn;
 };
 
-uniform sampler2D depthMap;
+uniform samplerCube depthMap;
 uniform Material material;
 uniform Light light;
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec3 fragPos)
 {
-    // perform perspective divide
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(depthMap, projCoords.xy).r; 
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoords.z;
-    // calculate bias (based on depth map resolution and slope)
-    vec3 normal = normalize(fs_in.Normal);
-    vec3 lightDir = normalize(light.position - fs_in.FragPos);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    // check whether current frag pos is in shadow
-    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
-    // PCF
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(depthMap, 0);
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(depthMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
-        }    
-    }
-    shadow /= 9.0;
-    
-    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
-    if(projCoords.z > 1.0)
-        shadow = 0.0;
+    // get vector between fragment position and light position
+    vec3 fragToLight = fragPos - light.position;
+    // ise the fragment to light vector to sample from the depth map    
+    float closestDepth = texture(depthMap, fragToLight).r;
+    // it is currently in linear range between [0,1], let's re-transform it back to original depth value
+    closestDepth *= far_plane;
+    // now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // test for shadows
+    float bias = 0.05; // we use a much larger bias since depth is now in [near_plane, far_plane] range
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;        
+    // display closestDepth as debug (to visualize depth cubemap)
+    // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
         
     return shadow;
 }
@@ -133,7 +116,7 @@ void main()
 	float theta     = dot(lightDir, normalize(-light.direction));
 	float epsilon   = light.cutOff - light.outerCutOff;
 	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-	
+	intensity = 1.0;
 	if(light.enableAttenuation){
 		ambient  *= attenuation * intensity; 
 		diffuse  *= attenuation * intensity;
@@ -141,7 +124,7 @@ void main()
 		emission *= attenuation * intensity;
 	}
     
-	float shadow = ShadowCalculation(fs_in.FragPosLightSpace);   
+	float shadow = ShadowCalculation(fs_in.FragPos);   
 	vec3 result = ambient + (1.0 - shadow) * (diffuse + specular); 
 	
     FragColor = vec4(result, 1.0);
