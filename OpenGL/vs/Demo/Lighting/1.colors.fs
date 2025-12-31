@@ -5,16 +5,22 @@ in VS_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec2 TexCoords;
+	vec3 TangentLightPos;
+    vec3 TangentViewPos;
+    vec3 TangentFragPos;
 } fs_in;
 
 uniform float time;
 uniform vec3 viewPos;
 uniform float far_plane;
+uniform bool useNormalMap;
+uniform bool useTBN;
 
 struct Material {
     sampler2D diffuse;
     sampler2D specular; 
 	sampler2D emission;
+	sampler2D normalMap;
     float shininess;
 }; 
 
@@ -66,19 +72,36 @@ void main()
     vec3 colorD = texture(material.diffuse, fs_in.TexCoords).rgb;
     vec3 colorS = texture(material.specular, fs_in.TexCoords).rgb;
     vec3 colorE = texture(material.emission, fs_in.TexCoords).rgb;
-
+	vec3 normal;
+	vec3 tempViewPos = viewPos;
+    vec3 tempLightPosition = light.position;
+    vec3 tempFragPos = fs_in.FragPos;
+	if(useNormalMap){
+		if(useTBN){
+			tempViewPos = fs_in.TangentLightPos;
+			tempLightPosition = fs_in.TangentViewPos;
+			tempFragPos = fs_in.TangentFragPos;
+		}
+		 // obtain normal from normal map in range [0,1]
+		normal = texture(material.normalMap, fs_in.TexCoords).rgb;
+		// transform normal vector to range [-1,1]
+		normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space
+	} else {
+	    normal = fs_in.Normal;
+	}
+	
     // ambient
     vec3 ambient = light.ambient * colorD;
   	
     // diffuse 
-    vec3 lightDir = normalize(light.position - fs_in.FragPos);
-    vec3 norm = normalize(fs_in.Normal);
+    vec3 lightDir = normalize(tempLightPosition - tempFragPos);
+    vec3 norm = normalize(normal);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.diffuse * diff * colorD;
 	
     // specular
 	vec3 specular;
-	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
+	vec3 viewDir = normalize(tempViewPos - tempFragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);  
 	if(light.useTextureS){
 		float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
@@ -111,7 +134,7 @@ void main()
 	}
 	
 	// attenuation
-	float distance    = length(light.position - fs_in.FragPos);
+	float distance    = length(tempLightPosition - tempFragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 	float theta     = dot(lightDir, normalize(-light.direction));
 	float epsilon   = light.cutOff - light.outerCutOff;
@@ -124,7 +147,7 @@ void main()
 		emission *= attenuation * intensity;
 	}
     
-	float shadow = ShadowCalculation(fs_in.FragPos);   
+	float shadow = ShadowCalculation(tempFragPos);   
 	vec3 result = ambient + (1.0 - shadow) * (diffuse + specular); 
 	
     FragColor = vec4(result, 1.0);
