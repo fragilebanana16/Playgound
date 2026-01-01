@@ -21,12 +21,15 @@ void processInput(GLFWwindow* window);
 unsigned int loadTexture(const char* path, bool gammaCorrection);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void renderScene(Shader& lightingShader, Shader& lightCubeShader, unsigned int planeVAO, unsigned int cubeVAO, unsigned int lightCubeVAO, 
+void renderScene(Shader& lightingShader, Shader& lightCubeShader, Shader& displaceShader, unsigned int planeVAO, unsigned int cubeVAO, unsigned int lightCubeVAO,
     unsigned int diffuseMap, 
     unsigned int specularMap,
     unsigned int floorTexture,
     unsigned int normalMap,
-    unsigned int wallDiffuseMap
+    unsigned int wallDiffuseMap,
+    unsigned int displaceDiffuseMap,
+    unsigned int displaceNormalMap,
+    unsigned int displaceHeightMap
 );
 void renderQuad();
 void renderSceneDepth(Shader& depthShader, unsigned int planeVAO, unsigned int cubeVAO);
@@ -88,6 +91,8 @@ bool gamma = false;
 bool tbn = false;
 // 角度
 float quadRotation = 0.0f;
+// 视差贴图高度缩放因子
+float heightScale = 0.1f;
 int main()
 {
     // glfw: initialize and configure
@@ -136,6 +141,7 @@ int main()
     Shader lightCubeShader("1.light_cube.vs", "1.light_cube.fs");
     Shader simpleDepthShader("3.2.1.point_shadows_depth.vs", "3.2.1.point_shadows_depth.fs", "3.2.1.point_shadows_depth.gs");
     Shader debugDepthQuad("3.1.1.debug_quad.vs", "3.1.1.debug_quad_depth.fs");
+    Shader displaceShader("5.1.parallax_mapping.vs", "5.1.parallax_mapping.fs");
 
     // load textures (we now use a utility function to keep the code more organized)
     unsigned int diffuseMap = loadTexture(FileSystem::getPath("resources/textures/container2.png").c_str(), true);
@@ -144,6 +150,10 @@ int main()
     unsigned int floorTexture = loadTexture(FileSystem::getPath("resources/textures/toy_box_diffuse.png").c_str(), true);
     unsigned int normalMap = loadTexture(FileSystem::getPath("resources/textures/brickwall_normal.jpg").c_str(), false);
     unsigned int wallDiffuseMap = loadTexture(FileSystem::getPath("resources/textures/brickwall.jpg").c_str(), true);
+
+    unsigned int displaceDiffuseMap = loadTexture(FileSystem::getPath("resources/textures/bricks2.jpg").c_str(), true);
+    unsigned int displaceNormalMap = loadTexture(FileSystem::getPath("resources/textures/bricks2_normal.jpg").c_str(), false);
+    unsigned int displaceHeightMap = loadTexture(FileSystem::getPath("resources/textures/bricks2_disp.jpg").c_str(), false);
 
     // Setup ImGui binding
     ImGui::CreateContext();
@@ -302,6 +312,13 @@ int main()
     lightingShader.setInt("material.specular", 1);
     lightingShader.setInt("material.emission", 2);
     lightingShader.setInt("material.normalMap", 3);
+
+     // shader configuration
+     // --------------------
+    displaceShader.use();
+    displaceShader.setInt("diffuseMap", 0);
+    displaceShader.setInt("normalMap", 1);
+    displaceShader.setInt("depthMap", 2);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -373,7 +390,7 @@ int main()
         lightingShader.setInt("depthMap", 15);
         glActiveTexture(GL_TEXTURE15);
         glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
-        renderScene(lightingShader, lightCubeShader, planeVAO, cubeVAO, lightCubeVAO, diffuseMap, specularMap, floorTexture, normalMap, wallDiffuseMap);
+        renderScene(lightingShader, lightCubeShader, displaceShader, planeVAO, cubeVAO, lightCubeVAO, diffuseMap, specularMap, floorTexture, normalMap, wallDiffuseMap, displaceDiffuseMap, displaceNormalMap, displaceHeightMap);
 
         // change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
         //lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
@@ -399,7 +416,7 @@ int main()
 
             // 修改光源位置
             ImGui::DragFloat3("Light Position", (float*)&lightPosition, 0.01f, -100.0f, 100.0f);
-
+            
             // 镜面反射颜色
             ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
             // 高光系数
@@ -415,6 +432,7 @@ int main()
             ImGui::Checkbox("Gamma Correct", &gamma);
             ImGui::Checkbox("TBN", &tbn);
             ImGui::DragFloat("Rotation", &quadRotation, 0.1f, -360.0f, 360.0f);
+            ImGui::DragFloat("HeightScale", (float*)&heightScale, 0.01f, -2.0f, 2.0f);
 
             //ImGui::SameLine();
             //ImGui::Text("counter = %d", counter);
@@ -475,6 +493,7 @@ void renderSceneDepth(Shader& depthShader, unsigned int planeVAO, unsigned int c
 void renderScene(
     Shader& lightingShader,
     Shader& lightCubeShader,
+    Shader& displaceShader,
     unsigned int planeVAO,
     unsigned int cubeVAO,
     unsigned int lightCubeVAO,
@@ -482,7 +501,10 @@ void renderScene(
     unsigned int specularMap,
     unsigned int floorTexture,
     unsigned int normalMap,
-    unsigned int wallDiffuseMap
+    unsigned int wallDiffuseMap,
+    unsigned int displaceDiffuseMap,
+    unsigned int displaceNormalMap,
+    unsigned int displaceHeightMap
 )
 {
     lightingShader.use();
@@ -564,6 +586,24 @@ void renderScene(
     renderQuad();
     lightingShader.setInt("useNormalMap", 0);
 
+    // 2.6 displacement wall
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(2.0f, 0.0f, 2.0f));
+    displaceShader.use();
+    displaceShader.setMat4("projection", projection);
+    displaceShader.setMat4("view", view);
+    displaceShader.setMat4("model", model);
+    displaceShader.setVec3("viewPos", camera.Position);
+    displaceShader.setVec3("lightPos", lightPosition);
+    displaceShader.setFloat("heightScale", heightScale);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, displaceDiffuseMap);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, displaceNormalMap);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, displaceHeightMap);
+    renderQuad();
+
     // 3.cubes
     glBindVertexArray(cubeVAO);
     // bind diffuse map
@@ -575,6 +615,7 @@ void renderScene(
     // bind emission map
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, 0);
+    lightingShader.use();
     for (unsigned int i = 0; i < 8; i++)
     {
         model = glm::mat4(1.0f);
