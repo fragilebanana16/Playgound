@@ -34,6 +34,7 @@ void renderScene(Shader& lightingShader, Shader& lightCubeShader, Shader& displa
 void renderQuad();
 void renderSceneDepth(Shader& depthShader, unsigned int planeVAO, unsigned int cubeVAO);
 void drawLamp(Shader& lightCubeShader, unsigned int lightCubeVAO, glm::mat4 projection, glm::mat4 view, glm::vec3 lightPos, glm::vec3 lightColor);
+void RenderFullQuad();
 
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
@@ -83,9 +84,9 @@ glm::vec3 cubePositions[] = {
 // Light sources
 std::vector<glm::vec3> lightPositions = {
     {0.0f, 0.0f, 49.5f},
-    {0.0f, 0.2f, 0.0f},
-    {0.0f, 0.4f, 0.0f},
-    {0.8f, 0.8f, 0.0f}
+    {-4.0f, 0.2f, 0.0f},
+    {-5.0f, 0.4f, 0.0f},
+    {-7.8f, 0.8f, 0.0f}
 };
 
 std::vector<glm::vec3> lightColors = {
@@ -102,13 +103,15 @@ bool useTextureS = false;
 // 布林-冯氏模型
 bool blinn = false;
 // gamma校正
-bool gamma = false;
+bool gamma = false; 
 // 法线贴图tbn
 bool tbn = false;
 // 角度
 float quadRotation = 0.0f;
 // 视差贴图高度缩放因子
 float heightScale = 0.1f;
+// hdr
+bool hdr = false;
 int main()
 {
     // glfw: initialize and configure
@@ -158,6 +161,7 @@ int main()
     Shader simpleDepthShader("3.2.1.point_shadows_depth.vs", "3.2.1.point_shadows_depth.fs", "3.2.1.point_shadows_depth.gs");
     Shader debugDepthQuad("3.1.1.debug_quad.vs", "3.1.1.debug_quad_depth.fs");
     Shader displaceShader("5.1.parallax_mapping.vs", "5.1.parallax_mapping.fs");
+    Shader hdrShader("6.hdr.vs", "6.hdr.fs");
 
     // load textures (we now use a utility function to keep the code more organized)
     unsigned int diffuseMap = loadTexture(FileSystem::getPath("resources/textures/container2.png").c_str(), true);
@@ -249,7 +253,29 @@ int main()
          10.0f, -0.5f, -10.0f,   0.0f, 1.0f, 0.0f,  10.0f, 10.0f   // 右下
     };
 
-    
+    // Set up floating point framebuffer to render scene to
+    GLuint hdrFBO;
+    glGenFramebuffers(1, &hdrFBO);
+    // - Create floating point color buffer
+    GLuint colorBuffer;
+    glGenTextures(1, &colorBuffer);
+    glBindTexture(GL_TEXTURE_2D, colorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // - Create depth buffer (renderbuffer)
+    GLuint rboDepth;
+    glGenRenderbuffers(1, &rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, SCR_WIDTH, SCR_HEIGHT);
+    // - Attach buffers
+    glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorBuffer, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Framebuffer not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // 1.cubeVAO
     unsigned int VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
@@ -328,6 +354,8 @@ int main()
     lightingShader.setInt("material.specular", 1);
     lightingShader.setInt("material.emission", 2);
     lightingShader.setInt("material.normalMap", 3);
+    hdrShader.use();
+    hdrShader.setInt("hdrBuffer", 14);
 
      // shader configuration
      // --------------------
@@ -389,7 +417,12 @@ int main()
         simpleDepthShader.setFloat("far_plane", far_plane);
         simpleDepthShader.setVec3("lightPos", lightPosition);
         renderSceneDepth(simpleDepthShader, planeVAO, cubeVAO);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Render scene into floating point framebuffer
+        if (hdr)
+            glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+        else
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // 2. render scene as normal 
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
@@ -407,6 +440,15 @@ int main()
         glActiveTexture(GL_TEXTURE15);
         glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
         renderScene(lightingShader, lightCubeShader, displaceShader, planeVAO, cubeVAO, lightCubeVAO, diffuseMap, specularMap, floorTexture, normalMap, wallDiffuseMap, displaceDiffuseMap, displaceNormalMap, displaceHeightMap);
+        if (hdr) {
+            hdrShader.use();
+            hdrShader.setBool("hdr", true);
+            hdrShader.setFloat("exposure", 1.0f);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glActiveTexture(GL_TEXTURE14);
+            glBindTexture(GL_TEXTURE_2D, colorBuffer);
+            RenderFullQuad();
+        }
 
         // change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
         //lightPos.x = 1.0f + sin(glfwGetTime()) * 2.0f;
@@ -453,10 +495,11 @@ int main()
             ImGui::Checkbox("UseTextureS", &useTextureS); 
             ImGui::Checkbox("Blinn-Phon", &blinn);
             ImGui::Checkbox("Gamma Correct", &gamma);
+            ImGui::Checkbox("hdr", &hdr);
             ImGui::Checkbox("TBN", &tbn);
             ImGui::DragFloat("Rotation", &quadRotation, 0.1f, -360.0f, 360.0f);
             ImGui::DragFloat("HeightScale", (float*)&heightScale, 0.01f, -2.0f, 2.0f);
-
+            
             //ImGui::SameLine();
             //ImGui::Text("counter = %d", counter);
             
@@ -612,6 +655,13 @@ void renderScene(
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    
+    // tunnel
+    model = glm::mat4(1.0);
+    model = glm::translate(model, glm::vec3(-6.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(5.0f, 5.0f, 55.0f));
+    lightingShader.setMat4("model", model);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     lightingShader.setInt("reverse_normals", 0); // and of course disable it
     glEnable(GL_CULL_FACE);
 
@@ -689,6 +739,35 @@ void drawLamp(Shader& lightCubeShader, unsigned int lightCubeVAO, glm::mat4 proj
     lightCubeShader.setVec3("color", lightColor);
     glBindVertexArray(lightCubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+}
+
+GLuint quadFullVAO = 0;
+GLuint quadFullVBO;
+void RenderFullQuad()
+{
+    if (quadFullVAO == 0)
+    {
+        GLfloat quadVertices[] = {
+            // Positions        // Texture Coords
+            -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // Setup plane VAO
+        glGenVertexArrays(1, &quadFullVAO);
+        glGenBuffers(1, &quadFullVBO);
+        glBindVertexArray(quadFullVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadFullVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    }
+    glBindVertexArray(quadFullVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
 

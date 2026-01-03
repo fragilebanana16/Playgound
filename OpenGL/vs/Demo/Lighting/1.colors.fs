@@ -51,6 +51,10 @@ uniform Material material;
 #define MAX_LIGHTS 4
 uniform Light lights[MAX_LIGHTS];
 
+uniform bool hdr;
+uniform float exposure;
+uniform sampler2D hdrBuffer;
+
 float ShadowCalculation(vec3 fragPos, Light light)
 {
     // get vector between fragment position and light position
@@ -70,7 +74,7 @@ float ShadowCalculation(vec3 fragPos, Light light)
     return shadow;
 }
 
-vec3 CalcLight(Light light){
+vec3 CalcLight(Light light, float testHDRStrength){
     vec3 colorD = texture(material.diffuse, fs_in.TexCoords).rgb;
     vec3 colorS = texture(material.specular, fs_in.TexCoords).rgb;
     vec3 colorE = texture(material.emission, fs_in.TexCoords).rgb;
@@ -99,7 +103,7 @@ vec3 CalcLight(Light light){
     vec3 lightDir = normalize(tempLightPosition - tempFragPos);
     vec3 norm = normalize(normal);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.diffuse * diff * colorD;
+    vec3 diffuse = light.diffuse * diff * colorD * testHDRStrength;
 	
     // specular
 	vec3 specular;
@@ -160,7 +164,7 @@ void main()
     vec3 result = vec3(0.0);
 	for (int i = 0; i < MAX_LIGHTS; i++) 
 	{ 
-	    result += CalcLight(lights[i]); 
+		result += CalcLight(lights[i], (i * 2.0f)); 
 	}
     FragColor = vec4(result, 1.0);
 }
