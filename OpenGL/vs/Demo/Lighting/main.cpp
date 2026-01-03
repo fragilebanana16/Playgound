@@ -33,6 +33,7 @@ void renderScene(Shader& lightingShader, Shader& lightCubeShader, Shader& displa
 );
 void renderQuad();
 void renderSceneDepth(Shader& depthShader, unsigned int planeVAO, unsigned int cubeVAO);
+void drawLamp(Shader& lightCubeShader, unsigned int lightCubeVAO, glm::mat4 projection, glm::mat4 view, glm::vec3 lightPos, glm::vec3 lightColor);
 
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
@@ -77,6 +78,21 @@ glm::vec3 cubePositions[] = {
     glm::vec3(1.3f, 2.0f, -2.5f),
     glm::vec3(1.5f,  4.2f, -1.5f),
     glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
+// Light sources
+std::vector<glm::vec3> lightPositions = {
+    {0.0f, 0.0f, 49.5f},
+    {0.0f, 0.2f, 0.0f},
+    {0.0f, 0.4f, 0.0f},
+    {0.8f, 0.8f, 0.0f}
+};
+
+std::vector<glm::vec3> lightColors = {
+    {200.0f, 200.0f, 200.0f},
+    {1.0f, 0.0f, 0.0f},
+    {0.0f, 1.0f, 0.0f},
+    {0.0f, 0.0f, 1.0f}
 };
 
 // 启用衰减
@@ -416,7 +432,14 @@ int main()
 
             // 修改光源位置
             ImGui::DragFloat3("Light Position", (float*)&lightPosition, 0.01f, -100.0f, 100.0f);
+            ImGui::DragFloat3("L1_Position", (float*)&lightPositions[1], 0.01f, -100.0f, 100.0f);
+            ImGui::DragFloat3("L2_Position", (float*)&lightPositions[2], 0.01f, -100.0f, 100.0f);
+            ImGui::DragFloat3("L3_Position", (float*)&lightPositions[3], 0.01f, -100.0f, 100.0f);
             
+            ImGui::ColorEdit3("L1_Color", (float*)&lightColors[1]);
+            ImGui::ColorEdit3("L2_Color", (float*)&lightColors[2]);
+            ImGui::ColorEdit3("L3_Color", (float*)&lightColors[3]);
+
             // 镜面反射颜色
             ImGui::ColorEdit3("Specular", (float*)&materialSpecular);
             // 高光系数
@@ -508,30 +531,51 @@ void renderScene(
 )
 {
     lightingShader.use();
-    lightingShader.setBool("light.enableAttenuation", enableAttenuation);
-    lightingShader.setBool("light.useTextureS", useTextureS);
-    lightingShader.setBool("light.blinn", blinn);
-    lightingShader.setBool("light.gamma", gamma);
-    lightingShader.setVec3("light.position", lightPosition);
-    lightingShader.setVec3("viewPos", camera.Position);
+    for (int i = 0; i < lightPositions.size(); i++)
+    {
+        bool ctrlLight = i == 0;
+        lightingShader.setVec3("lights[" + std::to_string(i) + "].position",      ctrlLight ? lightPosition : lightPositions[i]);
+        lightingShader.setVec3("lights[" + std::to_string(i) + "].ambient",       ctrlLight ? lightAmbient: glm::vec3(0.0));
+        lightingShader.setVec3("lights[" + std::to_string(i) + "].diffuse",       ctrlLight ? lightDiffuse: lightColors[i]);
+        lightingShader.setVec3("lights[" + std::to_string(i) + "].specular",      ctrlLight ? lightSpecular: glm::vec3(0.0));
+        lightingShader.setVec3("lights[" + std::to_string(i) + "].lightEmission", ctrlLight ? lightEmission: glm::vec3(0.0));
+        lightingShader.setBool("lights[" + std::to_string(i) + "].castShadow",    ctrlLight);
 
+        lightingShader.setBool("lights[" + std::to_string(i) + "].enableAttenuation", enableAttenuation);
+        lightingShader.setBool("lights[" + std::to_string(i) + "].useTextureS", useTextureS);
+        lightingShader.setBool("lights[" + std::to_string(i) + "].blinn", blinn);
+        lightingShader.setBool("lights[" + std::to_string(i) + "].gamma", gamma);
+        lightingShader.setBool("lights[" + std::to_string(i) + "].cutOff", glm::cos(glm::radians(12.5f)));
+        lightingShader.setBool("lights[" + std::to_string(i) + "].outerCutOff", glm::cos(glm::radians(25.0f)));
+
+        lightingShader.setFloat("lights[" + std::to_string(i) + "].constant", 1.0f);
+        lightingShader.setFloat("lights[" + std::to_string(i) + "].linear", 0.09f);
+        lightingShader.setFloat("lights[" + std::to_string(i) + "].quadratic", 0.032f);
+    }
+
+    //lightingShader.setBool("light.enableAttenuation", enableAttenuation);
+    //lightingShader.setBool("light.useTextureS", useTextureS);
+    //lightingShader.setBool("light.blinn", blinn);
+    //lightingShader.setBool("light.gamma", gamma);
+    //lightingShader.setVec3("light.position", lightPosition);
+    lightingShader.setVec3("viewPos", camera.Position);
     lightingShader.setVec3("material.specular", materialSpecular);
     lightingShader.setFloat("material.shininess", materialShininess);
 
     // uncomment this enableAttenuation
         /*  lightingShader.setVec3("light.position", camera.Position);
           lightingShader.setVec3("light.direction", camera.Front);*/
-    lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-    lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(25.0f)));
-    lightingShader.setVec3("light.ambient", lightAmbient);
-    lightingShader.setVec3("light.diffuse", lightDiffuse);
-    lightingShader.setVec3("light.specular", lightSpecular);
-    lightingShader.setVec3("light.emission", lightEmission);
+    //lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+    //lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(25.0f)));
+    //lightingShader.setVec3("light.ambient", lightAmbient);
+    //lightingShader.setVec3("light.diffuse", lightDiffuse);
+    //lightingShader.setVec3("light.specular", lightSpecular);
+    //lightingShader.setVec3("light.emission", lightEmission);
 
     // 衰减系数
-    lightingShader.setFloat("light.constant", 1.0f);
-    lightingShader.setFloat("light.linear", 0.09f);
-    lightingShader.setFloat("light.quadratic", 0.032f);
+    //lightingShader.setFloat("light.constant", 1.0f);
+    //lightingShader.setFloat("light.linear", 0.09f);
+    //lightingShader.setFloat("light.quadratic", 0.032f);
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = camera.GetViewMatrix();
@@ -630,21 +674,19 @@ void renderScene(
     lightCubeShader.use();
     lightCubeShader.setMat4("projection", projection);
     lightCubeShader.setMat4("view", view);
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, lightPosition);
-    model = glm::scale(model, glm::vec3(0.04f)); // a smaller cube
-    lightCubeShader.setMat4("model", model);
-    glBindVertexArray(lightCubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        drawLamp(lightCubeShader, lightCubeVAO, projection, view, (i == 0 ? lightPosition : lightPositions[i]), (i == 0 ? glm::vec3(1.0, 1.0, 1.0) : lightColors[i]));
+    }
+}
 
-    // --- 绘制光源 cube ---
-    lightCubeShader.use();
-    lightCubeShader.setMat4("projection", projection);
-    lightCubeShader.setMat4("view", view);
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, lightPosition);
-    model = glm::scale(model, glm::vec3(0.04f));
+void drawLamp(Shader& lightCubeShader, unsigned int lightCubeVAO, glm::mat4 projection, glm::mat4 view, glm::vec3 lightPos, glm::vec3 lightColor) {
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.06f)); // a smaller cube
     lightCubeShader.setMat4("model", model);
+    lightCubeShader.setVec3("color", lightColor);
     glBindVertexArray(lightCubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);

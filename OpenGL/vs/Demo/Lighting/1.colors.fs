@@ -42,13 +42,16 @@ struct Light {
 	bool enableAttenuation;
 	bool useTextureS;
 	bool blinn;
+	
+	bool castShadow;
 };
 
 uniform samplerCube depthMap;
 uniform Material material;
-uniform Light light;
+#define MAX_LIGHTS 4
+uniform Light lights[MAX_LIGHTS];
 
-float ShadowCalculation(vec3 fragPos)
+float ShadowCalculation(vec3 fragPos, Light light)
 {
     // get vector between fragment position and light position
     vec3 fragToLight = fragPos - light.position;
@@ -67,8 +70,7 @@ float ShadowCalculation(vec3 fragPos)
     return shadow;
 }
 
-void main()
-{
+vec3 CalcLight(Light light){
     vec3 colorD = texture(material.diffuse, fs_in.TexCoords).rgb;
     vec3 colorS = texture(material.specular, fs_in.TexCoords).rgb;
     vec3 colorE = texture(material.emission, fs_in.TexCoords).rgb;
@@ -110,14 +112,13 @@ void main()
 		if(light.blinn)
 		{
 			vec3 halfwayDir = normalize(lightDir + viewDir);  
-			specular = vec3(0.3) * pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
+			specular = vec3(0.3) * light.diffuse * pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
 		}
 		else
 		{
 			vec3 reflectDir = reflect(-lightDir, norm);
 			specular = vec3(0.3) * pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 		}
-
 	}
 	
 	// emission
@@ -146,9 +147,20 @@ void main()
 		specular *= attenuation * intensity;
 		emission *= attenuation * intensity;
 	}
-    
-	float shadow = ShadowCalculation(tempFragPos);   
-	vec3 result = ambient + (1.0 - shadow) * (diffuse + specular); 
-	
+	float shadow = 0.0;
+	if (light.castShadow)
+		shadow = ShadowCalculation(tempFragPos, light);
+
+	vec3 result = ambient + (1.0 - shadow) * (diffuse + specular);
+	return result; 
+}
+
+void main()
+{
+    vec3 result = vec3(0.0);
+	for (int i = 0; i < MAX_LIGHTS; i++) 
+	{ 
+	    result += CalcLight(lights[i]); 
+	}
     FragColor = vec4(result, 1.0);
 }
