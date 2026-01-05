@@ -1,4 +1,15 @@
+#### MRT（Multiple Render Targets，多渲染目标）
+ 在一次片段着色器执行中，同时输出到多个颜色缓冲附件(深度缓冲 / 模板缓冲：在一个 FBO 中只能有一个深度附件和一个模板附件)，多个 program 可以依次往==同一个 FBO 写入颜色缓冲==，并且可以叠加
+
+```c
+// 默认的
+out vec4 FragColor; 
+// 等价于 fbo的
+layout(location = 0) out vec4 FragColor;
+```
+
 #### HDR
+
 HDR ：让计算机能表达真实世界的亮度范围，在渲染阶段保留真实世界的亮度范围，不丢失高光和暗部细节。
 
 Tone Mapping（色调映射）：把 HDR 亮度范围（0–10000）压缩到显示器能显示的 0–1 范围。
