@@ -5,6 +5,9 @@
 #include <learnopengl/shader.h>
 #include <learnopengl/camera.h>
 #include <random>
+#include <learnopengl/model.h>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -22,6 +25,11 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+// lighting
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+glm::vec3 dirLightDirection(-0.2f, -1.0f, -0.3f);
+glm::vec3 dirLightColor(1.0f, 1.0f, 1.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -66,26 +74,33 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
 
-    Shader shader("cube.vs", "cube.fs");
-    shader.use();
+    // Setup ImGui binding
+    ImGui::CreateContext();
+    ImGui_ImplGlfwGL3_Init(window, true);
+    // Setup style
+    ImGui::StyleColorsDark();
 
-    std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // 随机浮点数，范围0.0 - 1.0
-    std::default_random_engine generator;
-    std::vector<glm::vec3> ssaoKernel;
-    for (GLuint i = 0; i < 640; ++i)
-    {
-        glm::vec3 sample(
-            randomFloats(generator) * 2.0 - 1.0,
-            randomFloats(generator) * 2.0 - 1.0,
-            randomFloats(generator)
-        );
-        sample = glm::normalize(sample);
-        sample *= randomFloats(generator);
-        GLfloat scale = GLfloat(i) / 64.0;
-        scale = lerp(0.1f, 1.0f, scale * scale);
-        sample *= scale;
-        ssaoKernel.push_back(sample);
-    }
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/modular_environment/obj/wall.obj");
+    Shader shader("model.vs", "model.fs");
+    Shader lightCubeShader("light_cube.vs", "light_cube.fs");
+
+        //std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // 随机浮点数，范围0.0 - 1.0
+    //std::default_random_engine generator;
+    //std::vector<glm::vec3> ssaoKernel;
+    //for (GLuint i = 0; i < 64; ++i)
+    //{
+    //    glm::vec3 sample(
+    //        randomFloats(generator) * 2.0 - 1.0,
+    //        randomFloats(generator) * 2.0 - 1.0,
+    //        randomFloats(generator)
+    //    );
+    //    sample = glm::normalize(sample);
+    //    sample *= randomFloats(generator);
+    //    GLfloat scale = GLfloat(i) / 64.0;
+    //    scale = lerp(0.1f, 1.0f, scale * scale);
+    //    sample *= scale;
+    //    ssaoKernel.push_back(sample);
+    //}
 
     // render loop
     // -----------
@@ -101,21 +116,42 @@ int main()
         processInput(window);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ImGui_ImplGlfwGL3_NewFrame();
 
         // view/projection transformations
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        shader.use();
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        for (GLuint i = 0; i < ssaoKernel.size(); ++i)
-        {
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, ssaoKernel[i]);
-            model = glm::scale(model, glm::vec3(0.02f)); // 每个立方体缩小
-            shader.setMat4("model", model);
-            renderCube(); // 你自己写的立方体绘制函数
-        }
+        shader.setMat4("model", model);
+        shader.setVec3("viewPos", camera.Position);
+        shader.setVec3("lightPos", lightPos);
+        shader.setVec3("lightColor", lightColor);
+        shader.setVec3("dirLightDirection", dirLightDirection);
+        shader.setVec3("dirLightColor", dirLightColor);
+        ourModel.Draw(shader);
+
+        lightCubeShader.use();
+        lightCubeShader.setMat4("projection", projection);
+        lightCubeShader.setMat4("view", view);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.6f));
+        lightCubeShader.setMat4("model", model);
+        lightCubeShader.setVec3("color", lightColor);
+        renderCube();
+
+        // imgui
+        ImGui::Begin("Light Controls");
+        ImGui::DragFloat3("Light Position", (float*)&lightPos, 0.5f, -50.0f, 50.0f);
+        ImGui::ColorEdit3("Light Color", (float*)&lightColor);
+        ImGui::SliderFloat3("Dir Light Direction", (float*)&dirLightDirection, -1.0f, 1.0f);
+        ImGui::ColorEdit3("Direction Color", (float*)&dirLightColor);
+        ImGui::End();
+        ImGui::Render();
+        ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

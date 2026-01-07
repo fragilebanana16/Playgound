@@ -457,6 +457,8 @@ glBindVertexArray(0);
 ```
 
 #### opengl加载obj的blender转换
+OBJ/MTL 完全不支持节点运算：导出obj时不要在纹理和output间加纹理，否则导出mtl没有纹理那行
+
 导出obj时blender4.2需要勾选copy path导出，这样mtl中包含纹理信息
 
 https://learnopengl-cn.github.io/01%20Getting%20started/01%20OpenGL/
@@ -503,3 +505,19 @@ https://learnopengl-cn.github.io/01%20Getting%20started/01%20OpenGL/
 ##### 绑定
 OpenGL有很多缓冲对象类型，顶点缓冲对象的缓冲类型是GL_ARRAY_BUFFER。OpenGL允许我们同时绑定多个缓冲，只要它们是不同的缓冲类型。
 glBindBuffer(GL_ARRAY_BUFFER, VBO);这一刻起，我们使用的任何（在GL_ARRAY_BUFFER目标上的）缓冲调用都会用来配置当前绑定的缓冲(VBO)
+
+
+
+#### 问题记录
+##### 模型红红绿绿的
+```c	
+
+FragColor = vec4(TexCoords, 0.0, 1.0);
+```
+首先查看纹理坐标，UV 在片段着色器中是插值后的结果，所以应该呈现平滑渐变
+==最后发现用错fs vs文件了==
+
+##### 集成imgui:
+
+拷贝imgui文件夹到各个子工程下，工程add existing item，选择这个文件夹下所有文件
+
