@@ -150,6 +150,23 @@ private:
         // specular: texture_specularN
         // normal: texture_normalN
 
+        for (unsigned int m = 0; m < scene->mNumMaterials; ++m) {
+            aiMaterial* material = scene->mMaterials[m];
+
+            // 遍历所有已知的纹理类型
+            for (int type = aiTextureType_NONE; type <= aiTextureType_UNKNOWN; ++type) {
+                unsigned int count = material->GetTextureCount((aiTextureType)type);
+                for (unsigned int i = 0; i < count; ++i) {
+                    aiString path;
+                    if (material->GetTexture((aiTextureType)type, i, &path) == AI_SUCCESS) {
+                        std::cout << "Material " << m
+                            << " Texture type " << type
+                            << " Path: " << path.C_Str() << std::endl;
+                    }
+                }
+            }
+        }
+
         // 1. diffuse maps
         vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -217,6 +234,8 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
         GLenum format;
         if (nrComponents == 1)
             format = GL_RED;
+        else if (nrComponents == 2) 
+            format = GL_RG;
         else if (nrComponents == 3)
             format = GL_RGB;
         else if (nrComponents == 4)

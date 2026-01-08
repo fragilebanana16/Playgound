@@ -8,10 +8,12 @@
 #include <learnopengl/model.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
+#include <learnopengl/filesystem.h>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void renderCube();
+unsigned int loadTexture(char const* path, bool gammaCorrection);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -30,6 +32,9 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 glm::vec3 dirLightDirection(-0.2f, -1.0f, -0.3f);
 glm::vec3 dirLightColor(1.0f, 1.0f, 1.0f);
+
+bool useSpecular = false;
+bool useEmissive = false;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -80,9 +85,11 @@ int main()
     // Setup style
     ImGui::StyleColorsDark();
 
-    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/modular_environment/obj/wall.obj");
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/low_poly_kitchen/frige.gltf");
     Shader shader("model.vs", "model.fs");
     Shader lightCubeShader("light_cube.vs", "light_cube.fs");
+
+    //unsigned int specularMap = loadTexture(FileSystem::getPath("resources/modular_environment/Material_baseColor_specular.png").c_str(), false);
 
         //std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // Ëæ»ú¸¡µãÊý£¬·¶Î§0.0 - 1.0
     //std::default_random_engine generator;
@@ -131,6 +138,12 @@ int main()
         shader.setVec3("lightColor", lightColor);
         shader.setVec3("dirLightDirection", dirLightDirection);
         shader.setVec3("dirLightColor", dirLightColor);
+        shader.setInt("useSpecular", useSpecular ? 1 : 0);
+        shader.setInt("useEmissive", useEmissive ? 1: 0);
+        //// bind specular map
+        //glActiveTexture(GL_TEXTURE15);
+        //glBindTexture(GL_TEXTURE_2D, specularMap);
+        //shader.setInt("specular1", 15);
         ourModel.Draw(shader);
 
         lightCubeShader.use();
@@ -149,7 +162,9 @@ int main()
         ImGui::ColorEdit3("Light Color", (float*)&lightColor);
         ImGui::SliderFloat3("Dir Light Direction", (float*)&dirLightDirection, -1.0f, 1.0f);
         ImGui::ColorEdit3("Direction Color", (float*)&dirLightColor);
-        ImGui::End();
+        ImGui::Checkbox("useSpecular", &useSpecular);
+        ImGui::Checkbox("useEmissive", &useEmissive);
+        ImGui::End(); 
         ImGui::Render();
         ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -320,4 +335,53 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
         camera.ProcessMouseScroll(static_cast<float>(yoffset));
     }
+}
+
+// ---------------------------------------------------
+// utility function for loading a 2D texture from file
+// ---------------------------------------------------
+unsigned int loadTexture(char const* path, bool gammaCorrection)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum internalFormat;
+        GLenum dataFormat;
+        if (nrComponents == 1)
+        {
+            internalFormat = dataFormat = GL_RED;
+        }
+        else if (nrComponents == 3)
+        {
+            internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
+            dataFormat = GL_RGB;
+        }
+        else if (nrComponents == 4)
+        {
+            internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
+            dataFormat = GL_RGBA;
+        }
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
 }

@@ -7,6 +7,7 @@ in vec2 TexCoords;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
+uniform sampler2D texture_emissive1;
 
 uniform vec3 lightPos;       // 点光源
 uniform vec3 viewPos;
@@ -15,6 +16,9 @@ uniform vec3 lightColor;
 // 平行光
 uniform vec3 dirLightDirection;
 uniform vec3 dirLightColor;
+
+uniform bool useSpecular;
+uniform bool useEmissive;
 
 void main()
 {
@@ -26,7 +30,7 @@ void main()
 
     // 点光源衰减
     float distance    = length(lightPos - FragPos);
-    float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
+    float attenuation = 1.0 / (1.0 + 0.045 * distance + 0.0075 * distance * distance);
 
     // 环境光
     vec3 ambient = 0.1 * diffuseColor;
@@ -42,27 +46,14 @@ void main()
     vec3 specular = specularStrength * spec * lightColor;
 
     // 应用衰减
-    ambient  *= attenuation;
-    diffuse  *= attenuation;
-    specular *= attenuation;
+    //ambient  *= attenuation;
+    //diffuse  *= attenuation;
+    //specular *= attenuation;
 
-    // -------------------------
-    // 平行光（Directional Light）
-    // -------------------------
-    vec3 dirLightDir = normalize(-dirLightDirection);
-
-    // 漫反射
-    float diffDir = max(dot(norm, dirLightDir), 0.0);
-    vec3 diffuseDir = diffDir * diffuseColor * dirLightColor;
-
-    // 高光
-    vec3 reflectDirDir = reflect(-dirLightDir, norm);
-    float specDir = pow(max(dot(viewDir, reflectDirDir), 0.0), 32.0);
-    vec3 specularDir = specularStrength * specDir * dirLightColor;
+    vec3 emissive = (useEmissive ? texture(texture_emissive1, TexCoords).rgb : vec3(0.0));
 
     // 最终颜色
-    vec3 result = ambient + diffuse + specular
-                + diffuseDir;
+    vec3 result = ambient + diffuse + emissive + (useSpecular ? specular : vec3(0.0));
 
     FragColor = vec4(result, 1.0);
 }

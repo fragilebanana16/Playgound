@@ -509,6 +509,13 @@ glBindBuffer(GL_ARRAY_BUFFER, VBO);这一刻起，我们使用的任何（在GL_
 
 
 #### 问题记录
+##### assimp版本升级以支持gltf(3.1不支持)
+- 下载https://github.com/assimp/assimp/releases
+- cmake选择assimp-5.3.0文件夹，子目录新建build，configure generate
+- 打开build/Assimp.sln，编译
+- 拷贝assimp-5.3.0\build\bin\Debug\assimp-vc142-mtd.dll、assimp-5.3.0\build\lib\Debug\assimp-vc142-mtd.lib到OpenGL\libraries\Libs
+- 拷贝assimp-5.3.0\assimp-5.3.0\include、build\include到OpenGL\libraries\Include，contrib到同级目录
+
 ##### 模型红红绿绿的
 ```c	
 
