@@ -17,7 +17,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
-unsigned int loadTexture(const char* path);
+unsigned int loadTexture(const char* path, bool alpha);
 void renderSphere();
 void renderCube();
 void renderQuad();
@@ -83,6 +83,9 @@ int main()
     // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // build and compile shaders
     // -------------------------
     Shader pbrShader("ibl_specular_textured/2.2.2.pbr.vs", "ibl_specular_textured/2.2.2.pbr.fs");
@@ -91,7 +94,7 @@ int main()
     Shader prefilterShader("ibl_specular_textured/2.2.2.cubemap.vs", "ibl_specular_textured/2.2.2.prefilter.fs");
     Shader brdfShader("ibl_specular_textured/2.2.2.brdf.vs", "ibl_specular_textured/2.2.2.brdf.fs");
     Shader backgroundShader("ibl_specular_textured/2.2.2.background.vs", "ibl_specular_textured/2.2.2.background.fs");
-    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/test/ibanez_jem_guitar/Scene.gltf");
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/test/2022car/export/car.gltf");
 
     pbrShader.use();
     pbrShader.setInt("irradianceMap", 0);
@@ -106,20 +109,20 @@ int main()
     backgroundShader.use();
     backgroundShader.setInt("environmentMap", 0);
 
-    unsigned int albedo = loadTexture(FileSystem::getPath("resources/test/ibanez_jem_guitar/textures/lambert4SG_diffuse.jpeg").c_str());
-    unsigned int normal = loadTexture(FileSystem::getPath("resources/test/ibanez_jem_guitar/textures/lambert5SG_normal.png").c_str());
-    unsigned int metallic = loadTexture(FileSystem::getPath("resources/test/ibanez_jem_guitar/textures/lambert4SG_specularGlossiness.png").c_str());
-    unsigned int roughness = loadTexture(FileSystem::getPath("resources/test/ibanez_jem_guitar/textures/lambert4SG_specularGlossiness.png").c_str());
-    unsigned int ao = loadTexture(FileSystem::getPath("resources/test/ibanez_jem_guitar/textures/lambert4SG_occlusion.png").c_str());
+    unsigned int albedo = loadTexture(FileSystem::getPath("resources/test/2022car/textures/diffuse.png").c_str(), true);
+    unsigned int normal = loadTexture(FileSystem::getPath("resources/test/2022car/textures/normal.png").c_str(), false);
+    unsigned int metallic = loadTexture(FileSystem::getPath("resources/test/2022car/textures/metal.png").c_str(), false);
+    unsigned int roughness = loadTexture(FileSystem::getPath("resources/test/2022car/textures/roughness.png").c_str(), false);
+    //unsigned int ao = loadTexture(FileSystem::getPath("resources/test/9_mm/done/textures/lambert4SG_occlusion.png").c_str());
 
     // load PBR material textures
     // --------------------------
     // rusted iron
-    unsigned int ironAlbedoMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/albedo.png").c_str());
-    unsigned int ironNormalMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/normal.png").c_str());
-    unsigned int ironMetallicMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/metallic.png").c_str());
-    unsigned int ironRoughnessMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/roughness.png").c_str());
-    unsigned int ironAOMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/ao.png").c_str());
+    unsigned int ironAlbedoMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/albedo.png").c_str(), false);
+    unsigned int ironNormalMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/normal.png").c_str(), false);
+    unsigned int ironMetallicMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/metallic.png").c_str(), false);
+    unsigned int ironRoughnessMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/roughness.png").c_str(), false);
+    unsigned int ironAOMap = loadTexture(FileSystem::getPath("resources/textures/pbr/rusted_iron/ao.png").c_str(), false);
 
     //// gold
     //unsigned int goldAlbedoMap = loadTexture(FileSystem::getPath("resources/textures/pbr/gold/albedo.png").c_str());
@@ -425,7 +428,7 @@ int main()
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, roughness);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, ao);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0, 0.0, 0.0));
@@ -830,7 +833,7 @@ void renderQuad()
 
 // utility function for loading a 2D texture from file
 // ---------------------------------------------------
-unsigned int loadTexture(char const* path)
+unsigned int loadTexture(char const* path, bool alpha = false)
 {
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -846,7 +849,9 @@ unsigned int loadTexture(char const* path)
             format = GL_RGB;
         else if (nrComponents == 4)
             format = GL_RGBA;
-
+        if (alpha) {
+            format = GL_RGBA;
+        }
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);

@@ -39,3 +39,5 @@
 !/OpenGL/**/x64/*.vs
 
 /OpenGL/libraries/**
+/OpenGL/vs/Demo/x64/*
+

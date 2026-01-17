@@ -93,7 +93,10 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 void main()
 {		
     // material properties
-    vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2));
+	vec4 albedoTex = texture(albedoMap, TexCoords);
+	vec3 albedo = pow(albedoTex.rgb, vec3(2.2));
+	float alpha = albedoTex.a;
+
     float metallic = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
     float ao = texture(aoMap, TexCoords).r;
@@ -171,5 +174,6 @@ void main()
     // gamma correct
     color = pow(color, vec3(1.0/2.2)); 
 
-    FragColor = vec4(color , 1.0);
+    FragColor = vec4(color, alpha);
+
 }

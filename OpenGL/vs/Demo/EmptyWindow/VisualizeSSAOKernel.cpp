@@ -16,6 +16,10 @@ void renderCube();
 unsigned int loadTexture(char const* path, bool gammaCorrection);
 void renderQuad();
 
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+unsigned int cubeVAO = 0;
+unsigned int cubeVBO = 0;
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -322,16 +326,42 @@ int main()
         glfwPollEvents();
     }
 
+    // É¾³ý Framebuffers
+    glDeleteFramebuffers(1, &gBuffer);
+    glDeleteFramebuffers(1, &ssaoFBO);
+    glDeleteFramebuffers(1, &ssaoBlurFBO);
+
+    // É¾³ý Textures
+    glDeleteTextures(1, &gPosition);
+    glDeleteTextures(1, &gNormal);
+    glDeleteTextures(1, &gAlbedo);
+    glDeleteTextures(1, &ssaoColorBuffer);
+    glDeleteTextures(1, &ssaoColorBufferBlur);
+    glDeleteTextures(1, &noiseTexture);
+
+    // É¾³ý Renderbuffers
+    glDeleteRenderbuffers(1, &rboDepth);
+
+    // É¾³ý VAO/VBO
+    glDeleteVertexArrays(1, &quadVAO);
+    glDeleteBuffers(1, &quadVBO);
+    glDeleteVertexArrays(1, &cubeVAO);
+    glDeleteBuffers(1, &cubeVBO);
+
+    // É¾³ý Shader Program
+    glDeleteProgram(shaderGeometryPass.ID);
+    glDeleteProgram(shaderLightingPass.ID);
+    glDeleteProgram(lightCubeShader.ID);
+    glDeleteProgram(shaderSSAO.ID);
+    glDeleteProgram(shaderSSAOBlur.ID);
+
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
 }
-
 // renderQuad() renders a 1x1 XY quad in NDC
 // -----------------------------------------
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
 void renderQuad()
 {
     if (quadVAO == 0)
@@ -360,8 +390,6 @@ void renderQuad()
 }
 // renderCube() renders a 1x1 3D cube in NDC.
 // -------------------------------------------------
-unsigned int cubeVAO = 0;
-unsigned int cubeVBO = 0;
 void renderCube()
 {
     // initialize (if necessary)
