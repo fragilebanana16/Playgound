@@ -26,7 +26,7 @@ class Model
 {
 public:
     // model data 
-    vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    vector<MaterialProperty> material_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
@@ -88,7 +88,7 @@ private:
         // data to fill
         vector<Vertex> vertices;
         vector<unsigned int> indices;
-        vector<Texture> textures;
+        vector<MaterialProperty> textures;
 
         // walk through each of the mesh's vertices
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
@@ -141,80 +141,85 @@ private:
             for(unsigned int j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);        
         }
-        // process materials
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];    
-        // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
-        // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
-        // Same applies to other texture as the following list summarizes:
-        // diffuse: texture_diffuseN
-        // specular: texture_specularN
-        // normal: texture_normalN
 
-        //for (unsigned int m = 0; m < scene->mNumMaterials; ++m) {
-        //    aiMaterial* material = scene->mMaterials[m];
+        Material material; 
+        if (mesh->mMaterialIndex >= 0) {
+            aiMaterial* aiMat = scene->mMaterials[mesh->mMaterialIndex]; 
+            loadMaterialTextures(aiMat, aiTextureType_DIFFUSE,            "albedoMap", material); 
+            loadMaterialTextures(aiMat, aiTextureType_NORMALS,            "normalMap", material);  // blender指向同一个
+            loadMaterialTextures(aiMat, aiTextureType_DIFFUSE_ROUGHNESS,  "metallicRoughnessMap", material); 
+            loadMaterialTextures(aiMat, aiTextureType_LIGHTMAP,           "aoMap", material);
+            loadMaterialConstants(aiMat, material); // 新增：常量值 
+        }
 
-        //    // 遍历所有已知的纹理类型
-        //    for (int type = aiTextureType_NONE; type <= aiTextureType_UNKNOWN; ++type) {
-        //        unsigned int count = material->GetTextureCount((aiTextureType)type);
-        //        for (unsigned int i = 0; i < count; ++i) {
-        //            aiString path;
-        //            if (material->GetTexture((aiTextureType)type, i, &path) == AI_SUCCESS) {
-        //                std::cout << "Material " << m
-        //                    << " Texture type " << type
-        //                    << " Path: " << path.C_Str() << std::endl;
-        //            }
-        //        }
-        //    }
-        //}
-
-        // 1. diffuse maps
-        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        // 2. specular maps
-        vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-        // 3. normal maps
-        std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-        textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-        // 4. height maps
-        std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-        textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-        
         // return a mesh object created from the extracted mesh data
-        return Mesh(vertices, indices, textures);
+        return Mesh(vertices, indices, material);
     }
 
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
-    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
+    void loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& baseName, Material& material)
     {
-        vector<Texture> textures;
         for(unsigned int i = 0; i < mat->GetTextureCount(type); i++)
         {
             aiString str;
             mat->GetTexture(type, i, &str);
             // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
             bool skip = false;
-            for(unsigned int j = 0; j < textures_loaded.size(); j++)
+            for(unsigned int j = 0; j < material_loaded.size(); j++)
             {
-                if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
+                if(std::strcmp(material_loaded[j].path.data(), str.C_Str()) == 0)
                 {
-                    textures.push_back(textures_loaded[j]);
+                    material.properties.push_back(material_loaded[j]);
                     skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
                     break;
                 }
             }
             if(!skip)
             {   // if texture hasn't been loaded already, load it
-                Texture texture;
-                texture.id = TextureFromFile(str.C_Str(), this->directory);
-                texture.type = typeName;
-                texture.path = str.C_Str();
-                textures.push_back(texture);
-                textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecessary load duplicate textures.
+                MaterialProperty prop{};
+                prop.isTexture = true; 
+                prop.id = TextureFromFile(str.C_Str(), this->directory); 
+                prop.type = baseName;
+                prop.path = str.C_Str(); 
+                material.properties.push_back(prop);
             }
         }
-        return textures;
+    }
+
+    void pushVec4(Material& material, const std::string& name, const aiColor4D& c) {
+        MaterialProperty p{};
+        p.isTexture = false; p.isVec4 = true; p.name = name;
+        p.vec4 = glm::vec4(c.r, c.g, c.b, c.a);
+        material.properties.push_back(p);
+    }
+    void pushFloat(Material& material, const std::string& name, float v) {
+        MaterialProperty p{};
+        p.isTexture = false; p.isVec4 = false; p.name = name;
+        p.scalar = v;
+        material.properties.push_back(p);
+    }
+
+    void loadMaterialConstants(aiMaterial* mat, Material& material) {
+        // 传统槽位（兼容非PBR）
+        aiColor4D c;
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_DIFFUSE, c))   pushVec4(material, "diffuseColor", c);
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_SPECULAR, c))  pushVec4(material, "specularColor", c);
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_COLOR_EMISSIVE, c))  pushVec4(material, "emissiveColor", c);
+
+        float f;
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_OPACITY, f))         pushFloat(material, "opacity", f);
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_SHININESS, f))       pushFloat(material, "shininess", f);
+
+        // PBR 扩展（GLTF/FBX 映射时常见）
+        // 注意：不同格式/导出器键名可能差异，以下是常见键位
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_BASE_COLOR, c))      pushVec4(material, "baseColor", c);
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_METALLIC_FACTOR, f)) pushFloat(material, "metallicFactor", f);
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, f))pushFloat(material, "roughnessFactor", f);
+
+        // 可选：清漆/透射等（若导出器写入）
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_CLEARCOAT_FACTOR, f))    pushFloat(material, "clearcoat", f);
+        if (AI_SUCCESS == mat->Get(AI_MATKEY_TRANSMISSION_FACTOR, f)) pushFloat(material, "transmission", f);
     }
 };
 
@@ -234,8 +239,6 @@ unsigned int TextureFromFile(const char *path, const string &directory, bool gam
         GLenum format;
         if (nrComponents == 1)
             format = GL_RED;
-        else if (nrComponents == 2) 
-            format = GL_RG;
         else if (nrComponents == 3)
             format = GL_RGB;
         else if (nrComponents == 4)

@@ -10,9 +10,32 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
 #define MAX_BONE_INFLUENCE 4
+static std::unordered_map<std::string, int> textureUnitMap = {
+    {"albedoMap", 3},
+    {"normalMap", 4},
+    {"metallicRoughnessMap", 5},
+    {"aoMap", 6}
+};
+
+
+struct MaterialProperty {
+    bool isTexture; // true: 纹理, false: 常量 
+    string type;
+    unsigned int id; // 纹理ID (仅纹理) 
+    std::string name; // uniform 名称 (如 "baseColor", "roughness", "diffuse1") 
+    std::string path; // 纹理路径 (仅纹理) 
+    glm::vec4 vec4; // 常量向量 (颜色等) 
+    float scalar; // 常量标量 (粗糙度、金属度等) 
+    bool isVec4; // true: vec4, false: float 
+};
+
+struct Material {
+    std::vector<MaterialProperty> properties; // diffuse, specular, normal, roughness, metallic, ao
+};
 
 struct Vertex {
     // position
@@ -42,59 +65,44 @@ public:
     // mesh Data
     vector<Vertex>       vertices;
     vector<unsigned int> indices;
-    vector<Texture>      textures;
+    Material material;
     unsigned int VAO;
 
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material)
     {
         this->vertices = vertices;
         this->indices = indices;
-        this->textures = textures;
+        this->material = material;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
     }
 
-    // render the mesh
-    void Draw(Shader &shader, bool ignoreTexture = false) 
-    {
-        if (!ignoreTexture)
-        {
-            // bind appropriate textures
-            unsigned int diffuseNr = 1;
-            unsigned int specularNr = 1;
-            unsigned int normalNr = 1;
-            unsigned int heightNr = 1;
-            for (unsigned int i = 0; i < textures.size(); i++)
-            {
-                glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-                // retrieve texture number (the N in diffuse_textureN)
-                string number;
-                string name = textures[i].type;
-                if (name == "texture_diffuse")
-                    number = std::to_string(diffuseNr++);
-                else if (name == "texture_specular")
-                    number = std::to_string(specularNr++); // transfer unsigned int to string
-                else if (name == "texture_normal")
-                    number = std::to_string(normalNr++); // transfer unsigned int to string
-                else if (name == "texture_height")
-                    number = std::to_string(heightNr++); // transfer unsigned int to string
-
-                // now set the sampler to the correct texture unit
-                glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-                // and finally bind the texture
-                glBindTexture(GL_TEXTURE_2D, textures[i].id);
+    void Draw(Shader& shader) {
+        for (auto& p : material.properties) {
+            if (p.isTexture) {
+                auto it = textureUnitMap.find(p.type);
+                if (it != textureUnitMap.end()) {
+                    int unit = it->second;
+                    glActiveTexture(GL_TEXTURE0 + unit);
+                    glBindTexture(GL_TEXTURE_2D, p.id);
+                    shader.setInt(p.type, GL_TEXTURE0 + unit);   // sampler uniform
+                    shader.setBool("has_" + p.type, true);
+                }
+            }
+            else {
+                shader.setBool("has_" + p.type, false);
+                if (p.isVec4) 
+                    shader.setVec4(p.name, p.vec4);
+                else          
+                    shader.setFloat(p.name, p.scalar);
             }
         }
-        
-        // draw mesh
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
 
-        // always good practice to set everything back to defaults once configured.
-        glActiveTexture(GL_TEXTURE0);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
     }
 
 private:

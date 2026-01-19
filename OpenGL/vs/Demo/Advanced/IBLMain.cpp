@@ -12,6 +12,8 @@
 #include <learnopengl/model.h>
 
 #include <iostream>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -35,7 +37,12 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-
+glm::vec3 albedoColor = glm::vec3(1.0f, 0.5f, 0.2f);
+static float metallic = 0.0f; 
+static float roughness = 0.5f;
+bool is_customDiffuseColor = false;
+bool is_customMetallic  = false;
+bool is_customRoughness = false;
 int main()
 {
     // glfw: initialize and configure
@@ -94,7 +101,7 @@ int main()
     Shader prefilterShader("ibl_specular_textured/2.2.2.cubemap.vs", "ibl_specular_textured/2.2.2.prefilter.fs");
     Shader brdfShader("ibl_specular_textured/2.2.2.brdf.vs", "ibl_specular_textured/2.2.2.brdf.fs");
     Shader backgroundShader("ibl_specular_textured/2.2.2.background.vs", "ibl_specular_textured/2.2.2.background.fs");
-    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/test/2022car/export/car.gltf");
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/test/basicNode/untitled.gltf");
 
     pbrShader.use();
     pbrShader.setInt("irradianceMap", 0);
@@ -102,17 +109,16 @@ int main()
     pbrShader.setInt("brdfLUT", 2);
     pbrShader.setInt("albedoMap", 3);
     pbrShader.setInt("normalMap", 4);
-    pbrShader.setInt("metallicMap", 5);
-    pbrShader.setInt("roughnessMap", 6);
-    pbrShader.setInt("aoMap", 7);
+    pbrShader.setInt("metallicRoughnessMap", 5);
+    pbrShader.setInt("aoMap", 6);
 
     backgroundShader.use();
     backgroundShader.setInt("environmentMap", 0);
 
-    unsigned int albedo = loadTexture(FileSystem::getPath("resources/test/2022car/textures/diffuse.png").c_str(), true);
-    unsigned int normal = loadTexture(FileSystem::getPath("resources/test/2022car/textures/normal.png").c_str(), false);
-    unsigned int metallic = loadTexture(FileSystem::getPath("resources/test/2022car/textures/metal.png").c_str(), false);
-    unsigned int roughness = loadTexture(FileSystem::getPath("resources/test/2022car/textures/roughness.png").c_str(), false);
+    //unsigned int albedo = loadTexture(FileSystem::getPath("resources/test/2022car/textures/diffuse.png").c_str(), true);
+    //unsigned int normal = loadTexture(FileSystem::getPath("resources/test/2022car/textures/normal.png").c_str(), false);
+    //unsigned int metallic = loadTexture(FileSystem::getPath("resources/test/2022car/textures/metal.png").c_str(), false);
+    //unsigned int roughness = loadTexture(FileSystem::getPath("resources/test/2022car/textures/roughness.png").c_str(), false);
     //unsigned int ao = loadTexture(FileSystem::getPath("resources/test/9_mm/done/textures/lambert4SG_occlusion.png").c_str());
 
     // load PBR material textures
@@ -384,6 +390,12 @@ int main()
     glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
     glViewport(0, 0, scrWidth, scrHeight);
 
+    // Setup ImGui binding
+    ImGui::CreateContext();
+    ImGui_ImplGlfwGL3_Init(window, true);
+    // Setup style
+    ImGui::StyleColorsDark();
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -402,6 +414,7 @@ int main()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ImGui_ImplGlfwGL3_NewFrame();
 
         // render scene, supplying the convoluted irradiance map to the final shader.
         // ------------------------------------------------------------------------------------------
@@ -411,6 +424,13 @@ int main()
         pbrShader.setMat4("view", view);
         pbrShader.setVec3("camPos", camera.Position);
 
+        pbrShader.setVec3("customDiffuseColor", albedoColor);
+        pbrShader.setBool("is_customDiffuseColor", is_customDiffuseColor);
+        pbrShader.setFloat("customMetallic", metallic);
+        pbrShader.setBool("is_customMetallic", is_customMetallic);
+        pbrShader.setFloat("customRougness", roughness);
+        pbrShader.setBool("is_customRoughness", is_customRoughness);
+        
         // bind pre-computed IBL data
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
@@ -419,7 +439,7 @@ int main()
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
 
-        glActiveTexture(GL_TEXTURE3);
+       /* glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, albedo);
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, normal);
@@ -428,7 +448,7 @@ int main()
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, roughness);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, 0);*/
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0, 0.0, 0.0));
@@ -437,7 +457,7 @@ int main()
         ourModel.Draw(pbrShader);
 
         // rusted iron
-        glActiveTexture(GL_TEXTURE3);
+  /*      glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, ironAlbedoMap);
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, ironNormalMap);
@@ -446,7 +466,7 @@ int main()
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, ironRoughnessMap);
         glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, ironAOMap);
+        glBindTexture(GL_TEXTURE_2D, ironAOMap);*/
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-5.0, 0.0, 2.0));
@@ -557,7 +577,20 @@ int main()
         // render BRDF map to screen
         //brdfShader.Use();
         //renderQuad();
+        ImGui::Begin("Shader");
+        ImGui::Text("Albedo"); 
+        ImGui::Checkbox("Custom Albedo", &is_customDiffuseColor);
+        ImGui::ColorEdit3("##AlbedoColor", &albedoColor.x); 
+        ImGui::Text("Metallic"); 
+        ImGui::Checkbox("Custom Metallic", &is_customMetallic);
+        ImGui::SliderFloat("##Metallic", &metallic, 0.0f, 1.0f);
+        ImGui::Text("Roughness"); 
+        ImGui::Checkbox("Custom Roughness", &is_customRoughness);
+        ImGui::SliderFloat("##Roughness", &roughness, 0.0f, 1.0f);
 
+        ImGui::End();
+        ImGui::Render();
+        ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -604,7 +637,6 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
-
     if (firstMouse)
     {
         lastX = xpos;
@@ -618,14 +650,23 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        // 只有当 ImGui 不需要鼠标时，并且右键被按住时，才更新相机
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        camera.ProcessMouseMovement(xoffset, yoffset);
+    }
+    else {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+        camera.ProcessMouseScroll(static_cast<float>(yoffset));
+    }
 }
 
 // renders (and builds at first invocation) a sphere

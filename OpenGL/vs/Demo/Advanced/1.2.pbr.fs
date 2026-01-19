@@ -11,6 +11,11 @@ uniform sampler2D metallicMap;
 uniform sampler2D roughnessMap;
 uniform sampler2D aoMap;
 
+
+uniform vec4 diffuseColor;
+uniform float metallicFactor;
+uniform float roughnessFactor;
+
 // lights
 uniform vec3 lightPositions[4];
 uniform vec3 lightColors[4];
@@ -86,7 +91,10 @@ void main()
     float metallic  = texture(metallicMap, TexCoords).r;
     float roughness = texture(roughnessMap, TexCoords).r;
     float ao        = texture(aoMap, TexCoords).r;
-
+    if (!has_diffuseColor)   albedo = diffuseColor.rgb;
+	if (!has_metallicFactor) metallic = metallicFactor;
+	if (!has_roughnessFactor)roughness = roughnessFactor;
+	
     vec3 N = getNormalFromMap();
     vec3 V = normalize(camPos - WorldPos);
 

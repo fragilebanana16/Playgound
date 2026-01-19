@@ -7,9 +7,21 @@ in vec3 Normal;
 // material parameters
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
-uniform sampler2D metallicMap;
-uniform sampler2D roughnessMap;
+uniform sampler2D metallicRoughnessMap;
 uniform sampler2D aoMap;
+
+uniform vec4 diffuseColor;
+uniform float metallicFactor;
+uniform float roughnessFactor;
+uniform bool has_albedoMap;
+uniform bool has_metallicRoughnessMap;
+
+uniform vec3 customDiffuseColor;
+uniform bool is_customDiffuseColor;
+uniform float customRougness;
+uniform bool is_customRoughness;
+uniform float customMetallic;
+uniform bool is_customMetallic;
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -94,13 +106,31 @@ void main()
 {		
     // material properties
 	vec4 albedoTex = texture(albedoMap, TexCoords);
-	vec3 albedo = pow(albedoTex.rgb, vec3(2.2));
-	float alpha = albedoTex.a;
+	vec3 albedo = pow(albedoTex.rgb, vec3(2.2)); // vec3(1.0)
+	float alpha = 1.0; // albedoTex.a;
 
-    float metallic = texture(metallicMap, TexCoords).r;
-    float roughness = texture(roughnessMap, TexCoords).r;
+    float metallic = texture(metallicRoughnessMap, TexCoords).r;
+    float roughness = texture(metallicRoughnessMap, TexCoords).g;
     float ao = texture(aoMap, TexCoords).r;
-       
+	
+	if(!has_albedoMap) {
+	    albedo = diffuseColor.rgb;
+	}
+	if(!has_metallicRoughnessMap) {
+	    metallic = metallicFactor;
+	    roughness = roughnessFactor;
+	}
+
+    if(is_customDiffuseColor){
+	    albedo = customDiffuseColor;
+	}
+	if(is_customMetallic){
+	    metallic = customMetallic;
+	}
+	if(is_customRoughness){
+	    roughness = customRougness;
+	}
+	
     // input lighting data
     vec3 N = getNormalFromMap();
     vec3 V = normalize(camPos - WorldPos);
@@ -175,5 +205,4 @@ void main()
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color, alpha);
-
 }
