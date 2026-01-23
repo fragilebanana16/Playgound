@@ -55,8 +55,8 @@ fileInput.addEventListener('change', (event) => {
         console.log('GLB 模型加载完成:', gltf);
       }, (error) => console.error('解析 GLB 出错:', error));
     } else if (file.name.endsWith('.gltf')) {
-      const text = new TextDecoder().decode(contents);
-      loader.parse(JSON.parse(text), '', (gltf) => {
+
+      loader.parse(contents, '', (gltf) => {
         scene.add(gltf.scene);
         console.log('GLTF 模型加载完成:', gltf);
       }, (error) => console.error('解析 GLTF 出错:', error));
