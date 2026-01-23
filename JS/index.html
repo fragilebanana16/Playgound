@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>EventDispatcher</title>
+  </head>
+  <body>
+    <script src="./EventDispatcher.js"></script>
+  </body>
+</html>
+
+<script>
+	// Adding events to custom object
+
+	class Car extends EventDispatcher {
+
+		start () {
+
+			this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+
+		}
+
+	}
+
+	// Using events
+
+	var car = new Car();
+
+	car.addEventListener( 'start', function ( event ) {
+
+		alert( event.message );
+
+	} );
+
+	car.start();
+
+</script>
