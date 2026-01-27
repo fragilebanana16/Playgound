@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Three.js Bloom Example</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<!-- Three.js 主库 -->
+<script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
+
+<!-- 后期处理依赖（必须按顺序） -->
+<script src="https://unpkg.com/three@0.146.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://unpkg.com/three@0.146.0/examples/js/postprocessing/Pass.js"></script>
+<script src="https://unpkg.com/three@0.146.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://unpkg.com/three@0.146.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://unpkg.com/three@0.146.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://unpkg.com/three@0.146.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://unpkg.com/three@0.146.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+<script>
+  // 基础场景
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 5;
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // 一个发光球体（模拟车灯）
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.0
+  });
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), material);
+  scene.add(sphere);
+
+  // 环境光
+  scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+
+  // 后期处理
+  const composer = new THREE.EffectComposer(renderer);
+  composer.addPass(new THREE.RenderPass(scene, camera));
+
+  const bloomPass = new THREE.UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.0, // strength
+    0.4, // radius
+    0.85 // threshold
+  );
+  composer.addPass(bloomPass);
+
+  // 动画：灯从灭到亮
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+
+    t += 0.01;
+    const v = Math.min(1, t);
+
+    material.emissiveIntensity = v * 3;
+    bloomPass.strength = v * 2;
+
+    composer.render();
+  }
+  animate();
+
+  // 自适应窗口
+  window.addEventListener("resize", () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
+</script>
+
+</body>
+</html>
