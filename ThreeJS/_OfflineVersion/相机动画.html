@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Camera Path Smooth Turn (2s)</title>
+<style>
+  body { margin: 0; overflow: hidden; background: #000; }
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/dat.gui@0.7.9/build/dat.gui.min.js"></script>
+
+<script>
+let scene, camera, renderer, controls;
+let recordedPositions = [];
+let isRecording = false;
+let curve = null;
+let playT = 0;
+let isPlaying = false;
+let curveLine = null;
+let zoomInKey = false;
+let zoomOutKey = false;
+let targetDistance = 8; // 初始距离，可根据你的场景调整
+
+const simplifyEpsilon = 0.2;
+
+let lastTime = performance.now();
+const smoothLookAt = new THREE.Vector3(); // 用来做“滞后朝向”
+
+init();
+animate();
+
+function init() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x222222);
+
+    camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 100);
+    camera.position.set(5, 3, 8);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+controls.zoomSpeed = 0.3;   // 默认 1.0，越大步长越大
+controls.dollySpeed = 3.0;  // 某些版本用这个
+controls.enableDamping = true;
+controls.dampingFactor = 0.01;  // 越小越丝滑
+
+    const grid = new THREE.GridHelper(40, 40);
+    scene.add(grid);
+	// ======== 世界中心球体（视觉锚点） ========
+	const sphereGeo = new THREE.SphereGeometry(0.5, 32, 32);
+	const sphereMat = new THREE.MeshStandardMaterial({
+		color: 0xff4444,
+		emissive: 0x550000,
+		roughness: 0.3,
+		metalness: 0.1
+	});
+	const centerSphere = new THREE.Mesh(sphereGeo, sphereMat);
+	centerSphere.position.set(0, 0.5, 0); // 你也可以改成 (0,0,0)
+	scene.add(centerSphere);
+
+    const cubeGeo = new THREE.BoxGeometry(1, 1, 1);
+    for (let i = 0; i < 20; i++) {
+        const mat = new THREE.MeshStandardMaterial({
+            color: new THREE.Color().setHSL(i / 20, 0.6, 0.5)
+        });
+        const cube = new THREE.Mesh(cubeGeo, mat);
+        cube.position.set(
+            (Math.random() - 0.5) * 20,
+            0.5,
+            (Math.random() - 0.5) * 20
+        );
+        scene.add(cube);
+    }
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5, 10, 5);
+    scene.add(light);
+
+    const gui = new dat.GUI();
+    gui.add({ startRecord }, "startRecord").name("开始录制");
+    gui.add({ stopRecord }, "stopRecord").name("停止录制");
+    gui.add({ playSmooth }, "playSmooth").name("播放平滑动画");
+    gui.add({ clearPath }, "clearPath").name("清除轨迹");
+
+    window.addEventListener("resize", onResize);
+}
+
+function startRecord() {
+    recordedPositions = [];
+    isRecording = true;
+    isPlaying = false;
+    curve = null;
+    if (curveLine) {
+        scene.remove(curveLine);
+        curveLine = null;
+    }
+    console.log("开始录制相机轨迹");
+}
+
+function stopRecord() {
+    isRecording = false;
+    console.log("停止录制，原始点数:", recordedPositions.length);
+
+    if (recordedPositions.length < 4) {
+        alert("点太少，无法生成曲线");
+        return;
+    }
+
+	const minCount = Math.floor(recordedPositions.length * 0.01); 
+    const simplified = simplifyRDPWithMinCount(recordedPositions, 0.3, minCount);
+
+
+    console.log("简化后点数:", simplified.length);
+
+    curve = new THREE.CatmullRomCurve3(simplified, false, "catmullrom", 0.5);
+    drawCurve();
+
+    // 初始化 lookAt 目标为当前相机前方
+    const startPos = curve.getPoint(0);
+    const nextPos = curve.getPoint(0.01);
+    smoothLookAt.copy(nextPos);
+}
+
+function playSmooth() {
+    if (!curve) {
+        alert("没有轨迹，请先录制");
+        return;
+    }
+    playT = 0;
+    isPlaying = true;
+}
+
+function clearPath() {
+    recordedPositions = [];
+    curve = null;
+    isPlaying = false;
+    if (curveLine) {
+        scene.remove(curveLine);
+        curveLine = null;
+    }
+}
+
+function drawCurve() {
+    if (curveLine) scene.remove(curveLine);
+
+    const points = curve.getPoints(200);
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.LineBasicMaterial({ color: 0xffaa00 });
+    curveLine = new THREE.Line(geo, mat);
+    scene.add(curveLine);
+}
+
+function simplifyRDP(points, epsilon) {
+    if (points.length < 3) return points;
+
+    const first = points[0];
+    const last = points[points.length - 1];
+
+    let index = -1;
+    let maxDist = 0;
+
+    for (let i = 1; i < points.length - 1; i++) {
+        const dist = pointLineDistance(points[i], first, last);
+        if (dist > maxDist) {
+            index = i;
+            maxDist = dist;
+        }
+    }
+
+    if (maxDist > epsilon) {
+        const left = simplifyRDP(points.slice(0, index + 1), epsilon);
+        const right = simplifyRDP(points.slice(index), epsilon);
+        return left.slice(0, -1).concat(right);
+    } else {
+        return [first, last];
+    }
+}
+function simplifyRDPWithMinCount(points, epsilon, minCount) {
+    let simplified = simplifyRDP(points, epsilon);
+
+    // 如果点数太少，降低 epsilon 再来一次
+    while (simplified.length < minCount) {
+        epsilon *= 0.5; // 降低阈值，保留更多点
+        simplified = simplifyRDP(points, epsilon);
+
+        // 防止死循环
+        if (epsilon < 1e-6) break;
+    }
+
+    return simplified;
+}
+
+function pointLineDistance(p, a, b) {
+    const ab = b.clone().sub(a);
+    const ap = p.clone().sub(a);
+    const t = ap.dot(ab) / ab.lengthSq();
+    const proj = a.clone().add(ab.multiplyScalar(t));
+    return p.distanceTo(proj);
+}
+
+function onResize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const now = performance.now();
+    const deltaTime = (now - lastTime) / 1000; // 秒
+    lastTime = now;
+
+    if (isRecording) {
+        recordedPositions.push(camera.position.clone());
+    }
+
+    if (isPlaying && curve) {
+        // 控制沿路径的速度
+        const speed = 0.01; // 越小越慢
+        playT += deltaTime * speed;
+        if (playT > 1) {
+            playT = 1;
+            isPlaying = false;
+        }
+
+        // 位置：直接用曲线
+       const pos = curve.getPointAt(playT);
+        camera.position.copy(pos);
+
+        // 目标朝向点：路径前方一点
+        const aheadT = Math.min(playT + 0.02, 1);
+      const targetLookPos = curve.getPointAt(aheadT);
+
+
+        // 用一个“滞后”的 lookAt 目标，避免瞬间转向
+        const lookLag = 0.5; // 越小越跟得慢，大约 2s 才完全对齐
+        smoothLookAt.lerp(targetLookPos, 1.0 - Math.exp(-lookLag * deltaTime));
+
+        // 计算目标四元数
+        const targetQuat = new THREE.Quaternion();
+        const tmpCam = camera.clone();
+        tmpCam.lookAt(smoothLookAt);
+        tmpCam.getWorldQuaternion(targetQuat);
+
+        // 用 slerp 平滑旋转（2s 级别的转向）
+        const turnDuration = 2.0; // 秒
+        const slerpAlpha = Math.min(deltaTime / turnDuration * 4.0, 1.0);
+        camera.quaternion.slerp(targetQuat, slerpAlpha);
+    }
+
+// 键盘持续缩放
+const zoomStep = 0.02; // 每帧缩放多少，越大越快
+if (zoomInKey)  targetDistance -= zoomStep;
+if (zoomOutKey) targetDistance += zoomStep;
+
+// 限制最小距离
+targetDistance = Math.max(1, targetDistance);
+
+// 当前距离
+const currentDistance = camera.position.distanceTo(controls.target);
+
+// 缩放插值（丝滑关键）
+const newDistance = THREE.MathUtils.lerp(currentDistance, targetDistance, 0.15);
+
+// 更新相机位置
+const dir = camera.position.clone().sub(controls.target).normalize();
+camera.position.copy(controls.target).add(dir.multiplyScalar(newDistance));
+
+
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+window.addEventListener("keydown", (e) => {
+    if (e.code === "KeyZ") zoomInKey = true;   // 持续放大
+    if (e.code === "KeyX") zoomOutKey = true;  // 持续缩小
+});
+
+window.addEventListener("keyup", (e) => {
+    if (e.code === "KeyZ") zoomInKey = false;
+    if (e.code === "KeyX") zoomOutKey = false;
+});
+
+</script>
+
+</body>
+</html>
