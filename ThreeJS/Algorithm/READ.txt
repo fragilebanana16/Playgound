@@ -1,0 +1,14 @@
+#### Map与Obejct
+两者都能存储键值对。
+Map 键可以是任意类型，Object 键只能是字符串或 Symbol。
+Map 有稳定的插入顺序，Object 的属性顺序不稳定。
+Map 提供更丰富的 API（size、forEach、迭代器）。
+Map 在频繁增删查改时性能更好。
+
+用 Object 存储结构化数据（如配置、JSON）。
+用 Map 做频繁操作的缓存、字典、LRU 等。
+
+#### LRU
+- 关键在于delete+set 把 key 移到队尾，淘汰时用 map.keys().next().value 删除队头
+- 每次添加时需要先删除key（即使存在，因为要放到队尾以保证最近使用）
+- map.keys()是按插入顺序的

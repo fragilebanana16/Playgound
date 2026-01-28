@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Three.js OrbitControls + LRU 可视化</title>
+<style>
+  body { margin: 0; overflow: hidden; background: #111; }
+  #info {
+    position: absolute; top: 10px; left: 10px;
+    color: white; font-family: monospace; font-size: 14px;
+    background: rgba(0,0,0,0.4); padding: 10px;
+  }
+</style>
+</head>
+<body>
+<div id="info">LRU 状态：<br></div>
+
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+// ========== LRU 缓存类 ==========
+class MeshLRU {
+    constructor(limit = 10) {
+        this.limit = limit;
+        this.map = new Map();
+    }
+
+    use(key, createFn) {
+        if (this.map.has(key)) {
+            const mesh = this.map.get(key);
+            this.map.delete(key);
+            this.map.set(key, mesh); // 移到末尾，标记为最近使用
+            return mesh;
+        }
+
+        const mesh = createFn();
+        this.map.set(key, mesh);
+
+        if (this.map.size > this.limit) {
+            const oldestKey = this.map.keys().next().value;
+            const oldestMesh = this.map.get(oldestKey);
+
+            oldestMesh.geometry.dispose();
+            oldestMesh.material.dispose();
+            oldestMesh.parent?.remove(oldestMesh);
+
+            this.map.delete(oldestKey);
+        }
+
+        return mesh;
+    }
+
+    debugText() {
+        return [...this.map.keys()].join(", ");
+    }
+}
+
+// ========== Three.js 场景 ==========
+let scene, camera, renderer, controls;
+let lru = new MeshLRU(10); // 最多保留 10 个物体
+let objects = [];
+
+init();
+animate();
+
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x222222);
+
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 500);
+    camera.position.set(0, 20, 80);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(5,10,5);
+    scene.add(light);
+
+    // 创建一堆物体的坐标信息（不直接放进场景）
+    for (let i = 0; i < 200; i++) {
+        const pos = new THREE.Vector3(
+            (Math.random()-0.5)*400,
+            0.5,
+            (Math.random()-0.5)*400
+        );
+        objects.push({ id: i, pos });
+    }
+
+    window.addEventListener("resize", onResize);
+}
+
+function createCube(id, pos) {
+    const geo = new THREE.BoxGeometry(2,2,2);
+    const mat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color().setHSL(id/200,0.7,0.5)
+    });
+    const cube = new THREE.Mesh(geo, mat);
+    cube.position.copy(pos);
+    scene.add(cube);
+
+    // === 创建文字标签 ===
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 128;
+    canvas.height = 64;
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.font = '28px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText("ID:"+id, canvas.width/2, canvas.height/2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(10,5,1); // 标签大小
+    sprite.position.set(0, 3, 0); // 在方块上方
+    cube.add(sprite);
+
+    return cube;
+}
+
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    controls.update();
+
+    const visibleDistance = 50; // 相机 50 单位内才显示
+
+    objects.forEach(obj => {
+        const dist = camera.position.distanceTo(obj.pos);
+        if (dist < visibleDistance) {
+            lru.use(obj.id, () => createCube(obj.id, obj.pos));
+        }
+    });
+
+    document.getElementById("info").innerHTML =
+        "LRU（最近使用 → 最旧）:<br>" + lru.debugText();
+
+    renderer.render(scene, camera);
+}
+
+function onResize() {
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+</script>
+</body>
+</html>
