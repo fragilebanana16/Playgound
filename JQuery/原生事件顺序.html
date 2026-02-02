@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浏览器事件顺序测试</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .log-item {
+            margin: 5px 0;
+            padding: 3px 0;
+        }
+        .event-loading { color: #ff9800; }
+        .event-interactive { color: #2196F3; }
+        .event-dom { color: #4CAF50; font-weight: bold; }
+        .event-complete { color: #9C27B0; }
+        .event-load { color: #F44336; font-weight: bold; }
+        .timestamp { color: #888; font-size: 12px; }
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .info {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .img-container {
+            margin: 20px 0;
+        }
+        .test-img {
+            max-width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 浏览器原生事件顺序测试</h1>
+    
+    <div class="info">
+        <strong>说明：</strong>打开浏览器控制台（F12），查看下方日志区域，观察各事件触发的先后顺序。刷新页面(F5)可重新测试。
+    </div>
+
+    <div class="controls">
+        <button onclick="clearLog()">清空日志</button>
+        <button onclick="location.reload()">刷新页面</button>
+        <button onclick="testBeforeUnload()">测试 beforeunload</button>
+    </div>
+
+    <div class="log-container" id="logContainer"></div>
+
+    <div class="img-container">
+        <h3>测试图片（用于测试 load 事件）</h3>
+        <img class="test-img" src="https://via.placeholder.com/300x200/4CAF50/ffffff?text=Test+Image" alt="测试图片" id="testImg">
+    </div>
+
+    <script>
+        // ==================== 日志系统 ====================
+        let startTime = performance.now();
+        let eventLog = [];
+
+        function log(message, className = '') {
+            const timestamp = (performance.now() - startTime).toFixed(2);
+            const logItem = {
+                time: timestamp,
+                message: message,
+                className: className
+            };
+            eventLog.push(logItem);
+            
+            const logContainer = document.getElementById('logContainer');
+            const logElement = document.createElement('div');
+            logElement.className = `log-item ${className}`;
+            logElement.innerHTML = `<span class="timestamp">[${timestamp}ms]</span> ${message}`;
+            logContainer.appendChild(logElement);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // 同时输出到控制台
+            console.log(`[${timestamp}ms] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '';
+            eventLog = [];
+            startTime = performance.now();
+            log('📝 日志已清空', '');
+        }
+
+        function testBeforeUnload() {
+            alert('点击确定后，尝试关闭或刷新页面，会看到 beforeunload 提示');
+            window.addEventListener('beforeunload', function(e) {
+                e.preventDefault();
+                e.returnValue = '';
+            }, { once: true });
+        }
+
+        // ==================== 初始状态 ====================
+        log('🚀 脚本开始执行', '');
+        log(`📄 当前 readyState: ${document.readyState}`, 'event-loading');
+
+        // ==================== 1. readystatechange 事件 ====================
+        document.addEventListener('readystatechange', function() {
+            const state = document.readyState;
+            let className = '';
+            let emoji = '';
+            
+            if (state === 'loading') {
+                className = 'event-loading';
+                emoji = '⏳';
+            } else if (state === 'interactive') {
+                className = 'event-interactive';
+                emoji = '🔄';
+            } else if (state === 'complete') {
+                className = 'event-complete';
+                emoji = '✅';
+            }
+            
+            log(`${emoji} readystatechange → ${state}`, className);
+        });
+
+        // ==================== 2. DOMContentLoaded 事件 ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🎯 DOMContentLoaded 触发 (DOM 树构建完成)', 'event-dom');
+            log(`   → readyState: ${document.readyState}`, 'event-dom');
+            log(`   → 可以安全操作 DOM 元素了`, 'event-dom');
+            
+            // 测试 DOM 访问
+            const img = document.getElementById('testImg');
+            if (img) {
+                log(`   → 图片元素可访问: ✓`, 'event-dom');
+                log(`   → 图片宽度: ${img.width || 0} (可能还未加载)`, 'event-dom');
+            }
+        });
+
+        // ==================== 3. window.load 事件 ====================
+        window.addEventListener('load', function() {
+            log('🔥 window.load 触发 (所有资源加载完成)', 'event-load');
+            log(`   → readyState: ${document.readyState}`, 'event-load');
+            
+            // 测试图片尺寸
+            const img = document.getElementById('testImg');
+            if (img) {
+                log(`   → 图片宽度: ${img.width} (真实尺寸)`, 'event-load');
+                log(`   → 图片高度: ${img.height}`, 'event-load');
+            }
+            
+            // 显示总结
+            setTimeout(() => {
+                log('', '');
+                log('═══════════════════════════════════', '');
+                log('📊 事件触发顺序总结:', '');
+                log('1. readystatechange (loading)', 'event-loading');
+                log('2. readystatechange (interactive)', 'event-interactive');
+                log('3. DOMContentLoaded', 'event-dom');
+                log('4. readystatechange (complete)', 'event-complete');
+                log('5. window.load', 'event-load');
+                log('═══════════════════════════════════', '');
+            }, 100);
+        });
+
+        // ==================== 4. beforeunload 事件 ====================
+        window.addEventListener('beforeunload', function(e) {
+            log('⚠️ beforeunload 触发 (即将离开页面)', '');
+            console.log('⚠️ beforeunload 触发 - 页面即将卸载');
+        });
+
+        // ==================== 5. unload 事件 ====================
+        window.addEventListener('unload', function() {
+            console.log('👋 unload 触发 - 页面已卸载');
+            // 注意：unload 时 DOM 可能已经不可用，所以只用 console.log
+        });
+
+        // ==================== 6. 测试图片的 load 事件 ====================
+        const testImg = document.getElementById('testImg');
+        if (testImg) {
+            testImg.addEventListener('load', function() {
+                log(`🖼️ 图片 load 事件触发 (单个图片加载完成)`, '');
+                log(`   → 图片尺寸: ${this.width} x ${this.height}`, '');
+            });
+            
+            testImg.addEventListener('error', function() {
+                log(`❌ 图片加载失败`, '');
+            });
+        }
+
+        // ==================== 页面 visibility 变化 ====================
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                log('👁️ 页面隐藏 (切换到其他标签)', '');
+            } else {
+                log('👁️ 页面可见 (切换回当前标签)', '');
+            }
+        });
+
+        // ==================== 脚本结束 ====================
+        log('✨ 脚本执行完毕，等待事件触发...', '');
+        log('', '');
+    </script>
+
+    <!-- 额外的测试资源 -->
+    <script>
+        // 记录脚本执行位置
+        log('📍 第二个 script 标签执行', '');
+    </script>
+</body>
+</html>
