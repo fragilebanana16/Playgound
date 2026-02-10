@@ -6,21 +6,15 @@ class EventBus {
     on(event, handler) {
         (this.events[event] || (this.events[event] = [])).push(handler);
     }
-    emit(event, data) {
-        (this.events[event] || []).forEach(h => h(data));
+    emit(event, ...args) {
+        (this.events[event] || []).forEach(h => h(...args));
     }
 }
 
+
 const eventBus = new EventBus();
 let dualLight;
-const params = {
-    exposure: 1,
-    bloomStrength: 5,
-    bloomThreshold: 0,
-    bloomRadius: 0,
-    scene: 'Scene with Glow',
-    showLight: false
-};
+
 let cameraTargetPos = new THREE.Vector3();
 const cameraInfo = {
     x: 0,
@@ -53,12 +47,15 @@ const bloomParams = {
     bloomThreshold: 0.85
 };
 
+let gui, bloomConfig, ssrConfig;
+
+
 const sceneTransitions = {
-    0: "Forest",
+    0: "City",
     1: "Desert",
-    2: "City",
+    2: "Forest",
 };
-let sceneId = 0;
+let sceneId = 1;
 // =========================
 //  主入口
 // =========================
@@ -76,9 +73,20 @@ function main() {
     CameraManager.getInstance().init(camera);
 
     // 创建场景
-    const forestScene = new CustomScene("Forest", 0x00cc00, renderer);
-    const desertScene = new CustomScene("Desert", 0xff0000, renderer);
-    const cityScene = new CustomScene("City", 0x0000ff, renderer);
+    const cityScene = new CustomScene("City", 0xA7B8C9, renderer, camera);
+	cityScene.enableCarSSR = true;
+	cityScene.updateCallback = (delta, scene) => {
+		const stillBg = scene.bgGroup;
+		if(!stillBg) return;
+		const speed = 8;
+		stillBg.position.x += speed * delta; // 超过长度后复位
+		if (stillBg.position.x > 60) {
+			stillBg.position.x = -100;
+		}
+	};
+	
+    const forestScene = new CustomScene("Forest", 0xB7D1C4, renderer);
+    const desertScene = new CustomScene("Desert", 0xE8DCC2, renderer);
 
     // 4. 加载场景
     forestScene.load();
@@ -86,12 +94,41 @@ function main() {
     cityScene.load();
 
     // 5. 添加场景到管理器
-    const scene1 = sceneManager.addScene("Forest", forestScene);
-	guiManager.addSceneToGUI(scene1);
-    const scene2 = sceneManager.addScene("Desert", desertScene);
-	guiManager.addSceneToGUI(scene2);
-    const scene3 = sceneManager.addScene("City", cityScene);
-	guiManager.addSceneToGUI(scene3);
+	const scene1 = sceneManager.addScene("City", cityScene);
+	
+	
+	// 测试物体
+	const geometry = new THREE.IcosahedronGeometry(.5, 4);
+	const material = new THREE.MeshStandardMaterial({ color: 'cyan' });
+	const mesh = new THREE.Mesh(geometry, material);
+	sceneManager.addObject("City", mesh);
+	
+	guiManager.addSceneToGUI(scene1.config);
+    const scene2 = sceneManager.addScene("Forest", forestScene);
+	guiManager.addSceneToGUI(scene2.config);
+    const scene3 = sceneManager.addScene("Desert", desertScene);
+	guiManager.addSceneToGUI(scene3.config);
+    
+	// 添加 SSR 效果
+	ssrConfig = scene1.effectComposer.addConfig(new SSRConfig({
+		enabled: true,
+		opacity: 0.5,
+		maxDistance: 0.2,
+		thickness: 0.018,
+		infiniteThick: false,
+		output: 0,
+		selects: [mesh]
+	}));
+	guiManager.addSSRToGUI("City", ssrConfig);
+	
+	// 添加 Bloom 效果
+    bloomConfig = scene1.effectComposer.addConfig(new BloomConfig({
+		enabled: false,
+		strength: 1.2,
+		radius: 0.4,
+		threshold: 0.45,
+	}));
+	guiManager.addBloomToGUI("City", bloomConfig);
 
     // 2. 灯光系统
     //const lightManager = LightManager.getInstance(scene, gui);
@@ -129,24 +166,27 @@ function main() {
     uiController.setupResize(camera, renderer);
 
     // 6. 初始化 Bloom
-    const bloomUtil = BloomUtil.getInstance(renderer, camera);
+    //const bloomUtil = BloomUtil.getInstance(renderer, camera);
 
-    //sceneManager.transitionTo("City");
+    sceneManager.transitionTo("Desert"); // c => d => f
+
 
     // 10. 动画循环
     function animate() {
         requestAnimationFrame(animate);
         const dt = sceneManager.clock.getDelta();
         sceneManager.updateTransition(dt);
+		sceneManager.updateSceneMovement(dt);
         controls.update();
-        /* if (sceneManager.transitionProgress >= 1.0) {
-            requestAnimationFrame(() => {
-                if (++sceneId > 2)
-                    sceneId = 0;
-                sceneManager.transitionTo(sceneTransitions[sceneId]);
-            });
-        } */
-
+ 		if (sceneManager.transitionProgress >= 1.0 && !sceneManager.isTransitioning) {
+			requestAnimationFrame(() => {
+				if (++sceneId > 2) sceneId = 0;
+				sceneManager.transitionTo(sceneTransitions[sceneId]);
+			});
+		} 
+		
+		// 使用后处理渲染
+		// postProcessManager.render();
         sceneManager.render(renderer, camera);
     }
     animate();
@@ -156,10 +196,20 @@ function main() {
 // 单个场景类
 // =========================
 class CustomScene {
-    constructor(name, bgColor, renderer) {
+    constructor(name, bgColor, renderer, camera=null) {
         this.name = name;
+		this.camera = camera;
+		this.carGroup = new THREE.Group();
+		this.bgGroup = new THREE.Group();
         this.scene = new THREE.Scene();
+		this.scene.fog = new THREE.Fog(0x443333, 0.1, 300);
+		this.scene.add(this.carGroup);
+		this.scene.add(this.bgGroup);
         this.scene.background = new THREE.Color(bgColor);
+		this.lights = {
+			ambient: new THREE.AmbientLight(0xffffff, 1), 
+			directional: new THREE.DirectionalLight(0xffffff, 1)
+		};
         this.cameraState = {
             position: new THREE.Vector3(),
             target: new THREE.Vector3()
@@ -167,28 +217,80 @@ class CustomScene {
         this.bloomParams = {
             strength: 1.5,
             radius: 0.4,
-            threshold: 0.85
+            threshold: 0.15
         };
         this.renderer = renderer;
         this.iblMaterials = [];
-        eventBus.on("modelLoaded", model => { // 每个场景自己决定怎么处理
-            const clone = model.clone(true);
-            clone.traverse(obj => {
-                if (obj.isMesh && obj.material) {
-                    // 克隆材质
-                    if (Array.isArray(obj.material)) {
-                        obj.material = obj.material.map(mat => mat.clone());
-                    } else {
-                        obj.material = obj.material.clone();
-                    }
+	    this.carMixer = null;
+		this.updateCallback = null;
+		this.enableCarSSR = false;
 
-                    if (obj.material.isMeshStandardMaterial || obj.material.isMeshPhysicalMaterial) {
-                        this.iblMaterials.push(obj.material);
-                    }
-                }
-            });
+		
+        eventBus.on("carLoaded", gltf => { // 每个场景自己决定怎么处理
+            const clone = gltf.scene.clone(true);
+            clone.rotation.y = -Math.PI / 2;
+			clone.position.z = -1.1;
+			 // 创建 AnimationMixer
+			 if(this.carMixer === null){
+				 this.carMixer = new THREE.AnimationMixer(clone);
+			 }
 
-            this.scene.add(clone);
+			// 播放所有动画（如果有多个）
+			if (this.carMixer && gltf.animations && gltf.animations.length > 0) {
+				gltf.animations.forEach(clip => {
+					const action = this.carMixer.clipAction(clip);
+					action.play();
+				});
+			}
+			if (this.enableCarSSR) {
+			    const selects = [];
+			    clone.traverse(c => {
+			        if (c.isMesh) {
+						if(c.name.startsWith('carBody')){
+						    c.castShadow = true;
+			                selects.push(c);
+						}
+			        }
+
+			        /*if (obj.isMesh && obj.material) {
+			        // 克隆材质
+			        if (Array.isArray(obj.material)) {
+			        obj.material = obj.material.map(mat => mat.clone());
+			        } else {
+			        obj.material = obj.material.clone();
+			        }
+
+			        if (obj.material.isMeshStandardMaterial || obj.material.isMeshPhysicalMaterial) {
+			        this.iblMaterials.push(obj.material);
+			        }
+			        } */
+			    });
+			    // 添加反射物体
+			    ssrConfig.updateParams({
+			        selects: selects // 可能必须要是mesh?
+			    });
+			}
+			
+			// TEST:创建一个地板
+			/* const floorGeometry = new THREE.PlaneGeometry(200, 200); // 尺寸可调
+			const floorMaterial = new THREE.MeshStandardMaterial({
+			  color: 0x888888,
+			  roughness: 1,   // 粗糙表面，不反射
+			  metalness: 0    // 非金属
+			});
+			const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+
+			// 旋转到水平面
+			floor.rotation.x = -Math.PI / 2;
+
+			// 设置接收阴影
+			floor.receiveShadow = true;
+
+			// 把地板也加到 carGroup 里
+			this.carGroup.add(floor); */
+
+            this.carGroup.add(clone);
+
         });
     }
 
@@ -209,7 +311,20 @@ class CustomScene {
     setupEnvironment() {}
     start() {}
     stop() {}
-
+	
+	// animation
+	updateCarAnimation(delta) {
+	    if (this.carMixer) {
+	        this.carMixer.update(delta);
+	    }
+	}
+	
+	// 背景动画回调
+    updateBgAnimation(delta) {
+        if (this.updateCallback) {
+            this.updateCallback(delta, this);
+        }
+    }
     // 不做全局fbo ibl
     _updateIBLMaterials() {
         let env = this.virtualFBO.texture;
@@ -344,11 +459,11 @@ class CustomScene {
         //     this.scene.environment = this.virtualFBO.texture;
         //  }
         if (background) {
-            this.scene.background = this.virtualFBO.texture;
+            //this.scene.background = this.virtualFBO.texture;
         }
-
-        // 更新
-        let count = 1;
+        //this.scene.environment = this.virtualFBO.texture;
+        // 更新，暂时车和场景都一个，免得不协调
+        /* let count = 1;
         const renderVirtual = () => {
             if (frames === Infinity || count < frames) {
                 this.virtualCubeCamera.update(this.renderer, this.virtualScene);
@@ -358,31 +473,44 @@ class CustomScene {
             }
             requestAnimationFrame(renderVirtual);
         };
-        renderVirtual();
+        renderVirtual(); */
     }
 
     // 设置灯光
     _setupLights() {
-        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+        const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+		this.lights.ambient = ambient;
         this.scene.add(ambient);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(5, 10, 5);
+		const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+		dirLight.position.set(100, 200, 100); // 高度和距离拉大
+		dirLight.castShadow = true;
+		dirLight.shadow.mapSize.width = 4096;
+		dirLight.shadow.mapSize.height = 4096;
+
+		dirLight.shadow.camera.left = -200;
+		dirLight.shadow.camera.right = 200;
+		dirLight.shadow.camera.top = 200;
+		dirLight.shadow.camera.bottom = -200;
+		dirLight.shadow.camera.near = 1;
+		dirLight.shadow.camera.far = 500;
+
+		this.lights.directional = dirLight;
+
+
+		
+
+		// 加辅助线
+		const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 2, 0xff0000);
+		this.scene.add(dirLightHelper);
+
         this.scene.add(dirLight);
     }
 
     // 设置环境
     _setupEnvironment() {
-        const groundGeo = new THREE.PlaneGeometry(10 + Math.random() * 10, Math.random() * 10);
-        const groundMat = new THREE.MeshStandardMaterial({
-            color: new THREE.Color().setHSL(Math.random(), 0.3, 0.3)
-        });
-        const ground = new THREE.Mesh(groundGeo, groundMat);
-        ground.rotation.x = -Math.PI / 2;
-        this.scene.add(ground);
-
         // 添加车（简化为立方体）
-        const carGeo = new THREE.BoxGeometry(1, 0.5, 2);
+/*         const carGeo = new THREE.BoxGeometry(1, 0.5, 2);
         const carMat = new THREE.MeshStandardMaterial({
             color: new THREE.Color().setHSL(Math.random(), 0.7, 0.6),
             emissive: 0x000000,
@@ -390,8 +518,8 @@ class CustomScene {
 			roughness: 0.1,
         });
         this.car = new THREE.Mesh(carGeo, carMat);
-        this.car.position.set(0, 0.25, 0);
-        this.scene.add(this.car);
+        this.car.position.set(0, 1, 0);
+        this.scene.add(this.car); */
 
         // 场景标识物
         const markerGeo = new THREE.SphereGeometry(0.3, 32, 32);
@@ -399,7 +527,8 @@ class CustomScene {
             color: new THREE.Color().setHSL(Math.random(), 0.8, 0.5)
         });
         const marker = new THREE.Mesh(markerGeo, markerMat);
-        marker.position.set(2, 0.3, 2);
+		marker.castShadow = true;
+        marker.position.set(0, 2, 0.4);
         this.scene.add(marker);
     }
 
@@ -704,12 +833,26 @@ class SceneManager {
         this.rtNext = new THREE.WebGLRenderTarget(w, h);
         this.rtCurrent.texture.encoding = THREE.LinearEncoding;
         this.rtNext.texture.encoding = THREE.LinearEncoding;
+		
+		// 各自场景
+		eventBus.on("sceneLoaded", (file, sceneName) => {
+            const scene = this.scenes.get(sceneName);
+		    if(!scene) {return}
+			file.traverse(c => {
+			    if (c.isMesh) {
+					if(c.name.startsWith('shadow')){
+						c.castShadow = true;
+					}
+			        c.receiveShadow = true;
+			    }
+			});
+            scene.content.bgGroup.add(file);
+        });
     }
     initHDR(hdrManager) {
         this.hdrManager = hdrManager;
 	}
     renderSceneToRT(scene, camera, rt) {
-
         this.renderer.setRenderTarget(rt);
         this.renderer.clear();
         this.renderer.render(scene, camera);
@@ -737,31 +880,57 @@ class SceneManager {
 
     // 添加场景
     addScene(name, scene) {
-		const wrapper = { content: scene, config: new SceneConfig(name)};
+		const wrapper = { content: scene, config: new SceneConfig(name), effectComposer: new PostProcessManager(this.renderer, scene.scene, this.camera)};
 		this.scenes.set(name, wrapper); 
         if (!this.currentScene)
-            this.currentScene = scene;
-		return wrapper.config;
+            this.currentScene = wrapper;
+		return wrapper;
     }
+	
+	addObject(name, object) {
+		const targetScene = this.getScene(name);
+		if (!targetScene) {
+			console.warn('addObject: target scene not found');
+			return null;
+		}
+
+		targetScene.scene.add(object);
+	}
+
+	getScene(name) {
+		const sceneWrapper = this.scenes.get(name);
+		return sceneWrapper && sceneWrapper.content;
+	}
 
     // 切换场景
-    transitionTo(name, speed = 0.3) {
+    transitionTo(name, speed = 0.1) {
         if (this.isTransitioning)
             return;
-        const nextScene = this.scenes.get(name).content;
-        if (!nextScene || nextScene === this.currentScene)
+        const nextScene = this.scenes.get(name);
+        if (!nextScene || nextScene.content === this.currentScene.content)
             return;
 
         this.nextScene = nextScene;
         this.transitionSpeed = speed;
         this.isTransitioning = true;
         this.transitionProgress = 0;
-
+        // this.renderer.clear();
+		
         // 保存当前场景的相机状态
         const camera = CameraManager.getInstance().getCamera();
-        this.currentScene.saveCameraState(camera);
+        this.currentScene.content.saveCameraState(camera);
     }
-
+	
+	// 场景后移
+	updateSceneMovement(delta) {
+		const scenes = [this.currentScene, this.nextScene];
+		for (const s of scenes) {
+			if (!s || !s.content) continue;
+			s.content.updateCarAnimation(delta);
+			s.content.updateBgAnimation(delta);
+		}
+	}
+	
     // 更新过渡
     updateTransition(dt) {
         if (!this.isTransitioning)
@@ -769,15 +938,15 @@ class SceneManager {
 
         this.transitionProgress += dt * this.transitionSpeed;
         this.transitionMaterial.uniforms.progress.value = this.transitionProgress;
-
         if (this.transitionProgress >= 1.0) {
+			console.log(`Transition ${this.currentScene.content.name} to ${this.nextScene.content.name} done.`)
             this.currentScene = this.nextScene;
             this.nextScene = null;
             this.isTransitioning = false;
 
             // 应用新场景的相机状态
             //const camera = CameraManager.getInstance().getCamera();
-            //this.currentScene.applyCameraState(camera);
+            //this.currentScene.content.applyCameraState(camera);
         }
     }
 
@@ -785,21 +954,35 @@ class SceneManager {
     render() {
         if (this.isTransitioning) {
             // 渲染下一个场景到纹理
-            this.renderSceneToRT(this.currentScene.scene, this.camera, this.rtCurrent);
-            this.renderSceneToRT(this.nextScene.scene, this.camera, this.rtNext);
-            this.updateTransitionTextures();
+            // this.renderSceneToRT(this.currentScene.content.scene, this.camera, this.rtCurrent);
+            // this.renderSceneToRT(this.nextScene.content.scene, this.camera, this.rtNext);
 
+			this.currentScene.effectComposer.render();
+			this.nextScene.effectComposer.render();
+			
+			this.transitionMaterial.uniforms.tCurrent.value = this.currentScene.effectComposer.composer.readBuffer.texture;// 这里可能用的是renderpass，也可能用的是最后一个pass
+            this.transitionMaterial.uniforms.tNext.value    = this.nextScene.effectComposer.composer.readBuffer.texture;
+			
             // 渲染过渡 Quad
             if (!this.transitionQuad) {
                 const geometry = new THREE.PlaneGeometry(2, 2);
                 this.transitionQuad = new THREE.Mesh(geometry, this.transitionMaterial);
             }
+			
             this.renderer.render(this.transitionQuad, new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1));
+			
         } else {
 
             // 这两个场景始终颜色空间不一致
-            this.renderer.render(this.currentScene.scene, this.camera);
-
+			this.currentScene.effectComposer.render();
+			this.transitionMaterial.uniforms.tCurrent.value = this.currentScene.effectComposer.composer.readBuffer.texture;
+			            if (!this.transitionQuad) {
+                const geometry = new THREE.PlaneGeometry(2, 2);
+                this.transitionQuad = new THREE.Mesh(geometry, this.transitionMaterial);
+            }
+			
+            this.renderer.render(this.transitionQuad, new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1));
+            //this.renderer.render(this.currentScene.content.scene, this.camera);
         }
     }
 
@@ -893,6 +1076,9 @@ class SceneManager {
         });
         renderer.setSize(w, h);
         renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 可选，柔和阴影
+
         // renderer.outputEncoding = THREE.sRGBEncoding;
         // renderer.toneMapping = THREE.ACESFilmicToneMapping;
         // renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1273,6 +1459,209 @@ class EnvironmentManager {
         });
     }
 }
+
+// ===============================================
+// 后处理配置基类
+// ===============================================
+class PostProcessConfig {
+	constructor(name, enabled = true) {
+		this.name = name;
+		this.enabled = enabled;
+		this.pass = null;
+	}
+
+	createPass(scene, camera, renderer, size) {
+		throw new Error('createPass() must be implemented');
+	}
+
+	updateParams(params) {
+		throw new Error('updateParams() must be implemented');
+	}
+
+	getPass() {
+		return this.pass;
+	}
+
+	setEnabled(enabled) {
+		this.enabled = enabled;
+		if (this.pass) {
+			this.pass.enabled = enabled;
+		}
+	}
+
+	dispose() {
+		if (this.pass && this.pass.dispose) {
+			this.pass.dispose();
+		}
+	}
+}
+ // ===============================================
+// SSR 后处理配置
+// ===============================================
+class SSRConfig extends PostProcessConfig {
+	constructor(params = {}) {
+		super('SSR', params.enabled !== undefined ? params.enabled : true);
+		
+		this.params = {
+			output: params.output !== undefined ? params.output : 0,
+			opacity: params.opacity !== undefined ? params.opacity : 0.5,
+			maxDistance: params.maxDistance !== undefined ? params.maxDistance : 0.2,
+			thickness: params.thickness !== undefined ? params.thickness : 0.018,
+			tempColor: params.tempColor !== undefined ? params.tempColor : new THREE.Color(1, 1, 1),
+            selects: params.selects || [], // null 是全部反射
+			infiniteThick: params.infiniteThick !== undefined ? params.infiniteThick : false,
+		};
+	}
+
+	createPass(scene, camera, renderer, size) {
+		this.pass = new THREE.SSRPass({
+			renderer: renderer,
+			scene: scene,
+			camera: camera,
+			width: size.width !== undefined ? size.width : innerWidth,
+			height: size.height !== undefined ? size.height : innerHeight,
+			selects: this.params.selects|| [],
+		});
+
+		// 打印SSRPass的所有属性，用于调试
+		console.log('SSRPass properties:', this.pass);
+		
+		// 设置初始参数
+		this.applyParams();
+		this.pass.enabled = this.enabled;
+		
+		return this.pass;
+	}
+
+	applyParams() {
+		if (!this.pass) return;
+
+		// 直接设置所有可能的属性
+		if (this.pass.output !== undefined) {
+			this.pass.output = this.params.output;
+		}
+		
+		if (this.pass.opacity !== undefined) {
+			this.pass.opacity = this.params.opacity;
+		}
+		
+		if (this.pass.maxDistance !== undefined) {
+			this.pass.maxDistance = this.params.maxDistance;
+		}
+		
+		if (this.pass.thickness !== undefined) {
+			this.pass.thickness = this.params.thickness;
+		}
+		
+		if (this.pass.infiniteThick !== undefined) {
+			this.pass.infiniteThick = this.params.infiniteThick;
+		}
+
+		// 尝试通过 ssrMaterial 设置（有些版本的SSRPass参数在material中）
+		if (this.pass.ssrMaterial) {
+			if (this.pass.ssrMaterial.uniforms) {
+				if (this.pass.ssrMaterial.uniforms.opacity) {
+					this.pass.ssrMaterial.uniforms.opacity.value = this.params.opacity;
+				}
+				if (this.pass.ssrMaterial.uniforms.maxDistance) {
+					this.pass.ssrMaterial.uniforms.maxDistance.value = this.params.maxDistance;
+				}
+				if (this.pass.ssrMaterial.uniforms.thickness) {
+					this.pass.ssrMaterial.uniforms.thickness.value = this.params.thickness;
+				}
+			}
+		}
+
+		// 强制更新
+		if (this.pass.ssrMaterial && this.pass.ssrMaterial.needsUpdate !== undefined) {
+			this.pass.ssrMaterial.needsUpdate = true;
+		}
+
+		if (this.params.selects && Array.isArray(this.params.selects)) {
+		  this.pass.selects = [
+			...(this.pass.selects || []),
+			...this.params.selects
+		  ];
+		}
+		console.log('Applied SSR params:', this.params);
+	}
+
+	updateParams(params) {
+	  if (!this.pass) return;
+	  for (const key in params) {
+		if (key === 'selects' && Array.isArray(params[key])) {
+		  // 合并而不是覆盖
+		  this.params.selects = [
+			...(this.params.selects || []),
+			...params.selects
+		  ];
+		} else {
+		  this.params[key] = params[key];
+		}
+	  }
+
+	  this.applyParams();
+	}
+
+	getParams() {
+		return Object.assign({}, this.params);
+	}
+}
+
+// ===============================================
+// Bloom 后处理配置
+// ===============================================
+class BloomConfig extends PostProcessConfig {
+	constructor(params = {}) {
+		super('Bloom', params.enabled !== undefined ? params.enabled : true);
+		
+		this.params = {
+			strength: params.strength !== undefined ? params.strength : 1.5,
+			radius: params.radius !== undefined ? params.radius : 0.4,
+			threshold: params.threshold !== undefined ? params.threshold : 0.85,
+		};
+	}
+
+	createPass(scene, camera, renderer, size) {
+		const resolution = new THREE.Vector2(
+			size.width !== undefined ? size.width : innerWidth, 
+			size.height !== undefined ? size.height : innerHeight
+		);
+		
+		this.pass = new THREE.UnrealBloomPass(
+			resolution,
+			this.params.strength,
+			this.params.radius,
+			this.params.threshold
+		);
+
+		this.pass.enabled = this.enabled;
+		return this.pass;
+	}
+
+	updateParams(params) {
+		if (!this.pass) return;
+
+		Object.assign(this.params, params);
+
+		if (params.strength !== undefined) {
+			this.pass.strength = params.strength;
+		}
+		if (params.radius !== undefined) {
+			this.pass.radius = params.radius;
+		}
+		if (params.threshold !== undefined) {
+			this.pass.threshold = params.threshold;
+		}
+	}
+
+	getParams() {
+		return Object.assign({}, this.params);
+	}
+}
+
+
+		
 class ModelManager {
     constructor(scene, gui) {
         this._scene = scene;
@@ -1281,12 +1670,22 @@ class ModelManager {
         this._box = null;
         this._boxPoints = {};
 
-        document.getElementById("fileInput")
+        document.getElementById("carInput")
         .addEventListener("change", (e) => {
             const file = e.target.files[0];
             if (file)
-                this.loadModelFromFile(file);
+                this.loadCarFromFile(file);
         });
+		
+		document.getElementById("sceneInput")
+			.addEventListener("change", (e) => {
+				const files = Array.from(e.target.files);
+				files.forEach(file => {
+					const sceneName = file.name.replace(/\.[^/.]+$/, ""); // 去掉扩展名
+					this.loadSceneFromFile(file, sceneName);
+				});
+			});
+
     }
 
     _attachDualLights(lampMesh) {
@@ -1338,49 +1737,21 @@ class ModelManager {
 
         return lights;
     }
-
-    loadModelFromFile(file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            const contents = ev.target.result;
-            const loader = new THREE.GLTFLoader();
-            loader.parse(contents, "", (gltf) => {
-                // 遍历模型，找到车灯
-                // gltf.scene.traverse((child) => {
-                // if (!child.isMesh) return;
-
-                // const name = child.name.toLowerCase();
-
-                // // 判断属于哪一类灯
-                // let type = null;
-                // if (name.includes("bigdeng")) type = "bigdeng";
-                // else if (name.includes("smalldeng")) type = "smalldeng";
-                // else if (name.includes("dengzhao")) type = "dengzhao";
-                // else if (name.includes("backdeng")) type = "backdeng";
-
-
-                // if (type){
-                // const lm = LightManager.getInstance();
-                // lm.addMesh(type, child)
-                // lm.createMeshGUI(type, type);
-
-                // child.layers.enable( BLOOM_SCENE );
-                // const bloom = child.clone();
-                // if (name.includes("bigdeng"))
-                // dualLight = this._attachDualLights(bloom); // 只有大灯有
-                // }
-                // else {
-                // child.layers.enable(ENTIRE_SCENE);
-                // }
-                // });
-                // gltf.scene.position.y -= 1.0;
-                //this._scene.add(gltf.scene);
-                //this._model = gltf.scene;
-
-                eventBus.emit("modelLoaded", gltf.scene);
-            });
-        };
-        reader.readAsArrayBuffer(file);
+    loadSceneFromFile(file, sceneName){
+		const url = URL.createObjectURL(file);
+		const loader = new THREE.GLTFLoader();
+		loader.load(url, gltf => {
+			eventBus.emit("sceneLoaded", gltf.scene, sceneName);
+			URL.revokeObjectURL(url);
+		});
+	}
+    loadCarFromFile(file) {
+		const url = URL.createObjectURL(file);
+		const loader = new THREE.GLTFLoader();
+		loader.load(url, gltf => {
+			eventBus.emit("carLoaded", gltf);
+			URL.revokeObjectURL(url);
+		});
     }
 
     customModel() {
@@ -1453,6 +1824,91 @@ class CameraManager {
     }
 }
 
+class PostProcessManager {
+	constructor(renderer, scene, camera) {
+		this.renderer = renderer;
+		this.scene = scene;
+		this.camera = camera;
+
+		// 创建 EffectComposer
+		this.composer = new THREE.EffectComposer(renderer);
+		this.composer.renderToScreen = false;
+		
+		// 添加基础渲染 Pass
+		this.renderPass = new THREE.RenderPass(scene, camera);
+		this.renderPass.renderToScreen = false;
+		this.composer.addPass(this.renderPass);
+		
+		// 后处理配置数组
+		this.configs = [];
+		
+		// 是否启用后处理
+		this.enabled = true;
+	}
+
+	addConfig(config) {
+		const size = this.renderer.getSize(new THREE.Vector2());
+		const pass = config.createPass(this.scene, this.camera, this.renderer, size);
+		pass.renderToScreen = false;
+		this.composer.addPass(pass);
+		this.configs.push(config);
+		return config;
+	}
+
+	removeConfig(nameOrConfig) {
+		const config = typeof nameOrConfig === 'string'
+			? this.getConfig(nameOrConfig)
+			: nameOrConfig;
+			
+		if (!config) return;
+
+		const index = this.configs.indexOf(config);
+		if (index !== -1) {
+			const pass = config.getPass();
+			if (pass) {
+				this.composer.passes = this.composer.passes.filter(p => p !== pass);
+			}
+			config.dispose();
+			this.configs.splice(index, 1);
+		}
+	}
+
+	getConfig(name) {
+		return this.configs.find(c => c.name === name);
+	}
+
+	render(deltaTime = 0) {
+		if (this.enabled) {
+			this.composer.render(deltaTime);
+		} else {
+			this.renderer.render(this.scene, this.camera);
+		}
+	}
+
+	setSize(width, height) {
+		this.composer.setSize(width, height);
+	}
+
+	setPixelRatio(ratio) {
+		this.composer.setPixelRatio(ratio);
+	}
+
+	setEnabled(enabled) {
+		this.enabled = enabled;
+	}
+
+	dispose() {
+		this.configs.forEach(config => config.dispose());
+		this.configs = [];
+		
+		this.composer.passes.forEach(pass => {
+			if (pass.dispose) {
+				pass.dispose();
+			}
+		});
+	}
+}
+		
 class HDRManager {
     constructor(renderer) {
         this.renderer = renderer;
@@ -1562,12 +2018,107 @@ class GUIManager {
         }
         return GUIManager._instance;
     }
+	addSSRToGUI(sceneName, bloomConfig){
+		const scene = this.sceneManager.scenes.get(sceneName);
+		if(!scene){return }
+		const cfg = scene.config;
+		if (cfg._guiFolder) {
+			cfg._guiFolder.add(ssrConfig, 'enabled').name('启用 SSR').onChange(value => {
+                ssrConfig.setEnabled(value);
+            });
 
-    addSceneToGUI(sceneConfig) {
-        const folder = this.gui.addFolder(sceneConfig.name);
-		// 保存 folder 引用
+            const outputModes = {
+                'Default (默认)': 0,
+                'SSR Only (仅反射)': 1,
+                'Beauty (美化)': 2,
+                'Depth (深度)': 3,
+                'Normal (法线)': 4,
+                'Metalness (金属度)': 5
+            };
+
+            cfg._guiFolder.add(ssrConfig.params, 'output', outputModes).name('输出模式').onChange(value => {
+                ssrConfig.updateParams({ output: parseInt(value) });
+            });
+
+            cfg._guiFolder.add(ssrConfig.params, 'opacity', 0, 1, 0.01).name('反射不透明度').onChange(value => {
+                ssrConfig.updateParams({ opacity: value });
+            });
+
+            cfg._guiFolder.add(ssrConfig.params, 'maxDistance', 0, 20, 1).name('最大追踪距离').onChange(value => {
+                ssrConfig.updateParams({ maxDistance: value });
+            });
+
+            cfg._guiFolder.add(ssrConfig.params, 'thickness', 0, 0.2, 0.001).name('表面厚度').onChange(value => {
+                ssrConfig.updateParams({ thickness: value });
+            });
+
+            cfg._guiFolder.add(ssrConfig.params, 'infiniteThick').name('无限厚度(快速)').onChange(value => {
+                ssrConfig.updateParams({ infiniteThick: value });
+            });
+		}
+	}
+	addBloomToGUI(sceneName, bloomConfig){
+		const scene = this.sceneManager.scenes.get(sceneName);
+		if(!scene){return }
+		const cfg = scene.config;
+		if (cfg._guiFolder) {
+		    cfg._guiFolder.add(bloomConfig, 'enabled').name('启用 Bloom').onChange(value => {
+		        bloomConfig.setEnabled(value);
+		    });
+		    cfg._guiFolder.add(bloomConfig.params, 'strength', 0, 3, 0.01).name('强度').onChange(value => {
+		        bloomConfig.updateParams({
+		            strength: value
+		        });
+		    });
+
+		    cfg._guiFolder.add(bloomConfig.params, 'radius', 0, 1, 0.01).name('半径').onChange(value => {
+		        bloomConfig.updateParams({
+		            radius: value
+		        });
+		    });
+
+		    cfg._guiFolder.add(bloomConfig.params, 'threshold', 0, 1, 0.01).name('阈值').onChange(value => {
+		        bloomConfig.updateParams({
+		            threshold: value
+		        });
+		    });
+		}
+	}
+			
+	addSceneToGUI(sceneConfig) {
+		const folder = this.gui.addFolder(sceneConfig.name);
 		sceneConfig._guiFolder = folder;
-    }
+
+		// 通过 SceneManager 获取灯光
+		const sceneManager = this.sceneManager;  
+		const scene = sceneManager.getScene(sceneConfig.name);
+
+		const ambient = scene.lights.ambient;
+		const directional = scene.lights.directional;
+		
+		// Ambient Light
+		const ambFolder = folder.addFolder("Ambient Light");
+		ambFolder.addColor({ color: ambient.color.getHex() }, "color")
+			.name("Color")
+			.onChange(v => ambient.color.set(v));
+
+		ambFolder.add(ambient, "intensity", 0, 5, 0.01)
+			.name("Intensity");
+
+		// Directional Light
+		const dirFolder = folder.addFolder("Directional Light");
+		dirFolder.addColor({ color: directional.color.getHex() }, "color")
+			.name("Color")
+			.onChange(v => directional.color.set(v));
+
+		dirFolder.add(directional, "intensity", 0, 5, 0.01)
+			.name("Intensity");
+
+		dirFolder.add(directional.position, "x", -50, 50);
+		dirFolder.add(directional.position, "y", -50, 50);
+		dirFolder.add(directional.position, "z", -50, 50);
+	}
+
 
 	refreshHDRList() {
 		const hdrNames = this.hdrManager.getHDRNames();

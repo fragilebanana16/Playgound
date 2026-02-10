@@ -5,7 +5,11 @@
     <title>three.js load model & HDR</title>
   </head>
   <body>
-    <input type="file" id="fileInput" accept=".gltf,.glb" />
+    <label for="carInput">Car</label>
+    <input type="file" id="carInput" accept=".gltf,.glb" />
+	<label for="sceneInput">Scene</label>
+    <input type="file" id="sceneInput" accept=".gltf,.glb" multiple />
+	<label for="hdrInput">HDR</label>
     <input type="file" id="hdrInput" accept=".hdr" multiple />
 	<script type="x-shader/x-vertex" id="vertexshader">
 		varying vec2 vUv;
@@ -26,12 +30,16 @@
 	</script>
     <script src="../libs/three.js"></script>
 	<script src="../libs/shaders/CopyShader.js"></script>
+	<script src="../libs/shaders/SSRShader.js"></script>
+    <script src="../libs/shaders/LuminosityHighPassShader.js"></script>
+	
 	<script src="../libs/postprocessing/Pass.js"></script>
 	<script src="../libs/shaders/LuminosityHighPassShader.js"></script>
 	<script src="../libs/postprocessing/ShaderPass.js"></script>
 	<script src="../libs/postprocessing/RenderPass.js"></script>
 	<script src="../libs/postprocessing/EffectComposer.js"></script>
 	<script src="../libs/postprocessing/UnrealBloomPass.js"></script>
+    <script src="../libs/postprocessing/SSRPass.js"></script>
 	<script src="../libs/dat.gui.min.js"></script>
     <script src="../libs/vanilla.js"></script>
     <script src="../libs/OrbitControls.js"></script>
