@@ -1,0 +1,255 @@
+vec2 hash(vec2 p)// replace this by something better
+{
+    p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));
+    return-1.+2.*fract(sin(p)*43758.5453123);
+}
+
+float noise(in vec2 p)
+{
+    const float K1=.366025404;// (sqrt(3)-1)/2;
+    const float K2=.211324865;// (3-sqrt(3))/6;
+    
+    vec2 i=floor(p+(p.x+p.y)*K1);
+    vec2 a=p-i+(i.x+i.y)*K2;
+    float m=step(a.y,a.x);
+    vec2 o=vec2(m,1.-m);
+    vec2 b=a-o+K2;
+    vec2 c=a-1.+2.*K2;
+    vec3 h=max(.5-vec3(dot(a,a),dot(b,b),dot(c,c)),0.);
+    vec3 n=h*h*h*h*vec3(dot(a,hash(i+0.)),dot(b,hash(i+o)),dot(c,hash(i+1.)));
+    return dot(n,vec3(70.));
+}
+
+#ifndef RANDOM_SCALE
+#if defined(RANDOM_HIGHER_RANGE)
+#define RANDOM_SCALE float4(0.1031, 0.1030, 0.0973, 0.1099)
+#else
+#define RANDOM_SCALE float4(443.897, 441.423, 0.0973, 0.1099)
+#endif
+#endif
+
+#ifndef FNC_RANDOM
+#define FNC_RANDOM
+float random(in float x) {
+#if defined(RANDOM_SINLESS)
+    return frac(sin(x) * 43758.5453);
+#else
+    x = frac(x * RANDOM_SCALE.x);
+    x *= x + 33.33;
+    x *= x + x;
+    return frac(x);
+#endif
+}
+
+float random(in float2 st) {
+#if defined(RANDOM_SINLESS)
+    float3 p3  = frac(st.xyx * RANDOM_SCALE.xyz);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+#else
+    return frac(sin(dot(st.xy, float2(12.9898, 78.233))) * 43758.5453);
+#endif
+}
+
+float random(in float3 pos) {
+#if defined(RANDOM_SINLESS)
+    pos  = frac(pos * RANDOM_SCALE.xyz);
+    pos += dot(pos, pos.zyx + 31.32);
+    return frac((pos.x + pos.y) * pos.z);
+#else
+    return frac(sin(dot(pos.xyz, float3(70.9898, 78.233, 32.4355))) * 43758.5453123);
+#endif
+}
+
+float random(in float4 pos) {
+#if defined(RANDOM_SINLESS)
+    pos = frac(pos * RANDOM_SCALE);
+    pos += dot(pos, pos.wzxy + 33.33);
+    return frac((pos.x + pos.y) * (pos.z + pos.w));
+#else
+    float dot_product = dot(pos, float4(12.9898, 78.233, 45.164, 94.673));
+    return frac(sin(dot_product) * 43758.5453);
+#endif
+}
+
+float2 random2(float p) {
+    float3 p3 = frac(float3(p, p, p) * RANDOM_SCALE.xyz);
+    p3 += dot(p3, p3.yzx + 19.19);
+    return frac((p3.xx+p3.yz)*p3.zy);
+}
+
+float2 random2(float2 p) {
+    float3 p3 = frac(p.xyx * RANDOM_SCALE.xyz);
+    p3 += dot(p3, p3.yzx + 19.19);
+    return frac((p3.xx+p3.yz)*p3.zy);
+}
+
+float2 random2(float3 p3) {
+    p3 = frac(p3 * RANDOM_SCALE.xyz);
+    p3 += dot(p3, p3.yzx + 19.19);
+    return frac((p3.xx+p3.yz)*p3.zy);
+}
+
+float3 random3(float p) {
+    float3 p3 = frac(float3(p) * RANDOM_SCALE.xyz);
+    p3 += dot(p3, p3.yzx+19.19);
+    return frac((p3.xxy+p3.yzz)*p3.zyx); 
+}
+
+float3 random3(float2 p) {
+    float3 p3 = frac(float3(p.xyx) * RANDOM_SCALE.xyz);
+    p3 += dot(p3, p3.yxz + 19.19);
+    return frac((p3.xxy+p3.yzz)*p3.zyx);
+}
+
+float3 random3(float3 p) {
+    p = frac(p * RANDOM_SCALE.xyz);
+    p += dot(p, p.yxz + 19.19);
+    return frac((p.xxy + p.yzz)*p.zyx);
+}
+
+float4 random4(float p) {
+    float4 p4 = frac(p * RANDOM_SCALE);
+    p4 += dot(p4, p4.wzxy+19.19);
+    return frac((p4.xxyz+p4.yzzw)*p4.zywx);   
+}
+
+float4 random4(float2 p) {
+    float4 p4 = frac(p.xyxy * RANDOM_SCALE);
+    p4 += dot(p4, p4.wzxy+19.19);
+    return frac((p4.xxyz+p4.yzzw)*p4.zywx);
+}
+
+float4 random4(float3 p) {
+    float4 p4 = frac(p.xyzx  * RANDOM_SCALE);
+    p4 += dot(p4, p4.wzxy+19.19);
+    return frac((p4.xxyz+p4.yzzw)*p4.zywx);
+}
+
+float4 random4(float4 p4) {
+    p4 = frac(p4  * RANDOM_SCALE);
+    p4 += dot(p4, p4.wzxy+19.19);
+    return frac((p4.xxyz+p4.yzzw)*p4.zywx);
+}
+
+
+#endif
+
+#if !defined(FNC_SATURATE) && !defined(saturate)
+#define FNC_SATURATE
+#define saturate(x) clamp(x, 0.0, 1.0)
+#endif
+
+#ifndef FNC_MAP
+#define FNC_MAP
+
+float map( float value, float inMin, float inMax ) {
+    return saturate( (value-inMin)/(inMax-inMin));
+}
+
+vec2 map( vec2 value, vec2 inMin, vec2 inMax ) {
+    return saturate( (value-inMin)/(inMax-inMin));
+}
+
+vec3 map( vec3 value, vec3 inMin, vec3 inMax ) {
+    return saturate( (value-inMin)/(inMax-inMin));
+}
+
+vec4 map( vec4 value, vec4 inMin, vec4 inMax ) {
+    return saturate( (value-inMin)/(inMax-inMin));
+}
+
+float map(in float value, in float inMin, in float inMax, in float outMin, in float outMax) {
+  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
+
+vec2 map(in vec2 value, in vec2 inMin, in vec2 inMax, in vec2 outMin, in vec2 outMax) {
+  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
+
+vec3 map(in vec3 value, in vec3 inMin, in vec3 inMax, in vec3 outMin, in vec3 outMax) {
+  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
+
+vec4 map(in vec4 value, in vec4 inMin, in vec4 inMax, in vec4 outMin, in vec4 outMax) {
+  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
+}
+
+#endif
+
+#ifndef FNC_PALETTE
+#define FNC_PALETTE
+vec3 palette (in float t, in vec3 a, in vec3 b, in vec3 c, in vec3 d) {
+    return a + b * cos(TAU * ( c * t + d ));
+}
+
+vec4 palette (in float t, in vec4 a, in vec4 b, in vec4 c, in vec4 d) {
+    return a + b * cos(TAU * ( c * t + d ));
+}
+#endif
+
+uniform float iTime;
+uniform vec3 iResolution;
+uniform vec4 iMouse;
+
+varying vec2 vUv;
+
+uniform float uSpeed;
+uniform float uOpacity;
+
+vec3 pos2col(vec2 i){
+    i+=vec2(9.,0.);
+    
+    float r=random(i+vec2(12.,2.));
+    float g=random(i+vec2(7.,5.));
+    float b=random(i);
+    
+    vec3 col=vec3(r,g,b);
+    return col;
+}
+
+vec3 colorNoise(vec2 uv){
+    vec2 size=vec2(1.);
+    vec2 pc=uv*size;
+    vec2 base=floor(pc);
+    
+    vec3 v1=pos2col((base+vec2(0.,0.))/size);
+    vec3 v2=pos2col((base+vec2(1.,0.))/size);
+    vec3 v3=pos2col((base+vec2(0.,1.))/size);
+    vec3 v4=pos2col((base+vec2(1.,1.))/size);
+    
+    vec2 f=fract(pc);
+    
+    f=smoothstep(0.,1.,f);
+    
+    vec3 px1=mix(v1,v2,f.x);
+    vec3 px2=mix(v3,v4,f.x);
+    vec3 v=mix(px1,px2,f.y);
+    return v;
+}
+
+void main(){
+    vec2 uv=vUv;
+    
+    vec3 col=vec3(1.);
+    
+    float mask=1.;
+    
+    vec2 noiseUv=uv;
+    noiseUv.x+=-iTime*.5;
+    float noiseValue=noise(noiseUv*vec2(3.,100.));
+    mask=noiseValue;
+    mask=map(mask,-1.,1.,0.,1.);
+    mask=pow(saturate(mask-.1),11.);
+    mask=smoothstep(0.,.04,mask);
+    
+    // col=palette(mask,vec3(.5),vec3(.5),vec3(1.),vec3(0.,.33,.67));
+    col=colorNoise(noiseUv*vec2(10.,100.));
+    col*=vec3(1.5,1.,400.);
+    // mask=1.;
+    mask*=smoothstep(.02,.5,uv.x)*smoothstep(.02,.5,1.-uv.x);
+    mask*=smoothstep(.01,.1,uv.y)*smoothstep(.01,.1,1.-uv.y);
+    mask*=smoothstep(1.,10.,uSpeed);
+    
+    gl_FragColor=vec4(col,mask*uOpacity);
+}
