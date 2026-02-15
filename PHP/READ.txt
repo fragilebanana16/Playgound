@@ -1,0 +1,8 @@
+下载
+https://windows.php.net/downloads/releases/php-8.2.30-Win32-vs16-x64.zip
+解压
+F:\php-8.2.30-Win32-vs16-x64
+本地
+php -S localhost:8080
+局域网
+php -S 0.0.0.0:8000，访问http://192.168.0.100:8000
