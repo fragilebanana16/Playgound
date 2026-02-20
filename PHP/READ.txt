@@ -1,3 +1,4 @@
+## 运行
 下载
 https://windows.php.net/downloads/releases/php-8.2.30-Win32-vs16-x64.zip
 解压
@@ -6,3 +7,128 @@ F:\php-8.2.30-Win32-vs16-x64
 php -S localhost:8080
 局域网
 php -S 0.0.0.0:8000，访问http://192.168.0.100:8000
+
+## 逆天PHP Crash Notes
+
+#### Cookies
+
+分持久 / 会话，会话不设置时间，关闭消失
+
+```php
+
+<?php
+// 增加（Create）
+setcookie("username", "Dicken", time() + 3600, "/"); 
+// 设置一个名为 username 的 Cookie，有效期 1 小时，路径为整个站点
+
+// 读取（Read）
+if (isset($_COOKIE['username'])) {
+    echo "用户名是: " . $_COOKIE['username'];
+}
+
+// 修改（Update）
+setcookie("username", "NewName", time() + 7200, "/"); 
+// 重新设置同名 Cookie，相当于更新值和过期时间
+
+// 删除（Delete）注意这里需要不仅设置空还要设置过期，否则设为空还是会存在，浏览器只会在过期时间到达时删除 Cookie
+setcookie("username", "", time() - 3600, "/"); 
+// 设置过期时间为过去，浏览器会立即删除 Cookie
+?> 
+```
+
+#### Session
+
+存在服务端，查询Session 依赖Cookie Session ID
+```php
+<?php
+// 开启 Session（必须在任何输出之前调用）
+session_start();
+
+// 增加（Create）
+$_SESSION['username'] = "Dicken";
+$_SESSION['role'] = "admin";
+
+// 读取（Read）
+if (isset($_SESSION['username'])) {
+    echo "用户名是: " . $_SESSION['username'];
+}
+
+// 修改（Update）
+$_SESSION['username'] = "NewName"; 
+// 直接重新赋值即可，相当于更新
+
+// 删除（Delete）
+unset($_SESSION['role']); // 删除单个键
+// 或者销毁整个 Session
+session_destroy(); // session_destroy() 之前必须先 session_start()
+?>
+```
+
+
+
+
+#### 变量需前缀 $
+
+#### PHP 字符串连接用 【.】，【+】 永远只做数字相加
+```php
+$a = "Hello";
+$b = "World";
+$c = $a . " " . $b;
+echo $c;   // 输出：Hello World
+```
+
+#### 字符串中的常量
+
+```php
+echo "${name} is :";
+```
+#### foreach的as
+```php
+foreach ($array as $value) {
+}
+```
+#### 函数内部访问和修改外部定义的全局变量
+```php
+<?php
+$x = 5;
+$y = 10;
+
+function add() {
+    global $x, $y; // 将全局变量引入函数作用域
+    return $x + $y;
+}
+
+echo add(); // 输出 15
+?>
+```
+#### 超级全局变量（Superglobals）
+
+| 变量名      | 作用说明                                               |
+| ----------- | ------------------------------------------------------ |
+| `$GLOBALS`  | 包含所有全局变量的数组，键是变量名，值是变量内容。     |
+| `$_SERVER`  | 包含服务器和执行环境信息，如脚本路径、域名、请求头等。 |
+| `$_GET`     | 保存通过 URL 查询字符串传递的参数。                    |
+| `$_POST`    | 保存通过 HTTP POST 方法传递的表单数据。                |
+| `$_FILES`   | 保存上传文件的信息（文件名、类型、大小、临时路径等）。 |
+| `$_COOKIE`  | 保存客户端 Cookie 数据。                               |
+| `$_SESSION` | 保存会话变量，用于跨页面保持用户状态。                 |
+| `$_REQUEST` | 包含 `$_GET`、`$_POST` 和 `$_COOKIE` 的数据。          |
+| `$_ENV`     | 保存环境变量信息。                                     |
+##### $_SERVER
+```php
+<?php
+echo $_SERVER['PHP_SELF'];     // 当前脚本文件名
+echo $_SERVER['SERVER_NAME'];  // 服务器主机名
+echo $_SERVER['HTTP_USER_AGENT']; // 客户端浏览器信息
+?>
+
+```
+###### $_GET
+
+```php
+<?php
+// URL: test.php?name=Tom&age=20
+echo $_GET['name']; // 输出 Tom
+echo $_GET['age'];  // 输出 20
+?>
+```
