@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放器 - 局域网</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .player-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .player-section.active {
+            display: block;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 15px;
+            background: #000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-playing {
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .video-list {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .list-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .video-count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .video-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .video-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .video-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .video-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .video-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .video-item.playing {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-color: #667eea;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail::before {
+            content: '▶';
+            color: white;
+            font-size: 40px;
+            opacity: 0.9;
+            z-index: 1;
+        }
+
+        .video-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .video-size {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            input[type="text"], button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <div class="video-icon">🎬</div>
+            </h1>
+            <div class="controls">
+                <input type="text" id="pathInput" placeholder="输入视频目录路径 (例如: /storage/emulated/0/film)" value="/storage/emulated/0/film">
+                <button onclick="scanDirectory()">扫描目录</button>
+            </div>
+        </div>
+
+        <div class="player-section" id="playerSection">
+            <video id="videoPlayer" controls controlsList="nodownload">
+                您的浏览器不支持视频播放
+            </video>
+            <div class="current-playing" id="currentPlaying">
+                当前播放: 无
+            </div>
+        </div>
+
+        <div class="video-list">
+            <div class="list-header">
+                <h2>视频列表</h2>
+                <span class="video-count" id="videoCount">0 个视频</span>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 搜索视频..." oninput="filterVideos()">
+            </div>
+            <div id="videoList" class="video-grid">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 7l-7 5 7 5V7z"></path>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                    </svg>
+                    <p>请输入目录路径并点击"扫描目录"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allVideos = [];
+        const videoExtensions = ['.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.webm', '.m4v', '.3gp', '.mpeg', '.mpg'];
+
+        async function scanDirectory() {
+            const path = document.getElementById('pathInput').value.trim();
+            if (!path) {
+                alert('请输入目录路径');
+                return;
+            }
+
+            const listDiv = document.getElementById('videoList');
+            listDiv.innerHTML = '<div class="loading">正在扫描目录...</div>';
+
+            try {
+                const response = await fetch('scan.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'path=' + encodeURIComponent(path)
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    listDiv.innerHTML = `<div class="error">错误: ${data.error}</div>`;
+                    return;
+                }
+
+                allVideos = data.videos || [];
+                displayVideos(allVideos);
+            } catch (error) {
+                listDiv.innerHTML = `<div class="error">扫描失败: ${error.message}</div>`;
+            }
+        }
+
+        function displayVideos(videos) {
+            const listDiv = document.getElementById('videoList');
+            const countDiv = document.getElementById('videoCount');
+
+            countDiv.textContent = `${videos.length} 个视频`;
+
+            if (videos.length === 0) {
+                listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p>该目录中没有找到视频文件</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listDiv.innerHTML = videos.map((video, index) => `
+                <div class="video-item" onclick="playVideo('${video.path.replace(/'/g, "\\'")}', '${video.name.replace(/'/g, "\\'")}', ${index})">
+                    <div class="video-thumbnail"></div>
+                    <div class="video-name">${video.name}</div>
+                    <div class="video-size">${formatFileSize(video.size)}</div>
+                </div>
+            `).join('');
+        }
+
+        function playVideo(path, name, index) {
+            const player = document.getElementById('videoPlayer');
+            const playerSection = document.getElementById('playerSection');
+            const currentPlaying = document.getElementById('currentPlaying');
+
+            // 更新视频源
+            player.src = 'play.php?file=' + encodeURIComponent(path);
+            player.load();
+            player.play();
+
+            // 显示播放器
+            playerSection.classList.add('active');
+            currentPlaying.textContent = `正在播放: ${name}`;
+
+            // 滚动到播放器
+            playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // 更新选中状态
+            document.querySelectorAll('.video-item').forEach((item, i) => {
+                item.classList.toggle('playing', i === index);
+            });
+        }
+
+        function filterVideos() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allVideos.filter(video => 
+                video.name.toLowerCase().includes(searchTerm)
+            );
+            displayVideos(filtered);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 视频播放结束后自动播放下一个
+        document.getElementById('videoPlayer').addEventListener('ended', function() {
+            const playingItem = document.querySelector('.video-item.playing');
+            if (playingItem) {
+                const nextItem = playingItem.nextElementSibling;
+                if (nextItem && nextItem.classList.contains('video-item')) {
+                    nextItem.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
