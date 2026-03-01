@@ -3,14 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title>three.js load model & HDR</title>
+	<link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <label for="carInput">Car</label>
-    <input type="file" id="carInput" accept=".gltf,.glb" />
-	<label for="sceneInput">Scene</label>
-    <input type="file" id="sceneInput" accept=".gltf,.glb" multiple />
-	<label for="hdrInput">HDR</label>
-    <input type="file" id="hdrInput" accept=".hdr" multiple />
+  <div id="loading">
+    <div id="loading-bar-wrap">
+        <div id="loading-bar"></div>
+    </div>
+    <div id="loading-text">0%</div>
+</div>
 	<script type="x-shader/x-vertex" id="vertexshader">
 		varying vec2 vUv;
 		void main() {
@@ -28,23 +29,139 @@
 			gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
 		}
 	</script>
+       <script type="x-shader/x-vertex" id="aurora-vert">
+        varying vec3 vDir;
+        void main() {
+          vDir = normalize((modelMatrix * vec4(position, 0.0)).xyz);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    </script>
+    <script type="x-shader/x-fragment" id="aurora-frag">
+       precision highp float;
+        uniform float iTime;
+        uniform vec2  iResolution;
+        varying vec3  vDir;
+
+        mat2 mm2(in float a){ float c=cos(a),s=sin(a); return mat2(c,s,-s,c); }
+        const mat2 m2 = mat2(0.95534,0.29552,-0.29552,0.95534);
+
+        float tri(in float x){ return clamp(abs(fract(x)-.5),0.01,0.49); }
+        vec2 tri2(in vec2 p){ return vec2(tri(p.x)+tri(p.y), tri(p.y+tri(p.x))); }
+
+        float triNoise2d(in vec2 p, float spd){
+          float z=1.8, z2=2.5, rz=0.;
+          p *= mm2(p.x*0.06);
+          vec2 bp = p;
+          for(float i=0.;i<3.;i++){
+            vec2 dg = tri2(bp*1.85)*.75;
+            dg *= mm2(iTime*spd);
+            p -= dg/z2;
+            bp *= 1.3; z2 *= .45; z *= .42;
+            p *= 1.21+(rz-1.0)*.02;
+            rz += tri(p.x+tri(p.y))*z;
+            p *= -m2;
+          }
+          return clamp(1./pow(rz*29.,1.3),0.,.55);
+        }
+
+        float hash21(in vec2 n){ return fract(sin(dot(n,vec2(12.9898,4.1414)))*43758.5453); }
+
+        vec4 aurora(vec3 ro, vec3 rd){
+          vec4 col=vec4(0.), avgCol=vec4(0.);
+          for(float i=0.;i<5.;i++){
+            float of = 0.006*hash21(vec2(i*13.71, i*7.33))*smoothstep(0.,15.,i);
+            float pt = ((.8+pow(i,1.4)*.002)-ro.y)/(rd.y*2.+0.4);
+            pt -= of;
+            vec3 bpos = ro+pt*rd;
+            vec2 p = bpos.zx;
+            float rzt = triNoise2d(p, 0.6);
+            vec4 col2 = vec4(0.,0.,0.,rzt);
+            col2.rgb = (sin(1.0 - vec3(2.15, -.5, 1.2) + i*0.043) * 0.5 + 0.5) * rzt;
+            avgCol = mix(avgCol, col2, .5);
+            col += avgCol*exp2(-i*0.065-2.5)*smoothstep(0.,5.,i);
+          }
+          col *= clamp(rd.y*15.+.4,0.,1.);
+          return col*1.8;
+        }
+
+        vec3 nmzHash33(vec3 q){
+          uvec3 p = uvec3(ivec3(q));
+          p = p*uvec3(374761393u,1103515245u,668265263u)+p.zxy+p.yzx;
+          p = p.yzx*(p.zxy^(p>>3u));
+          return vec3(p^(p>>16u))*(1.0/float(0xffffffffu));
+        }
+
+        vec3 stars(in vec3 p){
+          vec3 c = vec3(0.);
+          float res = iResolution.x;
+          for(float i=0.;i<4.;i++){
+            vec3 q = fract(p*(.15*res))-.5;
+            vec3 id = floor(p*(.15*res));
+            vec2 rn = nmzHash33(id).xy;
+            float c2 = 1.-smoothstep(0.,.6,length(q));
+            c2 *= step(rn.x,.0005+i*i*0.001);
+            c += c2*(mix(vec3(1.0,0.49,0.1),vec3(0.75,0.9,1.),rn.y)*0.1+0.9);
+            p *= 1.3;
+          }
+          return c*c*.8;
+        }
+
+        vec3 bg(in vec3 rd){
+          float sd = dot(normalize(vec3(-0.5,-0.6,0.9)),rd)*0.5+0.5;
+          sd = pow(sd,5.);
+          return mix(vec3(0.05,0.1,0.2),vec3(0.1,0.05,0.2),sd)*.63;
+        }
+
+        void main(){
+          vec3 ro = vec3(0.,0.,-6.7);
+          vec3 rd = normalize(vDir);
+          float fade = smoothstep(0.,0.01,abs(rd.y))*0.1+0.9;
+          vec3 col = bg(rd)*fade;
+          if(rd.y > 0.){
+            vec4 aur = smoothstep(0.,1.5,aurora(ro,rd))*fade;
+            col += stars(rd);
+            col = col*(1.-aur.a)+aur.rgb;
+          } else {
+            vec3 rrd = vec3(rd.x, abs(rd.y), rd.z);
+            col = bg(rrd)*fade*0.6;
+            vec4 aur = smoothstep(0.,2.5,aurora(ro,rrd));
+            col += stars(rrd)*0.1;
+            col = col*(1.-aur.a)+aur.rgb;
+            vec3 pos = ro+((0.5-ro.y)/rrd.y)*rrd;
+            float nz2 = triNoise2d(pos.xz*vec2(.5,.7),0.);
+            col += mix(vec3(0.2,0.25,0.5)*0.08,vec3(0.3,0.3,0.5)*0.7,nz2*0.4);
+          }
+          gl_FragColor = vec4(col,1.0);
+    }
+    </script>
     <script src="../libs/three.js"></script>
+	<script src="../libs/math/SimplexNoise.js"></script>
+	<script src="../libs/shaders/SSAOShader.js"></script>
 	<script src="../libs/shaders/CopyShader.js"></script>
 	<script src="../libs/shaders/SSRShader.js"></script>
     <script src="../libs/shaders/LuminosityHighPassShader.js"></script>
-	
+    <script src="../libs/shaders/SMAAShader.js"></script>
+    <script src="../libs/shaders/FXAAShader.js"></script>
+	<script src="../libs/lights/RectAreaLightUniformsLib.js"></script>
+	<script src="../libs/objects/ReflectorForSSRPass.js"></script>
+    <script src="../libs/helpers/RectAreaLightHelper.js"></script>
 	<script src="../libs/postprocessing/Pass.js"></script>
 	<script src="../libs/shaders/LuminosityHighPassShader.js"></script>
 	<script src="../libs/postprocessing/ShaderPass.js"></script>
+	<script src="../libs/postprocessing/SSAOPass.js"></script>
 	<script src="../libs/postprocessing/RenderPass.js"></script>
 	<script src="../libs/postprocessing/EffectComposer.js"></script>
 	<script src="../libs/postprocessing/UnrealBloomPass.js"></script>
     <script src="../libs/postprocessing/SSRPass.js"></script>
+    <script src="../libs/postprocessing/SMAAPass.js"></script>
 	<script src="../libs/dat.gui.min.js"></script>
     <script src="../libs/vanilla.js"></script>
     <script src="../libs/OrbitControls.js"></script>
     <script src="../libs/GLTFLoader.js"></script>
     <script src="../libs/RGBELoader.js"></script>
+    <script src="../libs/stats.min.js"></script>
+	<script src="js/libs/jquery-3.7.1.min.js"></script>
+    <script src="js/userInterface.js"></script>
     <script src="js/main.js"></script>
   </body>
 </html>
