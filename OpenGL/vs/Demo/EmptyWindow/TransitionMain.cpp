@@ -7,6 +7,9 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw_gl3.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/noise.hpp>
+#include <learnopengl/model.h>
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
@@ -22,6 +25,9 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+float yaw = 0.0f;   // 水平角（绕 Y 轴）
+float pitch = glm::radians(15.0f);
 
 // 当前真正显示的颜色（已经完成过渡的）
 static glm::vec3 g_CurrentColor = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -147,7 +153,7 @@ int main()
     };
 
     // cube VAO
-    unsigned int cubeVAO, cubeVBO;
+   /* unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &cubeVBO);
     glBindVertexArray(cubeVAO);
@@ -161,10 +167,12 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
 
     Shader shader("transition.vs", "transition.fs");
     shader.use();
+    int dir = 1;
+    Model ourModel("H:/jsProjects/RESUME/Playground/OpenGL/vs/Demo/resources/test/lowpoly_car/scene.gltf");
 
     // render loop
     // -----------
@@ -195,15 +203,118 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         shader.setMat4("model", model);
         shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
 
         shader.setVec3("fromColor", g_FromColor);
         shader.setVec3("toColor", g_ToColor);
         shader.setFloat("t", g_TransitionT);
         shader.setFloat("width", 0.1f); // 边缘柔和宽度
 
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+       /* glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);*/
+
+        ourModel.Draw(shader);
+
+        // 时间（只定义一次）
+        t = glfwGetTime();
+
+        // -------------------- 随机距离变化（柔和版） --------------------
+        static float radius = 4.0f;          // 当前距离
+        static float targetRadius = 4.0f;    // 目标距离
+        static float radiusTimer = 0.0f;     // 计时器
+        static float radiusVelocity = 0.0f;  // 用于平滑阻尼
+
+        radiusTimer += deltaTime;
+
+        if (radiusTimer > 3.0f + (rand() % 3000) / 1000.0f) {
+            targetRadius = 10.0f + (rand() % 800) / 1000.0f; // 4.0 ~ 4.8
+            radiusTimer = 0.0f;
+        }
+
+        // 平滑阻尼（类似 Unity 的 SmoothDamp）
+        float smoothTime = 1.2f; // 越大越慢越柔和
+        float omega = 2.0f / smoothTime;
+
+        float x = omega * deltaTime;
+        float exp = 1.0f / (1.0f + x + 0.48f * x * x + 0.235f * x * x * x);
+
+        float change = radius - targetRadius;
+        float temp = (radiusVelocity + omega * change) * deltaTime;
+
+        radiusVelocity = (radiusVelocity - omega * temp) * exp;
+        radius = targetRadius + (change + temp) * exp;
+
+
+        // 1. 更新 yaw 和 pitch（先更新）
+        static int dir = 1;  // 确保是 static，不要每帧重置
+
+        yaw += deltaTime * 0.2f;
+
+        // =======================
+        //   Pitch SmoothDamp 方案
+        // =======================
+
+        // pitch 范围（你可以调）
+        float pitchMin = glm::radians(5.0f);
+        float pitchMax = glm::radians(30.0f);
+
+        // static 状态变量
+        static float targetPitch = glm::radians(20.0f); // 初始目标角度
+        static float pitchVel = 0.0f;                   // SmoothDamp 速度
+        static float pitchTimer = 0.0f;                 // 计时器
+
+        pitchTimer += deltaTime;
+
+        // 每 2~4 秒随机一个新的目标 pitch
+        if (pitchTimer > 2.0f + (rand() % 2000) / 1000.0f) {
+            float r = (rand() % 1000) / 1000.0f; // 0~1
+            targetPitch = pitchMin + r * (pitchMax - pitchMin);
+            pitchTimer = 0.0f;
+        }
+
+        // SmoothDamp（Unity 同款）
+        float smoothTimePitch = 1.0f; // 越大越慢越柔和
+        float omegaP = 2.0f / smoothTimePitch;
+
+        float xP = omegaP * deltaTime;
+        float expP = 1.0f / (1.0f + xP + 0.48f * xP * xP + 0.235f * xP * xP * xP);
+
+        float changeP = pitch - targetPitch;
+        float tempP = (pitchVel + omegaP * changeP) * deltaTime;
+
+        pitchVel = (pitchVel - omegaP * tempP) * expP;
+        pitch = targetPitch + (changeP + tempP) * expP;
+
+        // 最终安全限制（不会参与节奏）
+        pitch = glm::clamp(pitch, pitchMin, pitchMax);
+
+
+        std::cout << "pitch = " << glm::degrees(pitch) << std::endl;
+
+
+        // 2. 计算汽车中心点（带 Perlin 噪声）
+        glm::vec3 noise(
+            glm::perlin(glm::vec2(t * 0.3f, 0.0f)) * 0.03f,
+            glm::perlin(glm::vec2(t * 0.4f, 10.0f)) * 0.015f,
+            glm::perlin(glm::vec2(t * 0.3f, 20.0f)) * 0.03f
+        );
+
+        glm::vec3 carPosition =
+            glm::vec3(model * glm::vec4(0, 0, 0, 1)) + noise;
+
+        glm::vec3 target = carPosition;
+
+
+        // 3. 用更新后的 yaw/pitch 计算摄像机位置
+        glm::vec3 cameraPos;
+        cameraPos.x = target.x + radius * cos(pitch) * sin(yaw);
+        cameraPos.y = target.y + radius * sin(pitch);
+        cameraPos.z = target.z + radius * cos(pitch) * cos(yaw);
+
+
+        // 5. 最终视图矩阵
+        view = glm::lookAt(cameraPos, target, glm::vec3(0, 1, 0));
+        shader.setMat4("view", view);
+
 
         // imgui
         ImGui::Begin("Controls");
