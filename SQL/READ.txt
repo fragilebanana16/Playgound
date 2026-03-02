@@ -1,0 +1,6 @@
+postgre
+服务启动-密码j--d-a-
+
+连接数据库Memo 
+F:\PostgreSQL\bin\psql.exe
+psql.exe -U postgres -h localhost -d Memo

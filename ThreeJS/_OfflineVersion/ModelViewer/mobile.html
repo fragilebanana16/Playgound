@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>@YOLO</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c: #00f0ff;      /* 主青色 */
+  --r: #ff2d55;      /* 红色 accent */
+  --g: #39ff14;      /* 绿色数据 */
+  --dim: rgba(0,240,255,0.08);
+  --border: rgba(0,240,255,0.18);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body {
+  width:100%; height:100%; overflow:hidden; background:#000;
+  touch-action:none; position:fixed; top:0; left:0;
+  font-family:'Share Tech Mono', monospace;
+}
+#app { width:100%; height:100%; position:fixed; top:0; left:0; }
+canvas { display:block; touch-action:none; width:100%!important; height:100%!important; }
+
+/* ── 扫描线覆盖层 ── */
+#scanlines {
+  position:fixed; inset:0; pointer-events:none; z-index:5;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+  );
+}
+#vignette {
+  position:fixed; inset:0; pointer-events:none; z-index:4;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+}
+
+/* ── 加载界面 ── */
+#loading {
+  position:fixed; inset:0; background:#000; z-index:200;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:opacity 1s ease;
+}
+#loading.hidden { opacity:0; pointer-events:none; }
+
+#loading-logo {
+  font-family:'Orbitron',sans-serif; font-weight:900;
+  font-size:clamp(28px,5vw,64px); letter-spacing:.1em;
+  color:#fff; margin-bottom:4px;
+  text-shadow: 0 0 20px var(--c), 0 0 60px rgba(0,240,255,0.3);
+}
+#loading-logo span { color:var(--c); }
+
+#loading-sub2 {
+  font-size:clamp(9px,1.5vw,12px); letter-spacing:.4em; color:rgba(0,240,255,0.4);
+  margin-bottom:48px; text-transform:uppercase;
+}
+#loading-bar-wrap {
+  width:min(320px,70vw); height:2px; background:rgba(0,240,255,0.1); position:relative;
+  overflow:visible;
+}
+#loading-bar {
+  height:2px; background:var(--c); width:0%;
+  box-shadow:0 0 8px var(--c), 0 0 20px rgba(0,240,255,0.5);
+  transition:width .15s ease;
+  position:relative;
+}
+#loading-bar::after {
+  content:''; position:absolute; right:-1px; top:-2px;
+  width:2px; height:6px; background:#fff;
+  box-shadow:0 0 6px var(--c);
+}
+#loading-pct {
+  position:absolute; right:0; top:10px;
+  font-size:10px; letter-spacing:.15em; color:rgba(0,240,255,0.5);
+}
+#loading-status {
+  margin-top:20px; font-size:9px; letter-spacing:.3em;
+  color:rgba(0,240,255,0.25); height:14px;
+  animation:statusCycle 3s steps(1) infinite;
+}
+@keyframes statusCycle {
+  0%  { content:'INITIALIZING RENDER ENGINE'; }
+  33% { content:'LOADING GEOMETRY'; }
+  66% { content:'COMPILING SHADERS'; }
+}
+
+/* ── 主 UI ── */
+#ui { position:fixed; inset:0; pointer-events:none; z-index:10; }
+#ui.hidden { opacity:0; pointer-events:none; }
+#ui { transition:opacity .6s ease; }
+
+/* ── 顶部左：标题区 ── */
+#title-block {
+  position:absolute;
+  top: max(env(safe-area-inset-top,0px), 16px);
+  left: max(env(safe-area-inset-left,0px), 20px);
+}
+#title-model {
+  font-family:'Orbitron',sans-serif; font-weight:900;
+  font-size:clamp(18px,3.5vw,42px); letter-spacing:.05em;
+  color:#fff; line-height:1;
+  text-shadow:0 0 15px var(--c), 0 0 40px rgba(0,240,255,0.2);
+}
+#title-model span { color:var(--c); }
+#title-sub {
+  font-size:clamp(7px,1.1vw,10px); letter-spacing:.35em;
+  color:rgba(0,240,255,0.45); margin-top:4px; text-transform:uppercase;
+}
+
+
+/* ── 顶部右：状态 ── */
+#status-block {
+  position:absolute;
+  top: max(env(safe-area-inset-top,0px), 16px);
+  right: max(env(safe-area-inset-right,0px), 20px);
+  text-align:right;
+}
+#orbit-status {
+  font-size:clamp(7px,1vw,9px); letter-spacing:.25em;
+  color:rgba(0,240,255,0.2); transition:color .5s;
+  text-transform:uppercase;
+}
+#orbit-status.on { color:rgba(0,240,255,0.6); }
+#orbit-status::before {
+  content:''; display:inline-block; width:5px; height:5px;
+  border-radius:50%; background:currentColor; margin-right:7px;
+  vertical-align:middle;
+}
+#orbit-status.on::before { animation:blink 1.8s ease-in-out infinite; }
+
+/* ── 左侧数据面板 ── */
+#data-panel {
+  position:absolute;
+  left: max(env(safe-area-inset-left,0px), 20px);
+  bottom: max(env(safe-area-inset-bottom,0px), 70px);
+  display:flex; flex-direction:column; gap:6px;
+}
+.data-row {
+  display:flex; align-items:baseline; gap:8px;
+}
+.data-label {
+  font-size:clamp(6px,0.9vw,8px); letter-spacing:.25em;
+  color:rgba(0,240,255,0.25); text-transform:uppercase; width:52px;
+}
+.data-value {
+  font-family:'Orbitron',sans-serif; font-size:clamp(10px,1.6vw,16px);
+  font-weight:700; color:var(--c);
+  text-shadow:0 0 8px rgba(0,240,255,0.5);
+}
+.data-unit {
+  font-size:clamp(6px,0.8vw,8px); color:rgba(0,240,255,0.35); letter-spacing:.1em;
+}
+
+/* ── 右侧规格面板 ── */
+#spec-panel {
+  position:absolute;
+  right: max(env(safe-area-inset-right,0px), 20px);
+  bottom: max(env(safe-area-inset-bottom,0px), 70px);
+  text-align:right; display:flex; flex-direction:column; gap:5px;
+}
+.spec-row { display:flex; align-items:baseline; gap:6px; justify-content:flex-end; }
+.spec-label { font-size:clamp(6px,0.85vw,8px); letter-spacing:.2em; color:rgba(255,255,255,0.2); text-transform:uppercase; }
+.spec-value { font-family:'Orbitron',sans-serif; font-size:clamp(9px,1.4vw,13px); font-weight:700; color:rgba(255,255,255,0.7); }
+
+/* ── 底部相机栏 ── */
+#cam-bar {
+  position:absolute; bottom:0; left:0; right:0;
+  padding: 0 max(env(safe-area-inset-right,12px),12px) max(env(safe-area-inset-bottom,10px),10px) max(env(safe-area-inset-left,12px),12px);
+  display:flex; justify-content:center; gap:clamp(4px,1vw,10px);
+  pointer-events:all;
+}
+.cam-btn {
+  background:rgba(0,0,0,0.7);
+  border:1px solid rgba(0,240,255,0.15);
+  color:rgba(0,240,255,0.3);
+  font-family:'Share Tech Mono',monospace;
+  font-size:clamp(7px,1.2vw,10px); letter-spacing:.2em;
+  padding:clamp(6px,1.2vh,10px) clamp(10px,2vw,20px);
+  cursor:pointer; transition:all .2s; text-transform:uppercase;
+  min-width:44px; min-height:44px;
+  display:flex; align-items:center; justify-content:center;
+  clip-path:polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  position:relative;
+}
+.cam-btn:hover, .cam-btn:active {
+  border-color:rgba(0,240,255,0.5);
+  color:var(--c);
+  background:rgba(0,240,255,0.08);
+  text-shadow:0 0 8px var(--c);
+}
+.cam-btn.active {
+  border-color:var(--c);
+  color:var(--c);
+  background:rgba(0,240,255,0.12);
+  text-shadow:0 0 10px var(--c);
+  box-shadow:0 0 12px rgba(0,240,255,0.15), inset 0 0 8px rgba(0,240,255,0.05);
+}
+
+/* ── 角落装饰（赛博风格） ── */
+.corner {
+  position:absolute; width:24px; height:24px;
+  pointer-events:none;
+}
+.corner::before,.corner::after {
+  content:''; position:absolute;
+  background:var(--c); opacity:.35;
+}
+.corner::before { width:100%; height:1px; }
+.corner::after  { width:1px; height:100%; }
+#c-tl{top:12px;left:12px} #c-tl::before{top:0;left:0} #c-tl::after{top:0;left:0}
+#c-tr{top:12px;right:12px} #c-tr::before{top:0;right:0} #c-tr::after{top:0;right:0}
+#c-bl{bottom:12px;left:12px} #c-bl::before{bottom:0;left:0} #c-bl::after{bottom:0;left:0}
+#c-br{bottom:12px;right:12px} #c-br::before{bottom:0;right:0} #c-br::after{bottom:0;right:0}
+
+/* ── 中央顶部频道标 ── */
+#center-top {
+  position:absolute; top: max(env(safe-area-inset-top,0px),14px); left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:8px; white-space:nowrap;
+}
+#channel-dot {
+  width:6px; height:6px; border-radius:50%; background:var(--r);
+  box-shadow:0 0 8px var(--r); animation:blink 1.5s ease-in-out infinite;
+}
+#channel-label {
+  font-size:clamp(7px,1vw,9px); letter-spacing:.3em;
+  color:rgba(255,45,85,0.7); text-transform:uppercase;
+}
+
+/* ── 底部中央水印 ── */
+#watermark {
+  position:absolute; bottom: max(env(safe-area-inset-bottom,0px),52px); left:50%; transform:translateX(-50%);
+  font-family:'Orbitron',sans-serif; font-size:clamp(6px,0.8vw,8px);
+  letter-spacing:.5em; color:rgba(0,240,255,0.08); white-space:nowrap; text-transform:uppercase;
+}
+
+/* ── 动画 ── */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+@keyframes scanDown {
+  0%   { transform:translateY(-100%); opacity:.6; }
+  100% { transform:translateY(100vh);  opacity:0; }
+}
+#scan-line {
+  position:fixed; left:0; right:0; height:2px; z-index:6; pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(0,240,255,0.3), rgba(0,240,255,0.6), rgba(0,240,255,0.3), transparent);
+  animation:scanDown 6s linear infinite;
+  top:0;
+}
+
+/* ── 数字闪烁动画 ── */
+@keyframes numFlicker {
+  0%,95%,100%{opacity:1} 96%{opacity:.3} 98%{opacity:.8}
+}
+.data-value { animation:numFlicker 8s ease-in-out infinite; }
+.data-value:nth-child(2) { animation-delay:1.2s; }
+.data-value:nth-child(3) { animation-delay:3.1s; }
+
+@media (max-height:500px) and (orientation:landscape) {
+  #data-panel { display:none; }
+  #spec-panel { display:none; }
+  #title-model { font-size:clamp(14px,2.5vw,28px); }
+  .cam-btn { min-height:36px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- 加载 -->
+  <div id="loading">
+    <div id="loading-logo">CAR<span>VIEWER</span></div>
+    <div id="loading-sub2">VISUALIZATION</div>
+    <div id="loading-bar-wrap">
+      <div id="loading-bar"></div>
+      <div id="loading-pct">0%</div>
+    </div>
+    <div id="loading-status">INITIALIZING RENDER ENGINE</div>
+  </div>
+
+  <!-- 主 UI -->
+  <div id="ui" class="hidden">
+    <div id="scanlines"></div>
+    <div id="vignette"></div>
+    <div id="scan-line"></div>
+
+    <div class="corner" id="c-tl"></div>
+    <div class="corner" id="c-tr"></div>
+    <div class="corner" id="c-bl"></div>
+    <div class="corner" id="c-br"></div>
+
+    <!-- 左上标题 -->
+    <div id="title-block">
+      <div id="title-model">YOLO <span>LIVE RENDER</span></div>
+      <div id="title-sub">2026 · DEMO EDITION</div>
+    </div>
+
+    <!-- 右上状态 -->
+    <div id="status-block">
+      <div id="orbit-status">AUTO ORBIT</div>
+    </div>
+
+    <!-- 左下数据 -->
+    <div id="data-panel">
+      <div class="data-row">
+        <div class="data-label">0-100</div>
+        <div class="data-value">2.78</div>
+        <div class="data-unit">S</div>
+      </div>
+      <div class="data-row">
+        <div class="data-label">MAX</div>
+        <div class="data-value">265</div>
+        <div class="data-unit">KM/H</div>
+      </div>
+      <div class="data-row">
+        <div class="data-label">POWER</div>
+        <div class="data-value">673</div>
+        <div class="data-unit">HP</div>
+      </div>
+      <div class="data-row">
+        <div class="data-label">RANGE</div>
+        <div class="data-value">800</div>
+        <div class="data-unit">KM</div>
+      </div>
+    </div>
+
+    <!-- 右下规格 -->
+    <div id="spec-panel">
+      <div class="spec-row">
+        <div class="spec-label">LENGTH</div>
+        <div class="spec-value">4997mm</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-label">WIDTH</div>
+        <div class="spec-value">1963mm</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-label">HEIGHT</div>
+        <div class="spec-value">1440mm</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-label">WEIGHT</div>
+        <div class="spec-value">2205kg</div>
+      </div>
+    </div>
+
+    <!-- 底部水印 -->
+    <div id="watermark">GAMEMCU · 3D SHOWCASE · XIAOMI SU7</div>
+
+    <!-- 相机栏 -->
+    <div id="cam-bar">
+      <button class="cam-btn" ontouchstart="" onclick="setCam(0)">FRONT</button>
+      <button class="cam-btn" ontouchstart="" onclick="setCam(1)">SIDE</button>
+      <button class="cam-btn" ontouchstart="" onclick="setCam(2)">REAR</button>
+      <button class="cam-btn" ontouchstart="" onclick="setCam(3)">TOP</button>
+      <button class="cam-btn" ontouchstart="" onclick="setCam(4)">HERO</button>
+    </div>
+  </div>
+</div>
+ <script src="../libs/three.js"></script>
+	<script src="../libs/lights/RectAreaLightUniformsLib.js"></script>
+     <script src="../libs/OrbitControls.js"></script>
+    <script src="../libs/GLTFLoader.js"></script>
+<script type="module">
+
+const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+THREE.RectAreaLightUniformsLib.init();
+
+// ── Renderer ──────────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.physicallyCorrectLights = true;
+document.getElementById('app').prepend(renderer.domElement);
+
+// ── Scene ─────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x04040a);
+
+// EnvMap
+const pmrem = new THREE.PMREMGenerator(renderer);
+pmrem.compileEquirectangularShader();
+{
+  const es = new THREE.Scene();
+  const dl1 = new THREE.DirectionalLight(0xffd090, 3); dl1.position.set(5,5,7); es.add(dl1);
+  const dl2 = new THREE.DirectionalLight(0x88aaff, 1.5); dl2.position.set(-7,3,2); es.add(dl2);
+  const dl3 = new THREE.DirectionalLight(0xff6020, 1.2); dl3.position.set(0,6,-9); es.add(dl3);
+  const dl4 = new THREE.DirectionalLight(0x00f0ff, 0.5); dl4.position.set(0,8,0); es.add(dl4);
+  es.add(new THREE.AmbientLight(0x141420, 2));
+  scene.environment = pmrem.fromScene(es).texture;
+  pmrem.dispose();
+}
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.05, 150);
+camera.position.set(6, 2.5, 9);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.04;
+controls.maxPolarAngle = Math.PI / 2 - 0.04;
+controls.minDistance = 1.5;
+controls.maxDistance = 12;
+controls.target.set(0, 0.6, 0);
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+controls.rotateSpeed = isMobile ? 0.6 : 1.0;
+controls.update();
+
+// ── Lights ────────────────────────────────────────────────────
+const LAYER_NO_REFL = 0;
+
+const key = new THREE.RectAreaLight(0xffd090, 10, 7, 3.5);
+key.position.set(5,5,7); key.lookAt(0,0.8,0); key.layers.set(LAYER_NO_REFL); scene.add(key);
+
+const fill = new THREE.RectAreaLight(0x88aaff, 5, 5, 6);
+fill.position.set(-7,3.5,2); fill.lookAt(0,0.8,0); fill.layers.set(LAYER_NO_REFL); scene.add(fill);
+
+const rim = new THREE.RectAreaLight(0xff6020, 4, 10, 2);
+rim.position.set(0,7,-9); rim.lookAt(0,0.5,0); rim.layers.set(LAYER_NO_REFL); scene.add(rim);
+
+const topLight = new THREE.RectAreaLight(0xffffff, 2.5, 8, 8);
+topLight.position.set(0,10,0); topLight.lookAt(0,0,0); topLight.layers.set(LAYER_NO_REFL); scene.add(topLight);
+
+// 青色边缘氛围光（gamemcu 风格）
+const cyLight = new THREE.RectAreaLight(0x00f0ff, 1.5, 12, 0.5);
+cyLight.position.set(0, 0.1, 0); cyLight.lookAt(0, 1, 0); cyLight.layers.set(LAYER_NO_REFL); scene.add(cyLight);
+
+scene.add(new THREE.AmbientLight(0x0a0a18, 5));
+
+// ── 平台 ──────────────────────────────────────────────────────
+const platGeo = new THREE.CylinderGeometry(5, 5.4, 0.14, 32);
+const platMat = new THREE.MeshStandardMaterial({ color:0x06060e, roughness:0.05, metalness:0.95 });
+const platform = new THREE.Mesh(platGeo, platMat);
+platform.receiveShadow = true; platform.position.y = -0.07; scene.add(platform);
+
+// 青色边缘环
+const ringGeo = new THREE.TorusGeometry(5, 0.025, 8, 120);
+const ringMat = new THREE.MeshBasicMaterial({ color:0x00f0ff, transparent:true, opacity:0.3 });
+const ring = new THREE.Mesh(ringGeo, ringMat);
+ring.rotation.x = Math.PI / 2; ring.position.y = 0.003; scene.add(ring);
+
+// 平台内侧发光线圈（装饰）
+for (let i = 1; i <= 3; i++) {
+  const rg = new THREE.TorusGeometry(5 * (1 - i*0.12), 0.008, 6, 100);
+  const rm = new THREE.MeshBasicMaterial({ color:0x00f0ff, transparent:true, opacity:0.06 * (4-i) });
+  const r  = new THREE.Mesh(rg, rm);
+  r.rotation.x = Math.PI/2; r.position.y = 0.002; scene.add(r);
+}
+
+// ── AutoOrbit ─────────────────────────────────────────────────
+class AutoOrbit {
+  constructor(camera,controls,target=new THREE.Vector3()){
+    this.camera=camera; this.controls=controls; this.target=target.clone();
+    this.enabled=true; this.userInteracting=false;
+    this.resumeDelay=3000; this.resumeTimer=null;
+    this.theta=0; this.phi=Math.PI/2.5; this.radius=8; this.baseRadius=8;
+    this.targetTheta=0; this.targetPhi=Math.PI/2.5; this.targetRadius=8;
+    this.roll=0; this.targetRoll=0; this.baseSpeed=0.0025; this.time=0;
+    this.minPhi=Math.PI/3; this.maxPhi=Math.PI/2.2;
+    this._bindEvents();
+  }
+  _bindEvents(){
+    this.controls.addEventListener('start',()=>{
+      this.userInteracting=true; clearTimeout(this.resumeTimer); setAutoUI(false);
+    });
+    this.controls.addEventListener('end',()=>{
+      clearTimeout(this.resumeTimer);
+      this.resumeTimer=setTimeout(()=>{
+        this.userInteracting=false; this._syncFromCamera(); setAutoUI(true);
+      },this.resumeDelay);
+    });
+  }
+  _syncFromCamera(){
+    const o=this.camera.position.clone().sub(this.target);
+    this.radius=o.length(); this.baseRadius=this.radius;
+    this.theta=Math.atan2(o.x,o.z);
+    this.phi=Math.acos(Math.max(-1,Math.min(1,o.y/this.radius)));
+    this.phi=Math.max(this.minPhi,Math.min(this.maxPhi,this.phi));
+    this.targetTheta=this.theta; this.targetPhi=this.phi;
+    this.targetRadius=this.radius; this.targetRoll=0;
+  }
+  setTarget(t){this.target.copy(t);}
+  setRadius(r){this.radius=r; this.baseRadius=r; this.targetRadius=r;}
+  update(dt){
+    if(!this.enabled||this.userInteracting)return;
+    this.time+=dt;
+    this.targetTheta+=this.baseSpeed+Math.sin(this.time*.3)*.0008;
+    this.targetPhi+=Math.sin(this.time*.08)*.0015;
+    this.targetPhi=Math.max(this.minPhi,Math.min(this.maxPhi,this.targetPhi));
+    this.targetRadius=this.baseRadius+Math.sin(this.time*.12)*(this.baseRadius*.12);
+    this.targetRoll=Math.sin(this.time*.05)*(Math.PI/20);
+    this.theta+=(this.targetTheta-this.theta)*.05;
+    this.phi+=(this.targetPhi-this.phi)*.05;
+    this.radius+=(this.targetRadius-this.radius)*.03;
+    this.roll+=(this.targetRoll-this.roll)*.02;
+    const sp=Math.sin(this.phi),cp=Math.cos(this.phi);
+    const x=this.target.x+this.radius*sp*Math.sin(this.theta);
+    const y=this.target.y+this.radius*cp;
+    const z=this.target.z+this.radius*sp*Math.cos(this.theta);
+    this.camera.position.lerp(new THREE.Vector3(x,y,z),.05);
+    const fwd=new THREE.Vector3().subVectors(this.target,this.camera.position).normalize();
+    const rt=new THREE.Vector3().crossVectors(fwd,new THREE.Vector3(0,1,0)).normalize();
+    const bu=new THREE.Vector3().crossVectors(rt,fwd).normalize();
+    const rq=new THREE.Quaternion().setFromAxisAngle(fwd,this.roll);
+    this.camera.up.copy(bu.clone().applyQuaternion(rq));
+    this.camera.lookAt(this.target);
+    this.controls.target.copy(this.target); this.controls.update();
+  }
+  dispose(){clearTimeout(this.resumeTimer);}
+}
+
+// ── 相机预设 ──────────────────────────────────────────────────
+const camDefs = [
+  {r:1.6,phi:16,theta:2,  ty:0.35,label:'FRONT'},
+  {r:1.6,phi:13,theta:90, ty:0.30,label:'SIDE' },
+  {r:1.6,phi:16,theta:180,ty:0.35,label:'REAR' },
+  {r:1.4,phi:68,theta:25, ty:0.15,label:'TOP'  },
+  {r:1.2,phi:22,theta:40, ty:0.25,label:'HERO' },
+];
+let modelScale=3, autoOrbit=null, camAnim=null;
+
+function defToWorld(d){
+  const ph=THREE.MathUtils.degToRad(d.phi), th=THREE.MathUtils.degToRad(d.theta);
+  const r=d.r*modelScale;
+  return {
+    pos:new THREE.Vector3(r*Math.cos(ph)*Math.sin(th),r*Math.sin(ph),r*Math.cos(ph)*Math.cos(th)),
+    target:new THREE.Vector3(0,d.ty*modelScale,0),
+  };
+}
+function quatFromLookAt(pos,tgt){
+  return new THREE.Quaternion().setFromRotationMatrix(
+    new THREE.Matrix4().lookAt(pos,tgt,new THREE.Vector3(0,1,0))
+  );
+}
+function easeInOutCubic(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+
+window.setCam=(idx)=>{
+  document.querySelectorAll('.cam-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  const w=defToWorld(camDefs[idx]);
+  if(autoOrbit)autoOrbit.userInteracting=true;
+  setAutoUI(false);
+  camAnim={
+    fromPos:camera.position.clone(), toPos:w.pos,
+    fromQ:camera.quaternion.clone(), toQ:quatFromLookAt(w.pos,w.target),
+    fromTarget:controls.target.clone(), toTarget:w.target, t:0,
+    onDone:()=>{
+      if(autoOrbit){autoOrbit._syncFromCamera();autoOrbit.userInteracting=false;setAutoUI(true);}
+    }
+  };
+};
+
+function setAutoUI(on){
+  const el=document.getElementById('orbit-status');
+  el.classList.toggle('on',on);
+  el.textContent = on ? 'AUTO ORBIT' : 'MANUAL';
+}
+
+// ── 模型加载 ──────────────────────────────────────────────────
+let carModel=null;
+const loader=new THREE.GLTFLoader();
+
+// 加载状态文字循环
+const statusMsgs=['INITIALIZING RENDER ENGINE','LOADING GEOMETRY','COMPILING SHADERS','PROCESSING MATERIALS','BUILDING REFLECTIONS'];
+let statusIdx=0;
+const statusEl=document.getElementById('loading-status');
+const statusTimer=setInterval(()=>{
+  statusIdx=(statusIdx+1)%statusMsgs.length;
+  statusEl.textContent=statusMsgs[statusIdx];
+},1200);
+
+function loadModel(url,name){
+  const loadEl=document.getElementById('loading');
+  loadEl.classList.remove('hidden');
+  loader.load(url,gltf=>{
+    clearInterval(statusTimer);
+    if(carModel){carModel.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});scene.remove(carModel);}
+    carModel=gltf.scene;
+    const box=new THREE.Box3().setFromObject(carModel);
+    const size=box.getSize(new THREE.Vector3());
+    const center=box.getCenter(new THREE.Vector3());
+    const s=3/Math.max(size.x,size.y,size.z);
+    carModel.scale.setScalar(0.2);
+    carModel.position.x=-center.x*s;
+    carModel.position.z=-center.z*s;
+    carModel.position.y=-box.min.y*s;
+    modelScale=3;
+    carModel.traverse(o=>{
+      if(o.isMesh){
+        o.castShadow=true; o.receiveShadow=true;
+        if(o.material)o.material.envMapIntensity=1.0;
+      }
+    });
+    scene.add(carModel);
+    renderer.compile(scene,camera);
+    loadEl.classList.add('hidden');
+    document.getElementById('ui').classList.remove('hidden');
+    const carH=size.y*s;
+    const orbitTgt=new THREE.Vector3(0,carH*.45,0);
+    controls.target.copy(orbitTgt);
+    if(autoOrbit)autoOrbit.dispose();
+    autoOrbit=new AutoOrbit(camera,controls,orbitTgt);
+    autoOrbit.setRadius(modelScale*1.7);
+    autoOrbit._syncFromCamera();
+    setAutoUI(true);
+  },prog=>{
+    const p=prog.total?Math.round(prog.loaded/prog.total*100):0;
+    document.getElementById('loading-bar').style.width=p+'%';
+    document.getElementById('loading-pct').textContent=p+'%';
+  },err=>{
+    clearInterval(statusTimer);
+    console.error('Load failed:',err);
+    statusEl.textContent='LOAD FAILED — CHECK CONSOLE';
+  });
+}
+
+loadModel('models/blackCar.glb','blackCar');
+
+// ── Render loop ───────────────────────────────────────────────
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),1/30);
+  if(camAnim){
+    camAnim.t+=dt*1.1;
+    const t=Math.min(camAnim.t,1), et=easeInOutCubic(t);
+    camera.position.lerpVectors(camAnim.fromPos,camAnim.toPos,et);
+    THREE.Quaternion.slerp(camAnim.fromQ,camAnim.toQ,camera.quaternion,et);
+    controls.target.lerpVectors(camAnim.fromTarget,camAnim.toTarget,et);
+    if(t>=1){if(camAnim.onDone)camAnim.onDone();camAnim=null;}
+  } else if(autoOrbit){
+    autoOrbit.update(dt);
+  } else {
+    controls.update();
+  }
+  renderer.render(scene,camera);
+}
+animate();
+
+function onResize(){
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+}
+window.addEventListener('resize',onResize);
+window.addEventListener('orientationchange',()=>setTimeout(onResize,300));
+</script>
+</body>
+</html>
