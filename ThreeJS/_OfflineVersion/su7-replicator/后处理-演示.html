@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js SSR + Bloom 后处理系统演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            pointer-events: none;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div id="info">
+        <h3>SSR + Bloom 后处理演示</h3>
+        <p>使用鼠标拖拽旋转视角</p>
+        <p>滚轮缩放</p>
+    </div>
+
+    <!-- Three.js 核心库 -->
+    <script src="../libs/three.js"></script>
+    
+    <!-- Controls -->
+    <script src="../libs/OrbitControls.js"></script>
+    
+    <!-- Shaders -->
+    <script src="../libs/shaders/CopyShader.js"></script>
+    <script src="../libs/shaders/LuminosityHighPassShader.js"></script>
+	<script src="../libs/shaders/SSRShader.js"></script>
+    
+    <!-- Post Processing -->
+    <script src="../libs/postprocessing/Pass.js"></script>
+    <script src="../libs/postprocessing/ShaderPass.js"></script>
+    <script src="../libs/postprocessing/RenderPass.js"></script>
+    <script src="../libs/postprocessing/EffectComposer.js"></script>
+    <script src="../libs/postprocessing/UnrealBloomPass.js"></script>
+    <script src="../libs/postprocessing/SSRPass.js"></script>
+    
+    <!-- GUI -->
+    <script src="../libs/dat.gui.min.js"></script>
+
+    <script>
+        // ===============================================
+        // 后处理配置基类
+        // ===============================================
+        class PostProcessConfig {
+            constructor(name, enabled = true) {
+                this.name = name;
+                this.enabled = enabled;
+                this.pass = null;
+            }
+
+            createPass(scene, camera, renderer, size) {
+                throw new Error('createPass() must be implemented');
+            }
+
+            updateParams(params) {
+                throw new Error('updateParams() must be implemented');
+            }
+
+            getPass() {
+                return this.pass;
+            }
+
+            setEnabled(enabled) {
+                this.enabled = enabled;
+                if (this.pass) {
+                    this.pass.enabled = enabled;
+                }
+            }
+
+            dispose() {
+                if (this.pass && this.pass.dispose) {
+                    this.pass.dispose();
+                }
+            }
+        }
+
+        // ===============================================
+        // SSR 后处理配置
+        // ===============================================
+        class SSRConfig extends PostProcessConfig {
+            constructor(params = {}) {
+                super('SSR', params.enabled !== undefined ? params.enabled : true);
+                
+                this.params = {
+                    output: params.output !== undefined ? params.output : 0,
+                    opacity: params.opacity !== undefined ? params.opacity : 0.5,
+                    maxDistance: params.maxDistance !== undefined ? params.maxDistance : 180,
+                    thickness: params.thickness !== undefined ? params.thickness : 0.018,
+                    tempColor: params.tempColor !== undefined ? params.tempColor : new THREE.Color(1, 1, 1),
+                    selects: params.selects !== undefined ? params.selects : null,
+                    infiniteThick: params.infiniteThick !== undefined ? params.infiniteThick : false,
+                };
+            }
+
+            createPass(scene, camera, renderer, size) {
+                this.pass = new THREE.SSRPass({
+                    renderer: renderer,
+                    scene: scene,
+                    camera: camera,
+                    width: size.width !== undefined ? size.width : innerWidth,
+                    height: size.height !== undefined ? size.height : innerHeight,
+                    groundReflector: null,
+                    selects: this.params.selects,
+                });
+
+                // 打印SSRPass的所有属性，用于调试
+                console.log('SSRPass properties:', this.pass);
+                
+                // 设置初始参数
+                this.applyParams();
+                this.pass.enabled = this.enabled;
+                
+                return this.pass;
+            }
+
+            applyParams() {
+                if (!this.pass) return;
+
+                // 直接设置所有可能的属性
+                if (this.pass.output !== undefined) {
+                    this.pass.output = this.params.output;
+                }
+                
+                if (this.pass.opacity !== undefined) {
+                    this.pass.opacity = this.params.opacity;
+                }
+                
+                if (this.pass.maxDistance !== undefined) {
+                    this.pass.maxDistance = this.params.maxDistance;
+                }
+                
+                if (this.pass.thickness !== undefined) {
+                    this.pass.thickness = this.params.thickness;
+                }
+                
+                if (this.pass.infiniteThick !== undefined) {
+                    this.pass.infiniteThick = this.params.infiniteThick;
+                }
+
+                // 尝试通过 ssrMaterial 设置（有些版本的SSRPass参数在material中）
+                if (this.pass.ssrMaterial) {
+                    if (this.pass.ssrMaterial.uniforms) {
+                        if (this.pass.ssrMaterial.uniforms.opacity) {
+                            this.pass.ssrMaterial.uniforms.opacity.value = this.params.opacity;
+                        }
+                        if (this.pass.ssrMaterial.uniforms.maxDistance) {
+                            this.pass.ssrMaterial.uniforms.maxDistance.value = this.params.maxDistance;
+                        }
+                        if (this.pass.ssrMaterial.uniforms.thickness) {
+                            this.pass.ssrMaterial.uniforms.thickness.value = this.params.thickness;
+                        }
+                    }
+                }
+
+                // 强制更新
+                if (this.pass.ssrMaterial && this.pass.ssrMaterial.needsUpdate !== undefined) {
+                    this.pass.ssrMaterial.needsUpdate = true;
+                }
+
+                console.log('Applied SSR params:', this.params);
+            }
+
+            updateParams(params) {
+                if (!this.pass) return;
+
+                Object.assign(this.params, params);
+                this.applyParams();
+            }
+
+            getParams() {
+                return Object.assign({}, this.params);
+            }
+        }
+
+        // ===============================================
+        // Bloom 后处理配置
+        // ===============================================
+        class BloomConfig extends PostProcessConfig {
+            constructor(params = {}) {
+                super('Bloom', params.enabled !== undefined ? params.enabled : true);
+                
+                this.params = {
+                    strength: params.strength !== undefined ? params.strength : 1.5,
+                    radius: params.radius !== undefined ? params.radius : 0.4,
+                    threshold: params.threshold !== undefined ? params.threshold : 0.85,
+                };
+            }
+
+            createPass(scene, camera, renderer, size) {
+                const resolution = new THREE.Vector2(
+                    size.width !== undefined ? size.width : innerWidth, 
+                    size.height !== undefined ? size.height : innerHeight
+                );
+                
+                this.pass = new THREE.UnrealBloomPass(
+                    resolution,
+                    this.params.strength,
+                    this.params.radius,
+                    this.params.threshold
+                );
+
+                this.pass.enabled = this.enabled;
+                return this.pass;
+            }
+
+            updateParams(params) {
+                if (!this.pass) return;
+
+                Object.assign(this.params, params);
+
+                if (params.strength !== undefined) {
+                    this.pass.strength = params.strength;
+                }
+                if (params.radius !== undefined) {
+                    this.pass.radius = params.radius;
+                }
+                if (params.threshold !== undefined) {
+                    this.pass.threshold = params.threshold;
+                }
+            }
+
+            getParams() {
+                return Object.assign({}, this.params);
+            }
+        }
+
+        // ===============================================
+        // 后处理管理器
+        // ===============================================
+        class PostProcessManager {
+            constructor(renderer, scene, camera) {
+                this.renderer = renderer;
+                this.scene = scene;
+                this.camera = camera;
+                
+                // 创建 EffectComposer
+                this.composer = new THREE.EffectComposer(renderer);
+                
+                // 添加基础渲染 Pass
+                this.renderPass = new THREE.RenderPass(scene, camera);
+                this.composer.addPass(this.renderPass);
+                
+                // 后处理配置数组
+                this.configs = [];
+                
+                // 是否启用后处理
+                this.enabled = true;
+            }
+
+            addConfig(config) {
+                const size = this.renderer.getSize(new THREE.Vector2());
+                const pass = config.createPass(this.scene, this.camera, this.renderer, size);
+                this.composer.addPass(pass);
+                this.configs.push(config);
+                return config;
+            }
+
+            removeConfig(nameOrConfig) {
+                const config = typeof nameOrConfig === 'string'
+                    ? this.getConfig(nameOrConfig)
+                    : nameOrConfig;
+                    
+                if (!config) return;
+
+                const index = this.configs.indexOf(config);
+                if (index !== -1) {
+                    const pass = config.getPass();
+                    if (pass) {
+                        this.composer.passes = this.composer.passes.filter(p => p !== pass);
+                    }
+                    config.dispose();
+                    this.configs.splice(index, 1);
+                }
+            }
+
+            getConfig(name) {
+                return this.configs.find(c => c.name === name);
+            }
+
+            render(deltaTime = 0) {
+                if (this.enabled) {
+                    this.composer.render(deltaTime);
+                } else {
+                    this.renderer.render(this.scene, this.camera);
+                }
+            }
+
+            setSize(width, height) {
+                this.composer.setSize(width, height);
+            }
+
+            setPixelRatio(ratio) {
+                this.composer.setPixelRatio(ratio);
+            }
+
+            setEnabled(enabled) {
+                this.enabled = enabled;
+            }
+
+            dispose() {
+                this.configs.forEach(config => config.dispose());
+                this.configs = [];
+                
+                this.composer.passes.forEach(pass => {
+                    if (pass.dispose) {
+                        pass.dispose();
+                    }
+                });
+            }
+        }
+
+        // ===============================================
+        // 主程序
+        // ===============================================
+        let scene, camera, renderer, controls, postProcessManager;
+        let torusKnot, sphere, cube, reflectivePlane;
+        let gui, bloomConfig, ssrConfig;
+
+        function init() {
+            // 创建场景
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111111);
+
+            // 创建相机
+            camera = new THREE.PerspectiveCamera(
+                75,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(5, 4, 8);
+
+            // 创建渲染器
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: true,
+                alpha: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // 添加 OrbitControls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 3;
+            controls.maxDistance = 20;
+            controls.maxPolarAngle = Math.PI / 2.1;
+
+            // 添加光源
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+
+            const pointLight1 = new THREE.PointLight(0xff0040, 3, 50);
+            pointLight1.position.set(-5, 3, 0);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0x0040ff, 3, 50);
+            pointLight2.position.set(5, 3, 0);
+            scene.add(pointLight2);
+
+            // 创建发光的环面纽结
+            const torusKnotGeometry = new THREE.TorusKnotGeometry(1.2, 0.4, 100, 16);
+            const torusKnotMaterial = new THREE.MeshStandardMaterial({
+                color: 0x00ffff,
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.5,
+                roughness: 0.05,
+                metalness: 0.98,
+            });
+            torusKnot = new THREE.Mesh(torusKnotGeometry, torusKnotMaterial);
+            torusKnot.position.y = 2;
+            scene.add(torusKnot);
+
+            // 发光球体
+            const sphereGeometry = new THREE.SphereGeometry(0.7, 32, 32);
+            const sphereMaterial = new THREE.MeshStandardMaterial({
+                color: 0xff00ff,
+                emissive: 0xff00ff,
+                emissiveIntensity: 0.8,
+                roughness: 0.02,
+                metalness: 0.99,
+            });
+            sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.set(-3, 1.5, -2);
+            scene.add(sphere);
+
+            // 发光立方体
+            const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const cubeMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffff00,
+                emissive: 0xffff00,
+                emissiveIntensity: 0.6,
+                roughness: 0.1,
+                metalness: 0.95,
+            });
+            cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            cube.position.set(3, 1.5, -2);
+            scene.add(cube);
+
+            // 添加反射地面（高金属度和低粗糙度以显示SSR效果）
+            const planeGeometry = new THREE.PlaneGeometry(30, 30);
+            const planeMaterial = new THREE.MeshStandardMaterial({
+                color: 0x222222,
+                roughness: 0.05,
+                metalness: 0.99,
+            });
+            reflectivePlane = new THREE.Mesh(planeGeometry, planeMaterial);
+            reflectivePlane.rotation.x = -Math.PI / 2;
+            reflectivePlane.position.y = 0;
+            scene.add(reflectivePlane);
+
+            // 添加背景墙（也有反射）
+            const wallGeometry = new THREE.PlaneGeometry(30, 15);
+            const wallMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                roughness: 0.2,
+                metalness: 0.8,
+            });
+            const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+            wall.position.set(0, 7.5, -5);
+            scene.add(wall);
+
+            // 创建后处理管理器
+            postProcessManager = new PostProcessManager(renderer, scene, camera);
+
+            // 添加 SSR 效果
+            ssrConfig = postProcessManager.addConfig(new SSRConfig({
+                enabled: true,
+                opacity: 0.5,
+                maxDistance: 180,
+                thickness: 0.018,
+                infiniteThick: false,
+                output: 0,
+            }));
+
+            // 添加 Bloom 效果
+            bloomConfig = postProcessManager.addConfig(new BloomConfig({
+                enabled: true,
+                strength: 1.2,
+                radius: 0.4,
+                threshold: 0.85,
+            }));
+
+            // 创建 GUI
+            createGUI();
+        }
+
+        function createGUI() {
+            gui = new dat.GUI({ width: 340 });
+
+            // 后处理总开关
+            const generalFolder = gui.addFolder('总控制');
+            generalFolder.add(postProcessManager, 'enabled').name('启用后处理');
+            generalFolder.open();
+
+            // SSR 控制
+            const ssrFolder = gui.addFolder('SSR 屏幕空间反射');
+            
+            ssrFolder.add(ssrConfig, 'enabled').name('启用 SSR').onChange(value => {
+                ssrConfig.setEnabled(value);
+            });
+
+            const outputModes = {
+                'Default (默认)': 0,
+                'SSR Only (仅反射)': 1,
+                'Beauty (美化)': 2,
+                'Depth (深度)': 3,
+                'Normal (法线)': 4,
+                'Metalness (金属度)': 5
+            };
+
+            ssrFolder.add(ssrConfig.params, 'output', outputModes).name('输出模式').onChange(value => {
+                ssrConfig.updateParams({ output: parseInt(value) });
+            });
+
+            ssrFolder.add(ssrConfig.params, 'opacity', 0, 1, 0.01).name('反射不透明度').onChange(value => {
+                ssrConfig.updateParams({ opacity: value });
+                console.log('Opacity changed to:', value);
+            });
+
+            ssrFolder.add(ssrConfig.params, 'maxDistance', 0, 500, 1).name('最大追踪距离').onChange(value => {
+                ssrConfig.updateParams({ maxDistance: value });
+                console.log('MaxDistance changed to:', value);
+            });
+
+            ssrFolder.add(ssrConfig.params, 'thickness', 0, 0.2, 0.001).name('表面厚度').onChange(value => {
+                ssrConfig.updateParams({ thickness: value });
+                console.log('Thickness changed to:', value);
+            });
+
+            ssrFolder.add(ssrConfig.params, 'infiniteThick').name('无限厚度(快速)').onChange(value => {
+                ssrConfig.updateParams({ infiniteThick: value });
+                console.log('InfiniteThick changed to:', value);
+            });
+
+            ssrFolder.open();
+
+            // Bloom 控制
+            const bloomFolder = gui.addFolder('Bloom 辉光效果');
+            
+            bloomFolder.add(bloomConfig, 'enabled').name('启用 Bloom').onChange(value => {
+                bloomConfig.setEnabled(value);
+            });
+
+            bloomFolder.add(bloomConfig.params, 'strength', 0, 3, 0.01).name('强度').onChange(value => {
+                bloomConfig.updateParams({ strength: value });
+            });
+
+            bloomFolder.add(bloomConfig.params, 'radius', 0, 1, 0.01).name('半径').onChange(value => {
+                bloomConfig.updateParams({ radius: value });
+            });
+
+            bloomFolder.add(bloomConfig.params, 'threshold', 0, 1, 0.01).name('阈值').onChange(value => {
+                bloomConfig.updateParams({ threshold: value });
+            });
+
+            bloomFolder.open();
+
+            // 场景控制
+            const sceneFolder = gui.addFolder('场景控制');
+            
+            const sceneControls = {
+                torusKnotEmissive: 0.5,
+                sphereEmissive: 0.8,
+                cubeEmissive: 0.6,
+                planeRoughness: 0.05,
+                planeMetalness: 0.99,
+                rotationSpeed: 1.0,
+            };
+
+            sceneFolder.add(sceneControls, 'torusKnotEmissive', 0, 2, 0.01).name('环面发光').onChange(value => {
+                torusKnot.material.emissiveIntensity = value;
+            });
+
+            sceneFolder.add(sceneControls, 'sphereEmissive', 0, 2, 0.01).name('球体发光').onChange(value => {
+                sphere.material.emissiveIntensity = value;
+            });
+
+            sceneFolder.add(sceneControls, 'cubeEmissive', 0, 2, 0.01).name('立方体发光').onChange(value => {
+                cube.material.emissiveIntensity = value;
+            });
+
+            sceneFolder.add(sceneControls, 'planeRoughness', 0, 1, 0.01).name('地面粗糙度').onChange(value => {
+                reflectivePlane.material.roughness = value;
+                reflectivePlane.material.needsUpdate = true;
+            });
+
+            sceneFolder.add(sceneControls, 'planeMetalness', 0, 1, 0.01).name('地面金属度').onChange(value => {
+                reflectivePlane.material.metalness = value;
+                reflectivePlane.material.needsUpdate = true;
+            });
+
+            sceneFolder.add(sceneControls, 'rotationSpeed', 0, 5, 0.1).name('旋转速度');
+
+            sceneFolder.open();
+
+            // 预设方案
+            const presets = {
+                '强反射 + 强辉光': () => {
+                    ssrConfig.updateParams({
+                        opacity: 0.9,
+                        maxDistance: 300,
+                        thickness: 0.05,
+                    });
+                    bloomConfig.updateParams({
+                        strength: 2.5,
+                        threshold: 0.6,
+                    });
+                    updateGUI();
+                },
+                '柔和效果': () => {
+                    ssrConfig.updateParams({
+                        opacity: 0.3,
+                        maxDistance: 100,
+                        thickness: 0.01,
+                    });
+                    bloomConfig.updateParams({
+                        strength: 1.0,
+                        threshold: 0.9,
+                    });
+                    updateGUI();
+                },
+                '默认设置': () => {
+                    ssrConfig.updateParams({
+                        opacity: 0.5,
+                        maxDistance: 180,
+                        thickness: 0.018,
+                    });
+                    bloomConfig.updateParams({
+                        strength: 1.2,
+                        threshold: 0.85,
+                    });
+                    updateGUI();
+                },
+                '调试 - 查看SSR属性': () => {
+                    console.log('SSR Pass:', ssrConfig.pass);
+                    console.log('SSR Params:', ssrConfig.params);
+                    alert('请查看控制台输出的SSR信息');
+                }
+            };
+
+            const presetFolder = gui.addFolder('预设方案');
+            for (let name in presets) {
+                presetFolder.add(presets, name);
+            }
+            presetFolder.open();
+
+            function updateGUI() {
+                for (let i in gui.__folders) {
+                    const folder = gui.__folders[i];
+                    for (let j in folder.__controllers) {
+                        folder.__controllers[j].updateDisplay();
+                    }
+                }
+            }
+
+            window.updateGUI = updateGUI;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = Date.now() * 0.001;
+            
+            // 获取旋转速度
+            let rotationSpeed = 1.0;
+            if (gui && gui.__folders['场景控制']) {
+                const controller = gui.__folders['场景控制'].__controllers.find(c => c.property === 'rotationSpeed');
+                if (controller) {
+                    rotationSpeed = controller.getValue();
+                }
+            }
+
+            // 旋转物体
+            torusKnot.rotation.x += 0.01 * rotationSpeed;
+            torusKnot.rotation.y += 0.01 * rotationSpeed;
+
+            sphere.rotation.y += 0.02 * rotationSpeed;
+            sphere.position.y = 1.5 + Math.sin(time * 2) * 0.3;
+
+            cube.rotation.x += 0.015 * rotationSpeed;
+            cube.rotation.y += 0.015 * rotationSpeed;
+            cube.position.y = 1.5 + Math.cos(time * 1.5) * 0.3;
+
+            // 更新控制器
+            controls.update();
+
+            // 使用后处理渲染
+            postProcessManager.render();
+        }
+
+        function onWindowResize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+            postProcessManager.setSize(width, height);
+        }
+
+        // 初始化并启动
+        init();
+        animate();
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', onWindowResize);
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            postProcessManager.dispose();
+            controls.dispose();
+            renderer.dispose();
+            gui.destroy();
+        });
+    </script>
+</body>
+</html>

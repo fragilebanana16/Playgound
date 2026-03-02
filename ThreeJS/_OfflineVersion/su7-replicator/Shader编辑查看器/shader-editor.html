@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Shader Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            overflow: hidden;
+            background: #1e1e1e;
+        }
+        
+        #container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        #editor-panel {
+            width: 45%;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #333;
+        }
+        
+        #canvas-panel {
+            width: 55%;
+            position: relative;
+            background: #000;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #252526;
+            border-bottom: 1px solid #333;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #2d2d30;
+            border: none;
+            color: #969696;
+            font-size: 13px;
+            border-right: 1px solid #333;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            background: #37373d;
+            color: #fff;
+        }
+        
+        .tab.active {
+            background: #1e1e1e;
+            color: #fff;
+            border-bottom: 2px solid #007acc;
+        }
+        
+        .editor-content {
+            display: none;
+            flex: 1;
+            position: relative;
+        }
+        
+        .editor-content.active {
+            display: block;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+        
+        textarea::selection {
+            background: #264f78;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #007acc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background: #005a9e;
+            transform: translateY(-1px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #error-display {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 15px;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        #error-display.show {
+            display: block;
+        }
+        
+        #stats {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #0f0;
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        canvas {
+            display: block;
+        }
+        
+        .file-inputs {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        input[type="file"] {
+            font-size: 11px;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 1px solid #555;
+            border-radius: 3px;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            max-width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="editor-panel">
+            <div class="tabs">
+                <button class="tab active" data-tab="vertex">Vertex Shader</button>
+                <button class="tab" data-tab="fragment">Fragment Shader</button>
+            </div>
+            
+            <div class="editor-content active" id="vertex-editor">
+                <textarea id="vertex-code" spellcheck="false">varying vec2 vUv;
+
+void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}</textarea>
+            </div>
+            
+            <div class="editor-content" id="fragment-editor">
+                <textarea id="fragment-code" spellcheck="false">uniform float iTime;
+varying vec2 vUv;
+uniform vec2 iResolution;
+
+float plot(vec2 st) {    
+    return smoothstep(0.05, 0.0, abs(st.x - st.y));
+}
+
+void main() {
+    vec2 st = gl_FragCoord.xy / iResolution;
+    st = vUv;
+    
+    vec3 color = vec3(0.0);
+    
+    // Animated pattern
+    float wave = sin(st.x * 10.0 + iTime) * 0.5 + 0.5;
+    color = mix(vec3(0.2, 0.4, 0.8), vec3(0.8, 0.2, 0.4), wave);
+    
+    // Plot a line
+    float pct = plot(st);
+    color = (1.0 - pct) * color + pct * vec3(0.0, 1.0, 0.0);
+    
+    gl_FragColor = vec4(color, 1.0);
+}</textarea>
+            </div>
+            
+            <div id="error-display"></div>
+        </div>
+        
+        <div id="canvas-panel">
+            <div id="controls">
+                <button id="apply-btn">Apply (Ctrl+Enter)</button>
+                <button id="reset-btn">Reset</button>
+                <button id="auto-apply-btn">Auto: OFF</button>
+            </div>
+
+            <div id="info">
+                <strong>Controls:</strong><br>
+                • Ctrl+Enter: Apply shader<br>
+                • Mouse: Rotate camera<br>
+                • Scroll: Zoom
+            </div>
+            
+            <div id="stats">FPS: 0</div>
+        </div>
+    </div>
+
+    <script src="../../libs/three.min.js"></script>
+    <script src="../../libs/OrbitControls.js"></script>
+
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a0a);
+                
+        // Shader uniforms
+        const uniforms = {
+            iTime: { value: 0.0 },
+            iResolution: { value: new THREE.Vector2() }
+        };
+        const camera = new THREE.PerspectiveCamera(
+            75,
+            1, // Will be updated
+            0.1,
+            1000
+        );
+        camera.position.set(2, 2, 3);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const canvasPanel = document.getElementById('canvas-panel');
+        
+        function updateRendererSize() {
+            const width = canvasPanel.clientWidth;
+            const height = canvasPanel.clientHeight;
+            renderer.setSize(width, height);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            uniforms.iResolution.value.set(width, height);
+			uniforms.iTime.value += 0.0016; 
+        }
+        
+        canvasPanel.appendChild(renderer.domElement);
+        updateRendererSize();
+        
+        // OrbitControls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 2;
+        controls.maxDistance = 15;
+
+        
+        // Initial shaders
+        let vertexShader = document.getElementById('vertex-code').value;
+        let fragmentShader = document.getElementById('fragment-code').value;
+        
+        // Create material
+        let material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms
+        });
+        
+        // Create mesh
+        const geometry = new THREE.BoxGeometry(3, 3, 1);
+        let mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+        
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const editorContents = document.querySelectorAll('.editor-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                editorContents.forEach(e => e.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`${tabName}-editor`).classList.add('active');
+            });
+        });
+        
+        // Error display
+        const errorDisplay = document.getElementById('error-display');
+        
+        function showError(message) {
+            errorDisplay.textContent = message;
+            errorDisplay.classList.add('show');
+            setTimeout(() => {
+                errorDisplay.classList.remove('show');
+            }, 5000);
+        }
+        
+        function clearError() {
+            errorDisplay.classList.remove('show');
+        }
+        
+        // Apply shader
+        let autoApply = false;
+        
+        function applyShader() {
+            try {
+                const newVertexShader = document.getElementById('vertex-code').value;
+                const newFragmentShader = document.getElementById('fragment-code').value;
+                
+                // Test compilation by creating a temporary material
+                const testMaterial = new THREE.ShaderMaterial({
+                    vertexShader: newVertexShader,
+                    fragmentShader: newFragmentShader,
+                    uniforms
+                });
+                
+                // If we get here, compilation succeeded
+                material.dispose();
+                material = testMaterial;
+                mesh.material = material;
+                
+                clearError();
+                
+                // Flash effect
+                const applyBtn = document.getElementById('apply-btn');
+                applyBtn.style.background = '#28a745';
+                setTimeout(() => {
+                    applyBtn.style.background = '#007acc';
+                }, 200);
+                
+            } catch (error) {
+                showError('Shader Error: ' + error.message);
+                console.error(error);
+            }
+        }
+        
+        // Button events
+        document.getElementById('apply-btn').addEventListener('click', applyShader);
+        
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            document.getElementById('vertex-code').value = `varying vec2 vUv;
+
+void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+            
+            document.getElementById('fragment-code').value = `uniform float iTime;
+varying vec2 vUv;
+uniform vec2 iResolution;
+
+float plot(vec2 st) {    
+    return smoothstep(0.05, 0.0, abs(st.x - st.y));
+}
+
+void main() {
+    vec2 st = gl_FragCoord.xy / iResolution;
+    st = vUv;
+    
+    vec3 color = vec3(0.0);
+    
+    // Plot a line
+    float pct = plot(st);
+    color = (1.0 - pct) * color + pct * vec3(0.0, 1.0, 0.0);
+    
+    gl_FragColor = vec4(color, 1.0);
+}`;
+            
+            applyShader();
+        });
+        
+        const autoApplyBtn = document.getElementById('auto-apply-btn');
+        autoApplyBtn.addEventListener('click', () => {
+            autoApply = !autoApply;
+            autoApplyBtn.textContent = autoApply ? 'Auto: ON' : 'Auto: OFF';
+            autoApplyBtn.style.background = autoApply ? '#28a745' : '#007acc';
+        });
+        
+        // Auto-apply on typing (debounced)
+        let typingTimer;
+        const textareas = document.querySelectorAll('textarea');
+        
+        textareas.forEach(textarea => {
+            textarea.addEventListener('input', () => {
+                if (autoApply) {
+                    clearTimeout(typingTimer);
+                    typingTimer = setTimeout(applyShader, 500);
+                }
+            });
+            
+            // Ctrl+Enter to apply
+            textarea.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    applyShader();
+                }
+                
+                // Tab key for indentation
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    textarea.value = textarea.value.substring(0, start) + '    ' + textarea.value.substring(end);
+                    textarea.selectionStart = textarea.selectionEnd = start + 4;
+                }
+            });
+        });
+        
+        // FPS counter
+        let lastTime = performance.now();
+        let frames = 0;
+        let fps = 0;
+        
+        function updateFPS() {
+            frames++;
+            const currentTime = performance.now();
+            if (currentTime >= lastTime + 1000) {
+                fps = Math.round((frames * 1000) / (currentTime - lastTime));
+                document.getElementById('stats').textContent = `FPS: ${fps}`;
+                frames = 0;
+                lastTime = currentTime;
+            }
+        }
+        
+        // Animation loop
+        function animate(time) {
+            requestAnimationFrame(animate);
+            
+            uniforms.iTime.value = time * 0.001;
+            
+            controls.update(); // Update OrbitControls
+            
+            renderer.render(scene, camera);
+            updateFPS();
+        }
+        
+        animate();
+        
+        // Window resize
+        window.addEventListener('resize', updateRendererSize);
+        
+        // Initial size update
+        updateRendererSize();
+    </script>
+</body>
+</html>

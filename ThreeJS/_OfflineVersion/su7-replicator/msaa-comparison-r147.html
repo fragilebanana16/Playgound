@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Three.js MSAA 对比 (r147)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; color: #e0e0e0; font-family: 'Courier New', monospace; overflow: hidden; }
+
+  #ui {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    padding: 14px 24px;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  #ui h1 { font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: #666; white-space: nowrap; }
+  .divider { width: 1px; height: 22px; background: rgba(255,255,255,0.08); }
+
+  .control-group { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #888; }
+  .control-group label { white-space: nowrap; letter-spacing: 0.05em; }
+  .btn-group { display: flex; gap: 3px; }
+
+  .btn {
+    padding: 4px 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.03);
+    color: #777;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    transition: all 0.12s;
+    border-radius: 3px;
+  }
+  .btn:hover { background: rgba(255,255,255,0.07); color: #ccc; }
+  .btn.active { background: rgba(100,200,255,0.12); border-color: rgba(100,200,255,0.35); color: #7dd6f0; }
+
+  #canvases { display: flex; width: 100vw; height: 100vh; padding-top: 53px; }
+
+  .panel { flex: 1; position: relative; overflow: hidden; }
+  .panel + .panel { border-left: 1px solid rgba(255,255,255,0.06); }
+  .panel canvas { width: 100% !important; height: 100% !important; display: block; }
+
+  .panel-label {
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; letter-spacing: 0.1em; color: rgba(255,255,255,0.3);
+    text-transform: uppercase; white-space: nowrap; pointer-events: none;
+    background: rgba(0,0,0,0.45); padding: 4px 10px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .split-line {
+    position: fixed; top: 53px; bottom: 0; left: 50%;
+    width: 1px; background: rgba(255,255,255,0.06);
+    z-index: 5; pointer-events: none;
+  }
+
+  #info {
+    position: fixed; bottom: 18px; right: 18px;
+    font-size: 10px; color: rgba(255,255,255,0.18);
+    letter-spacing: 0.05em; line-height: 1.9; text-align: right;
+  }
+</style>
+</head>
+<body>
+
+<div id="ui">
+  <h1>MSAA 对比 · r147</h1>
+  <div class="divider"></div>
+
+  <div class="control-group">
+    <label>左侧</label>
+    <div class="btn-group" id="leftMode">
+      <button class="btn" data-val="native">直接渲染</button>
+      <button class="btn active" data-val="0">samples:0</button>
+      <button class="btn" data-val="2">samples:2</button>
+      <button class="btn" data-val="4">samples:4</button>
+      <button class="btn" data-val="8">samples:8</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="control-group">
+    <label>右侧</label>
+    <div class="btn-group" id="rightMode">
+      <button class="btn active" data-val="native">直接渲染</button>
+      <button class="btn" data-val="0">samples:0</button>
+      <button class="btn" data-val="2">samples:2</button>
+      <button class="btn" data-val="4">samples:4</button>
+      <button class="btn" data-val="8">samples:8</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="control-group">
+    <label>场景</label>
+    <div class="btn-group" id="sceneType">
+      <button class="btn active" data-val="geo">几何体</button>
+      <button class="btn" data-val="thin">细线</button>
+      <button class="btn" data-val="texture">纹理</button>
+    </div>
+  </div>
+</div>
+
+<div id="canvases">
+  <div class="panel" id="panelLeft">
+    <div class="panel-label" id="labelLeft">EffectComposer — samples: 0</div>
+  </div>
+  <div class="panel" id="panelRight">
+    <div class="panel-label" id="labelRight">直接渲染 (antialias:true)</div>
+  </div>
+</div>
+
+<div class="split-line"></div>
+<div id="info">拖动旋转 · 左右独立选择模式</div>
+
+<!-- Three.js r147 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.147.0/three.min.js"></script>
+<script>
+
+// ─── 状态 ─────────────────────────────────────────────────
+let leftMode  = '0';      // 'native' 或 samples 数字字符串
+let rightMode = 'native';
+let sceneType = 'geo';
+
+const modeLabel = v => v === 'native'
+  ? '直接渲染 (antialias:true)'
+  : `EffectComposer — samples: ${v}`;
+
+// ─── 渲染器（两个，各自独立）────────────────────────────────
+const rendererL = new THREE.WebGLRenderer({ antialias: true });
+const rendererR = new THREE.WebGLRenderer({ antialias: true });
+[rendererL, rendererR].forEach(r => {
+  r.setPixelRatio(devicePixelRatio);
+  r.outputColorSpace = THREE.SRGBColorSpace;
+});
+rendererL.domElement.id = 'cvL';
+rendererR.domElement.id = 'cvR';
+document.getElementById('panelLeft').prepend(rendererL.domElement);
+document.getElementById('panelRight').prepend(rendererR.domElement);
+
+// ─── SimpleComposer（r147，samples 真正生效）────────────────
+class SimpleComposer {
+  constructor(renderer, samples) {
+    this.renderer = renderer;
+    this.samples  = samples;
+    this._rt      = null;
+    this._blitScene = null;
+    this._resize(renderer.domElement.width, renderer.domElement.height);
+  }
+
+  _resize(w, h) {
+    if (this._rt) this._rt.dispose();
+    // r147: WebGLRenderTarget options.samples 直接支持
+    this._rt = new THREE.WebGLRenderTarget(w, h, {
+      format:  THREE.RGBAFormat,
+      samples: this.samples,   // ← 真正生效的地方
+    });
+  }
+
+  setSize(w, h) { this._resize(w, h); }
+
+  render(scene, camera) {
+    const renderer = this.renderer;
+
+    // 渲染场景 → RT
+    renderer.setRenderTarget(this._rt);
+    renderer.clear();
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+
+    // blit RT → 屏幕
+    if (!this._blitScene) {
+      this._blitCam  = new THREE.OrthographicCamera(-1,1,1,-1,-1,1);
+      this._blitMat  = new THREE.MeshBasicMaterial({ depthTest: false });
+      const geo      = new THREE.PlaneGeometry(2, 2);
+      this._blitMesh = new THREE.Mesh(geo, this._blitMat);
+      this._blitScene = new THREE.Scene();
+      this._blitScene.add(this._blitMesh);
+    }
+    this._blitMat.map = this._rt.texture;
+    renderer.render(this._blitScene, this._blitCam);
+  }
+
+  dispose() { this._rt.dispose(); }
+}
+
+// composer 缓存，按 renderer id + samples 缓存
+const composerCache = {};
+function getComposer(renderer, samples) {
+  const key = `${renderer.domElement.id}_${samples}`;
+  if (!composerCache[key]) {
+    composerCache[key] = new SimpleComposer(renderer, parseInt(samples));
+  }
+  return composerCache[key];
+}
+
+// ─── 场景构建 ─────────────────────────────────────────────
+function buildScene(type) {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d0d14);
+
+  scene.add(new THREE.AmbientLight(0x334466, 1.0));
+  const dir = new THREE.DirectionalLight(0xffffff, 1.4);
+  dir.position.set(3, 5, 4);
+  scene.add(dir);
+
+  if (type === 'geo') {
+    const items = [
+      [new THREE.TorusKnotGeometry(0.55, 0.17, 128, 16), 0x4488ff, [-2.5, 0, 0]],
+      [new THREE.IcosahedronGeometry(0.75, 0),            0xff6644, [-1.2, 0, 0]],
+      [new THREE.ConeGeometry(0.55, 1.2, 5),              0x44ffaa, [ 0.0, 0, 0]],
+      [new THREE.OctahedronGeometry(0.75, 0),             0xffcc44, [ 1.2, 0, 0]],
+      [new THREE.TorusGeometry(0.55, 0.22, 8, 6),         0xcc44ff, [ 2.5, 0, 0]],
+    ];
+    items.forEach(([geo, color, pos]) => {
+      const mesh = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({ color }));
+      mesh.position.set(...pos);
+      scene.add(mesh);
+    });
+
+  } else if (type === 'thin') {
+    for (let i = 0; i < 40; i++) {
+      const pts = Array.from({ length: 60 }, (_, j) => {
+        const t = j / 59;
+        return new THREE.Vector3(
+          Math.sin(t * Math.PI * 4 + i * 0.4) * 2.5,
+          (t - 0.5) * 4,
+          Math.cos(t * Math.PI * 3 + i * 0.3) * 1.2
+        );
+      });
+      const line = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(pts),
+        new THREE.LineBasicMaterial({ color: new THREE.Color().setHSL(i/40, 0.8, 0.6) })
+      );
+      scene.add(line);
+    }
+    scene.add(new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1.5, 1),
+      new THREE.MeshBasicMaterial({ color: 0xff4466, wireframe: true })
+    ));
+
+  } else if (type === 'texture') {
+    const size = 512;
+    const data = new Uint8Array(size * size * 4);
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const i = (y * size + x) * 4;
+        const checker  = ((x >> 4) + (y >> 4)) % 2;
+        const thinLine = (x % 16 < 1 || y % 16 < 1);
+        const v = checker ? 220 : 30;
+        data[i]   = thinLine ? 255 : v;
+        data[i+1] = thinLine ? 100 : v;
+        data[i+2] = thinLine ? 50  : v;
+        data[i+3] = 255;
+      }
+    }
+    const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+    tex.needsUpdate = true;
+    tex.generateMipmaps = true;
+    tex.minFilter = THREE.LinearMipmapLinearFilter;
+
+    const mkPlane = (rx, ry, rz, px, py, pz, sz=5) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(sz,sz), new THREE.MeshBasicMaterial({ map: tex }));
+      m.rotation.set(rx,ry,rz); m.position.set(px,py,pz);
+      scene.add(m);
+    };
+    mkPlane(-0.5, 0, 0,  0, -0.5, 0, 5);
+    mkPlane(-0.3, 0.6, 0.1, 0, 0.5, 1, 3);
+  }
+
+  return scene;
+}
+
+// ─── 相机 & 鼠标 ──────────────────────────────────────────
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+camera.position.set(0, 0.5, 6);
+
+let rotX = 0, rotY = 0, targetRotX = 0, targetRotY = 0;
+let isDragging = false, lastX = 0, lastY = 0;
+
+window.addEventListener('mousedown', e => { isDragging=true; lastX=e.clientX; lastY=e.clientY; });
+window.addEventListener('mouseup',   () => isDragging=false);
+window.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  targetRotY += (e.clientX - lastX) * 0.008;
+  targetRotX += (e.clientY - lastY) * 0.005;
+  lastX=e.clientX; lastY=e.clientY;
+});
+
+let sceneL = buildScene(sceneType);
+let sceneR = buildScene(sceneType);
+
+function rebuildScenes() {
+  sceneL = buildScene(sceneType);
+  sceneR = buildScene(sceneType);
+}
+
+// ─── Resize ───────────────────────────────────────────────
+function resize() {
+  const w = Math.floor(window.innerWidth / 2);
+  const h = window.innerHeight - 53;
+  rendererL.setSize(w, h);
+  rendererR.setSize(w, h);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  // 重建所有 composer（尺寸变了）
+  Object.keys(composerCache).forEach(k => {
+    composerCache[k].dispose();
+    delete composerCache[k];
+  });
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ─── 渲染 ─────────────────────────────────────────────────
+function renderPanel(renderer, scene, mode) {
+  if (mode === 'native') {
+    renderer.setRenderTarget(null);
+    renderer.render(scene, camera);
+  } else {
+    const composer = getComposer(renderer, mode);
+    composer.render(scene, camera);
+  }
+}
+
+// ─── 动画 ─────────────────────────────────────────────────
+let time = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  time += 0.01;
+  targetRotY += 0.003;
+  rotX += (targetRotX - rotX) * 0.1;
+  rotY += (targetRotY - rotY) * 0.1;
+
+  [sceneL, sceneR].forEach(s => {
+    s.traverse(obj => {
+      if (obj.isMesh || obj.isLine) {
+        obj.rotation.x = rotX;
+        obj.rotation.y = rotY;
+        if (obj.geometry?.type === 'TorusKnotGeometry') obj.rotation.z = time * 0.4;
+      }
+    });
+  });
+
+  renderPanel(rendererL, sceneL, leftMode);
+  renderPanel(rendererR, sceneR, rightMode);
+}
+animate();
+
+// ─── UI ───────────────────────────────────────────────────
+function setupGroup(id, onChange) {
+  document.getElementById(id).addEventListener('click', e => {
+    const btn = e.target.closest('.btn');
+    if (!btn) return;
+    document.querySelectorAll(`#${id} .btn`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    onChange(btn.dataset.val);
+  });
+}
+
+setupGroup('leftMode', val => {
+  leftMode = val;
+  document.getElementById('labelLeft').textContent = modeLabel(val);
+});
+setupGroup('rightMode', val => {
+  rightMode = val;
+  document.getElementById('labelRight').textContent = modeLabel(val);
+});
+setupGroup('sceneType', val => {
+  sceneType = val;
+  rebuildScenes();
+});
+
+</script>
+</body>
+</html>

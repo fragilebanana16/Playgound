@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js 四元数与欧拉角交互示例</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 300px;
+        }
+        .slider-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            width: 250px;
+        }
+        .slider-item {
+            margin: 10px 0;
+        }
+        label { display: block; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>四元数与欧拉角示例</h3>
+        <p><strong>Euler（欧拉角）</strong>：用三个角度（x, y, z）表示旋转，直观但易受万向锁问题影响。</p>
+        <p><strong>Quaternion（四元数）</strong>：用四个数表示旋转，避免万向锁，适合插值和复合旋转。</p>
+        <p><strong>setFromEuler</strong>：从欧拉角转换为四元数。</p>
+        <p><strong>setFromAxisAngle</strong>：从旋转轴和角度直接创建四元数。</p>
+    </div>
+
+    <div class="slider-container">
+        <div class="slider-item">
+            <label for="eulerX">Euler X (绕X轴旋转): <span id="eulerXValue">0</span></label>
+            <input type="range" id="eulerX" min="0" max="360" value="0" step="1">
+        </div>
+        <div class="slider-item">
+            <label for="eulerY">Euler Y (绕Y轴旋转): <span id="eulerYValue">0</span></label>
+            <input type="range" id="eulerY" min="0" max="360" value="0" step="1">
+        </div>
+        <div class="slider-item">
+            <label for="axisAngle">AxisAngle (绕(1,1,1)轴旋转): <span id="axisAngleValue">0</span></label>
+            <input type="range" id="axisAngle" min="0" max="360" value="0" step="1">
+        </div>
+        <div class="slider-item">
+            <label for="quatAdd">四元数叠加: <span id="quatAddValue">0</span></label>
+            <input type="range" id="quatAdd" min="0" max="100" value="0" step="1">
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        // 初始化场景、相机、渲染器
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f0f0);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 5, 5);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 添加世界坐标轴和网格
+        const worldAxes = new THREE.AxesHelper(5);
+        scene.add(worldAxes);
+        const gridHelper = new THREE.GridHelper(10, 10);
+        scene.add(gridHelper);
+
+        // 创建立方体
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // 为立方体添加本地坐标轴
+        const cubeAxes = new THREE.AxesHelper(2);
+        cube.add(cubeAxes);
+
+        // 添加 OrbitControls 实现交互
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // 初始化欧拉角和四元数
+        const euler = new THREE.Euler(0, 0, 0, 'XYZ');
+        const quaternion = new THREE.Quaternion();
+        const axisAngleQuat = new THREE.Quaternion();
+        const quatAddResult = new THREE.Quaternion();
+
+        // 更新滑块显示值
+        function updateSliderValue(sliderId, valueId) {
+            const slider = document.getElementById(sliderId);
+            const valueSpan = document.getElementById(valueId);
+            valueSpan.textContent = slider.value;
+        }
+
+        // 绑定滑块事件
+        document.getElementById('eulerX').addEventListener('input', () => updateSliderValue('eulerX', 'eulerXValue'));
+        document.getElementById('eulerY').addEventListener('input', () => updateSliderValue('eulerY', 'eulerYValue'));
+        document.getElementById('axisAngle').addEventListener('input', () => updateSliderValue('axisAngle', 'axisAngleValue'));
+        document.getElementById('quatAdd').addEventListener('input', () => updateSliderValue('quatAdd', 'quatAddValue'));
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 从滑块获取欧拉角
+            const eulerX = document.getElementById('eulerX').value * Math.PI / 180;
+            const eulerY = document.getElementById('eulerY').value * Math.PI / 180;
+            euler.set(eulerX, eulerY, 0);
+            quaternion.setFromEuler(euler); // 从欧拉角设置四元数
+
+            // 从滑块获取轴角并设置四元数
+            const axisAngle = document.getElementById('axisAngle').value * Math.PI / 180;
+            axisAngleQuat.setFromAxisAngle(new THREE.Vector3(1, 1, 1).normalize(), axisAngle);
+
+            // 四元数叠加（slerp 插值）
+            const quatAddWeight = document.getElementById('quatAdd').value / 100;
+            quatAddResult.copy(quaternion).slerp(axisAngleQuat, quatAddWeight);
+
+            // 应用四元数到立方体
+            cube.quaternion.copy(quatAddResult);
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // 处理窗口大小变化
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>

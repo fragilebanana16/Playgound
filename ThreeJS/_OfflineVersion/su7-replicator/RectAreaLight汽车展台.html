@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CAR STUDIO</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#000; overflow:hidden; font-family:'Courier New',monospace; }
+  #app { width:100vw; height:100vh; position:relative; }
+  canvas { display:block; }
+
+  #loading {
+    position:fixed; inset:0; background:#000;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:100; transition:opacity .8s ease;
+  }
+  #loading.hidden { opacity:0; pointer-events:none; }
+  #loading-title { font-size:clamp(20px,4vw,40px); letter-spacing:.4em; color:#fff; margin-bottom:6px; font-weight:200; }
+  #loading-sub { font-size:10px; letter-spacing:.25em; color:#444; margin-bottom:48px; }
+  #loading-bar-wrap { width:min(280px,65vw); height:1px; background:#1a1a1a; position:relative; }
+  #loading-bar { height:1px; background:#fff; width:0%; transition:width .2s ease; }
+  #loading-pct { position:absolute; right:0; top:8px; font-size:9px; letter-spacing:.15em; color:#444; }
+
+  #upload-btn {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    z-index:50; display:flex; flex-direction:column; align-items:center; gap:20px;
+  }
+  #upload-btn.hidden { display:none; }
+  #upload-title { font-size:clamp(24px,5vw,52px); letter-spacing:.5em; color:#fff; font-weight:100; text-align:center; }
+  #upload-sub { font-size:9px; letter-spacing:.3em; color:#2a2a2a; text-align:center; }
+  #drop-zone {
+    width:min(300px,75vw); height:140px; border:1px solid #1e1e1e;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; transition:border-color .3s;
+  }
+  #drop-zone:hover, #drop-zone.drag-over { border-color:#444; }
+  #drop-text { font-size:10px; letter-spacing:.2em; color:#333; text-align:center; line-height:2; }
+  #file-input { display:none; }
+
+  #ui { position:fixed; inset:0; pointer-events:none; z-index:10; }
+  #ui.hidden { display:none; }
+  #top-bar { position:absolute; top:0; left:0; right:0; padding:20px 28px; display:flex; justify-content:space-between; align-items:flex-start; }
+  #model-name { font-size:10px; letter-spacing:.3em; color:#555; }
+  #cam-label { font-size:9px; letter-spacing:.2em; color:#2a2a2a; text-align:right; line-height:1.8; }
+  #cam-bar { position:absolute; bottom:0; left:0; right:0; padding:20px; display:flex; justify-content:center; gap:6px; pointer-events:all; }
+  .cam-btn {
+    background:transparent; border:1px solid #1e1e1e; color:#383838;
+    font-family:'Courier New',monospace; font-size:8px; letter-spacing:.2em;
+    padding:7px 14px; cursor:pointer; transition:all .25s; text-transform:uppercase;
+  }
+  .cam-btn:hover { border-color:#444; color:#777; }
+  .cam-btn.active { border-color:#666; color:#aaa; }
+  .corner { position:absolute; width:16px; height:16px; }
+  .corner::before,.corner::after { content:''; position:absolute; background:#1a1a1a; }
+  .corner::before { width:100%; height:1px; }
+  .corner::after { width:1px; height:100%; }
+  #c-tl{top:14px;left:14px} #c-tl::before{top:0;left:0} #c-tl::after{top:0;left:0}
+  #c-tr{top:14px;right:14px} #c-tr::before{top:0;right:0} #c-tr::after{top:0;right:0}
+  #c-bl{bottom:14px;left:14px} #c-bl::before{bottom:0;left:0} #c-bl::after{bottom:0;left:0}
+  #c-br{bottom:14px;right:14px} #c-br::before{bottom:0;right:0} #c-br::after{bottom:0;right:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="upload-btn">
+    <div id="upload-title">CAR STUDIO</div>
+    <div id="upload-sub">VEHICLE VISUALIZATION SYSTEM</div>
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div id="drop-text">DROP GLB / GLTF<br>OR CLICK TO SELECT</div>
+    </div>
+    <input type="file" id="file-input" accept=".glb,.gltf">
+  </div>
+
+  <div id="loading" class="hidden">
+    <div id="loading-title">LOADING</div>
+    <div id="loading-sub">PROCESSING GEOMETRY</div>
+    <div id="loading-bar-wrap">
+      <div id="loading-bar"></div>
+      <div id="loading-pct">0%</div>
+    </div>
+  </div>
+
+  <div id="ui" class="hidden">
+    <div class="corner" id="c-tl"></div>
+    <div class="corner" id="c-tr"></div>
+    <div class="corner" id="c-bl"></div>
+    <div class="corner" id="c-br"></div>
+    <div id="top-bar">
+      <div id="model-name">—</div>
+      <div id="cam-label">CAM 01<br>FRONT</div>
+    </div>
+    <div id="cam-bar">
+      <button class="cam-btn active" onclick="setCam(0)">FRONT</button>
+      <button class="cam-btn" onclick="setCam(1)">SIDE</button>
+      <button class="cam-btn" onclick="setCam(2)">REAR</button>
+      <button class="cam-btn" onclick="setCam(3)">TOP</button>
+      <button class="cam-btn" onclick="setCam(4)">HERO</button>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js" } }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+const BASE = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/';
+async function loadModule(path) {
+  const res = await fetch(BASE + path);
+  let src = await res.text();
+  src = src.replace(/from ['"]three['"]/g, `from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js'`);
+  const dir = BASE + path.split('/').slice(0,-1).join('/') + '/';
+  src = src.replace(/from ['"]\.\//g, `from '${dir}`);
+  return import(URL.createObjectURL(new Blob([src], {type:'text/javascript'})));
+}
+
+const [
+  { GLTFLoader },
+  { OrbitControls },
+  { RectAreaLightUniformsLib },
+  { Reflector },
+] = await Promise.all([
+  loadModule('loaders/GLTFLoader.js'),
+  loadModule('controls/OrbitControls.js'),
+  loadModule('lights/RectAreaLightUniformsLib.js'),
+  loadModule('objects/Reflector.js'),
+]);
+RectAreaLightUniformsLib.init();
+
+// ── Renderer ──────────────────────────────────────────────────
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.physicallyCorrectLights = true;
+document.getElementById('app').prepend(renderer.domElement);
+
+// ── Scene ─────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a0e);
+scene.fog = new THREE.FogExp2(0x0a0a0e, 0.04);
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.05, 150);
+camera.position.set(6, 2.5, 9);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.03;
+controls.maxPolarAngle = Math.PI / 2 - 0.04;
+controls.minDistance = 2;
+controls.maxDistance = 18;
+controls.target.set(0, 0.6, 0);
+controls.update();
+
+// ── Lights ────────────────────────────────────────────────────
+// 主 key：暖橙，右前
+const key = new THREE.RectAreaLight(0xffd090, 8, 6, 3);
+key.position.set(4, 4, 6);
+key.lookAt(0, 0.8, 0);
+scene.add(key);
+
+// fill：冷蓝，左侧
+const fill = new THREE.RectAreaLight(0x90a8ff, 4, 4, 5);
+fill.position.set(-6, 3, 1);
+fill.lookAt(0, 0.8, 0);
+scene.add(fill);
+
+// rim：琥珀轮廓，后方
+const rim = new THREE.RectAreaLight(0xff6818, 3, 8, 1.5);
+rim.position.set(0, 6, -8);
+rim.lookAt(0, 0, 0);
+scene.add(rim);
+
+// 顶部补光，让车顶不那么死黑
+const top = new THREE.RectAreaLight(0xffffff, 2, 6, 6);
+top.position.set(0, 9, 0);
+top.lookAt(0, 0, 0);
+scene.add(top);
+
+scene.add(new THREE.AmbientLight(0x101018, 3));
+
+// ── 圆形平台（底座） ──────────────────────────────────────────
+const platGeo = new THREE.CylinderGeometry(5, 5.3, 0.12, 80);
+const platMat = new THREE.MeshStandardMaterial({ color:0x0c0c0e, roughness:0.08, metalness:0.9 });
+const platform = new THREE.Mesh(platGeo, platMat);
+platform.receiveShadow = true;
+platform.position.y = -0.06;
+scene.add(platform);
+
+// 平台边缘光晕环
+const ringGeo = new THREE.TorusGeometry(5, 0.018, 8, 120);
+const ringMat = new THREE.MeshBasicMaterial({ color:0x1a2030 });
+const ring = new THREE.Mesh(ringGeo, ringMat);
+ring.rotation.x = Math.PI / 2;
+ring.position.y = 0.002;
+scene.add(ring);
+
+// ── Reflector 镜面地板（Three.js 内置，透视正确） ────────────
+const reflector = new Reflector(new THREE.CircleGeometry(5, 80), {
+  clipBias: 0.003,
+  textureWidth: innerWidth * devicePixelRatio,
+  textureHeight: innerHeight * devicePixelRatio,
+  color: 0x222233,        // 反射底色（深色，不要太亮）
+  recursion: 1,
+});
+reflector.rotation.x = -Math.PI / 2;
+reflector.position.y = 0.001;
+scene.add(reflector);
+
+// ── 相机预设 ──────────────────────────────────────────────────
+const camDefs = [
+  { r:2.2, phi:16, theta:2,   ty:0.35, label:'CAM 01\nFRONT' },
+  { r:2.2, phi:13, theta:90,  ty:0.30, label:'CAM 02\nSIDE'  },
+  { r:2.2, phi:16, theta:180, ty:0.35, label:'CAM 03\nREAR'  },
+  { r:1.8, phi:68, theta:25,  ty:0.15, label:'CAM 04\nTOP'   },
+  { r:1.5, phi:22, theta:40,  ty:0.25, label:'CAM 05\nHERO'  },
+];
+let modelScale = 3;
+
+function defToWorld(d) {
+  const ph = THREE.MathUtils.degToRad(d.phi);
+  const th = THREE.MathUtils.degToRad(d.theta);
+  const r  = d.r * modelScale;
+  return {
+    pos:    new THREE.Vector3(r*Math.cos(ph)*Math.sin(th), r*Math.sin(ph), r*Math.cos(ph)*Math.cos(th)),
+    target: new THREE.Vector3(0, d.ty * modelScale, 0),
+  };
+}
+
+function quatFromLookAt(pos, target) {
+  const m = new THREE.Matrix4().lookAt(pos, target, new THREE.Vector3(0,1,0));
+  return new THREE.Quaternion().setFromRotationMatrix(m);
+}
+
+let camAnim = null;
+
+window.setCam = (idx) => {
+  document.querySelectorAll('.cam-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.getElementById('cam-label').textContent = camDefs[idx].label;
+  const w = defToWorld(camDefs[idx]);
+  camAnim = {
+    fromPos:    camera.position.clone(),
+    toPos:      w.pos,
+    fromQ:      camera.quaternion.clone(),
+    toQ:        quatFromLookAt(w.pos, w.target),
+    fromTarget: controls.target.clone(),
+    toTarget:   w.target,
+    t: 0,
+  };
+};
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+}
+
+// ── 模型加载 ──────────────────────────────────────────────────
+let carModel = null;
+const loader = new GLTFLoader();
+
+function loadModel(url, name) {
+  document.getElementById('upload-btn').classList.add('hidden');
+  const loadEl = document.getElementById('loading');
+  loadEl.classList.remove('hidden');
+
+  loader.load(url, gltf => {
+    if (carModel) {
+      carModel.traverse(o => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
+      scene.remove(carModel);
+    }
+    carModel = gltf.scene;
+
+    // 计算包围盒，让车底面贴地 y=0
+    const box    = new THREE.Box3().setFromObject(carModel);
+    const size   = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const maxD   = Math.max(size.x, size.y, size.z);
+    const s      = 3 / maxD;
+
+    carModel.scale.setScalar(s);
+    // 先把中心归零
+    carModel.position.x = -center.x * s;
+    carModel.position.z = -center.z * s;
+    // 车底 = box.min.y * s，把底部抬到 y=0
+    carModel.position.y = -box.min.y * s;
+
+    modelScale = size.y * s; // 用车高作为 scale 参考
+
+    carModel.traverse(o => {
+      if (o.isMesh) {
+        o.castShadow = true;
+        o.receiveShadow = true;
+        if (o.material) o.material.envMapIntensity = 1.0;
+      }
+    });
+    scene.add(carModel);
+
+    document.getElementById('model-name').textContent = name.replace(/\.[^.]+$/,'').toUpperCase();
+    loadEl.classList.add('hidden');
+    document.getElementById('ui').classList.remove('hidden');
+    setCam(0);
+  }, prog => {
+    const p = prog.total ? Math.round(prog.loaded/prog.total*100) : 0;
+    document.getElementById('loading-bar').style.width = p + '%';
+    document.getElementById('loading-pct').textContent = p + '%';
+  }, err => {
+    console.error(err);
+    loadEl.classList.add('hidden');
+    document.getElementById('upload-btn').classList.remove('hidden');
+  });
+}
+
+document.getElementById('file-input').addEventListener('change', e => {
+  const f = e.target.files[0]; if (f) loadModel(URL.createObjectURL(f), f.name);
+});
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0]; if (f) loadModel(URL.createObjectURL(f), f.name);
+});
+
+// ── Render loop ───────────────────────────────────────────────
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 1/30);
+
+  if (camAnim) {
+    camAnim.t += dt * 1.1;
+    const t  = Math.min(camAnim.t, 1);
+    const et = easeInOutCubic(t);
+    camera.position.lerpVectors(camAnim.fromPos, camAnim.toPos, et);
+    THREE.Quaternion.slerp(camAnim.fromQ, camAnim.toQ, camera.quaternion, et);
+    controls.target.lerpVectors(camAnim.fromTarget, camAnim.toTarget, et);
+    if (t >= 1) camAnim = null;
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

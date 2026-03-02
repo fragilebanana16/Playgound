@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Volumetric Lighting with Realistic God Rays</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; }
+    #info {
+      position: absolute; top: 10px; left: 10px; color: #fff;
+      font-family: sans-serif; font-size: 13px;
+      background: rgba(0,0,0,0.6); padding: 8px 10px; border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+<div id="info">
+  Q: lights look at cube（缓慢转向）<br>
+  R: 恢复原始方向（缓慢转回）<br>
+  真实丁达尔体积光效果
+</div>
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+
+let scene, camera, renderer;
+let cube, plane;
+let lights = [];
+let mode = 'idle';
+
+init();
+animate();
+
+function init() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x050505);
+  scene.fog = new THREE.FogExp2(0x000000, 0.015);
+
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 6, 14);
+  camera.lookAt(0, 0, 0);
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  // 地面
+  const planeGeo = new THREE.PlaneGeometry(30, 30);
+  const planeMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 });
+  plane = new THREE.Mesh(planeGeo, planeMat);
+  plane.rotation.x = -Math.PI / 2;
+  plane.receiveShadow = true;
+  scene.add(plane);
+
+  // 中间方块
+  const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
+  const cubeMat = new THREE.MeshStandardMaterial({ color: 0x66aaff, roughness: 0.3, metalness: 0.2 });
+  cube = new THREE.Mesh(cubeGeo, cubeMat);
+  cube.position.set(0, 1, 0);
+  cube.castShadow = true;
+  cube.receiveShadow = true;
+  scene.add(cube);
+
+  // 环境光
+  const amb = new THREE.AmbientLight(0xffffff, 0.1);
+  scene.add(amb);
+
+  // 左右两排聚光灯
+  createSpotRow(-8, 3, 0, 3, 0xffaa88);
+  createSpotRow( 8, 3, 0, 3, 0x88aaff);
+
+  window.addEventListener('resize', onWindowResize);
+  window.addEventListener('keydown', onKeyDown);
+}
+
+function createSpotRow(xBase, y, zBase, count, color) {
+  const spacing = 3;
+  for (let i = 0; i < count; i++) {
+    const spot = new THREE.SpotLight(color, 60, 40, Math.PI / 7, 0.4, 1.8);
+    const x = xBase;
+    const z = zBase + (i - (count - 1) / 2) * spacing;
+
+    spot.position.set(x, y, z);
+    spot.castShadow = true;
+    spot.shadow.mapSize.set(2048, 2048);
+    spot.shadow.camera.near = 1;
+    spot.shadow.camera.far = 50;
+
+    const target = new THREE.Object3D();
+    target.position.set(0, 0, z);
+    scene.add(target);
+    spot.target = target;
+    spot.userData.originalTarget = target.position.clone();
+
+    scene.add(spot);
+    lights.push(spot);
+
+    // 创建更真实的体积光
+    createRealisticVolumetricLight(spot, color);
+
+    // 灯光位置标记
+    const helperGeo = new THREE.SphereGeometry(0.12, 16, 16);
+    const helperMat = new THREE.MeshBasicMaterial({ color });
+    const helperMesh = new THREE.Mesh(helperGeo, helperMat);
+    helperMesh.position.copy(spot.position);
+    scene.add(helperMesh);
+  }
+}
+
+function createRealisticVolumetricLight(spotlight, color) {
+  const distance = spotlight.distance || 40;
+  const angle = spotlight.angle;
+  
+  // 使用自定义shader创建体积光
+  const volumetricShader = {
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec3 vPositionNormal;
+      
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        vPositionNormal = normalize((modelViewMatrix * vec4(position, 1.0)).xyz);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 lightColor;
+      uniform float opacity;
+      varying vec3 vNormal;
+      varying vec3 vPositionNormal;
+      
+      void main() {
+        // 边缘发光效果（菲涅尔效应）
+        float fresnel = pow(1.0 - abs(dot(vNormal, vPositionNormal)), 2.5);
+        
+        // 距离衰减
+        float distanceFade = 1.0 - length(vPositionNormal) / 10.0;
+        distanceFade = clamp(distanceFade, 0.0, 1.0);
+        
+        // 组合效果
+        float alpha = fresnel * distanceFade * opacity;
+        
+        gl_FragColor = vec4(lightColor, alpha);
+      }
+    `,
+    uniforms: {
+      lightColor: { value: new THREE.Color(color) },
+      opacity: { value: 0.3 }
+    }
+  };
+
+  // 创建多层锥形，模拟光线散射
+  const coneGroup = new THREE.Group();
+  
+  // 主光束
+  const mainRadius = Math.tan(angle) * distance;
+  const mainCone = new THREE.ConeGeometry(mainRadius, distance, 32, 8, true);
+  const mainMaterial = new THREE.ShaderMaterial({
+    vertexShader: volumetricShader.vertexShader,
+    fragmentShader: volumetricShader.fragmentShader,
+    uniforms: THREE.UniformsUtils.clone(volumetricShader.uniforms),
+    transparent: true,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  
+  const mainMesh = new THREE.Mesh(mainCone, mainMaterial);
+  mainMesh.rotation.x = Math.PI / 2;
+  mainMesh.position.z = -distance / 2;
+  coneGroup.add(mainMesh);
+  
+  // 内层光芯（更亮）
+  const coreRadius = mainRadius * 0.5;
+  const coreCone = new THREE.ConeGeometry(coreRadius, distance * 0.95, 16, 1, true);
+  const coreMaterial = new THREE.ShaderMaterial({
+    vertexShader: volumetricShader.vertexShader,
+    fragmentShader: volumetricShader.fragmentShader,
+    uniforms: {
+      lightColor: { value: new THREE.Color(color).multiplyScalar(1.5) },
+      opacity: { value: 0.25 }
+    },
+    transparent: true,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  
+  const coreMesh = new THREE.Mesh(coreCone, coreMaterial);
+  coreMesh.rotation.x = Math.PI / 2;
+  coreMesh.position.z = -distance * 0.95 / 2;
+  coneGroup.add(coreMesh);
+  
+  // 添加粒子模拟灰尘散射
+  createDustParticles(coneGroup, color, distance, mainRadius);
+  
+  spotlight.add(coneGroup);
+  spotlight.userData.volumetricCone = coneGroup;
+}
+
+function createDustParticles(parent, color, distance, radius) {
+  const particleCount = 80;
+  const positions = new Float32Array(particleCount * 3);
+  const sizes = new Float32Array(particleCount);
+  
+  for (let i = 0; i < particleCount; i++) {
+    const t = Math.random();
+    const angle = Math.random() * Math.PI * 2;
+    const r = Math.random() * radius * t;
+    
+    positions[i * 3] = Math.cos(angle) * r;
+    positions[i * 3 + 1] = Math.sin(angle) * r;
+    positions[i * 3 + 2] = -t * distance;
+    
+    sizes[i] = Math.random() * 0.08 + 0.02;
+  }
+  
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+  
+  const material = new THREE.PointsMaterial({
+    color: color,
+    size: 0.05,
+    transparent: true,
+    opacity: 0.4,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true
+  });
+  
+  const particles = new THREE.Points(geometry, material);
+  parent.add(particles);
+  
+  // 保存用于动画
+  particles.userData.originalPositions = positions.slice();
+}
+
+function onKeyDown(e) {
+  if (e.key === 'q' || e.key === 'Q') {
+    mode = 'toCube';
+  } else if (e.key === 'r' || e.key === 'R') {
+    mode = 'toOriginal';
+  }
+}
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  cube.rotation.y += 0.01;
+  
+  // 粒子动画
+  const time = Date.now() * 0.0005;
+  lights.forEach(light => {
+    if (light.userData.volumetricCone) {
+      light.userData.volumetricCone.children.forEach(child => {
+        if (child instanceof THREE.Points) {
+          const positions = child.geometry.attributes.position.array;
+          const original = child.userData.originalPositions;
+          for (let i = 0; i < positions.length; i += 3) {
+            positions[i] = original[i] + Math.sin(time + i) * 0.03;
+            positions[i + 1] = original[i + 1] + Math.cos(time + i * 0.5) * 0.03;
+          }
+          child.geometry.attributes.position.needsUpdate = true;
+        }
+      });
+    }
+  });
+
+  updateLights();
+  renderer.render(scene, camera);
+}
+
+function updateLights() {
+  const lerpFactor = 0.08;
+
+  lights.forEach(light => {
+    const targetPos = light.target.position;
+    if (mode === 'toCube') {
+      targetPos.lerp(cube.position, lerpFactor);
+    } else if (mode === 'toOriginal') {
+      const orig = light.userData.originalTarget;
+      targetPos.lerp(orig, lerpFactor);
+    }
+    light.lookAt(targetPos);
+  });
+
+  if (mode === 'toCube') {
+    const anyFar = lights.some(light => light.target.position.distanceTo(cube.position) > 0.05);
+    if (!anyFar) mode = 'idle';
+  } else if (mode === 'toOriginal') {
+    const anyFar = lights.some(light => light.target.position.distanceTo(light.userData.originalTarget) > 0.05);
+    if (!anyFar) mode = 'idle';
+  }
+}
+</script>
+</body>
+</html>

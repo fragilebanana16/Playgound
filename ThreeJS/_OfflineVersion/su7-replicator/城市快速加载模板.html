@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyberpunk City Viewer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; color: #0ff; }
+  #canvas-container { width: 100vw; height: 100vh; }
+  canvas { display: block; }
+
+  #hud {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; z-index: 10;
+  }
+  #hud::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px,
+      rgba(0,255,255,0.012) 2px, rgba(0,255,255,0.012) 4px);
+  }
+  #hud::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
+  }
+
+  #title {
+    position: fixed; top: 24px; left: 32px;
+    font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: rgba(0,255,255,0.7); text-shadow: 0 0 10px rgba(0,255,255,0.5);
+    pointer-events: none; z-index: 20;
+  }
+  #title span {
+    display: block; font-size: 18px; font-weight: bold; letter-spacing: 0.5em;
+    color: #0ff; text-shadow: 0 0 20px #0ff, 0 0 40px rgba(0,255,255,0.4);
+    margin-bottom: 4px;
+  }
+
+  #controls-hint {
+    position: fixed; bottom: 24px; right: 32px;
+    font-size: 10px; letter-spacing: 0.2em;
+    color: rgba(0,255,255,0.35); text-align: right;
+    pointer-events: none; z-index: 20; line-height: 1.8;
+  }
+
+  #loading {
+    position: fixed; inset: 0; background: #000;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 100; transition: opacity 0.6s ease;
+  }
+  #loading.fade-out { opacity: 0; pointer-events: none; }
+
+  #loading-title {
+    font-size: 13px; letter-spacing: 0.5em; color: #0ff;
+    text-shadow: 0 0 20px #0ff; margin-bottom: 40px; text-transform: uppercase;
+  }
+  #loading-bar-wrap { width: 300px; height: 2px; background: rgba(0,255,255,0.1); }
+  #loading-bar {
+    height: 100%; background: linear-gradient(90deg, #0ff, #f0f); width: 0%;
+    transition: width 0.15s ease; box-shadow: 0 0 10px #0ff;
+  }
+  #loading-text { margin-top: 20px; font-size: 10px; letter-spacing: 0.3em; color: rgba(0,255,255,0.5); }
+  #error-msg { margin-top: 12px; font-size: 10px; letter-spacing: 0.2em; color: #ff4466; min-height: 16px; }
+
+  #post-controls {
+    position: fixed; top: 50%; right: 24px;
+    transform: translateY(-50%); z-index: 20;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .ctrl-group { display: flex; flex-direction: column; gap: 6px; }
+  .ctrl-label { font-size: 9px; letter-spacing: 0.3em; color: rgba(0,255,255,0.4); text-transform: uppercase; }
+  .ctrl-row { display: flex; align-items: center; gap: 8px; }
+  .ctrl-name { font-size: 9px; letter-spacing: 0.1em; color: rgba(0,255,255,0.6); width: 56px; }
+  input[type=range] {
+    -webkit-appearance: none; width: 80px; height: 2px;
+    background: rgba(0,255,255,0.2); outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 10px; height: 10px;
+    background: #0ff; border-radius: 50%; box-shadow: 0 0 6px #0ff; cursor: pointer;
+  }
+  .ctrl-val { font-size: 9px; color: rgba(0,255,255,0.4); width: 28px; text-align: right; }
+  .toggle-btn {
+    font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 0.2em;
+    padding: 4px 9px; background: transparent;
+    border: 1px solid rgba(0,255,255,0.25); color: rgba(0,255,255,0.4);
+    cursor: pointer; text-transform: uppercase; transition: all 0.15s;
+  }
+  .toggle-btn.on {
+    background: rgba(0,255,255,0.08); border-color: #0ff; color: #0ff;
+    box-shadow: 0 0 8px rgba(0,255,255,0.25);
+  }
+
+  #file-btn {
+    position: fixed; bottom: 24px; left: 32px;
+    font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 0.3em;
+    padding: 8px 18px; background: transparent;
+    border: 1px solid rgba(0,255,255,0.35); color: rgba(0,255,255,0.6);
+    cursor: pointer; text-transform: uppercase; z-index: 20; transition: all 0.15s;
+  }
+  #file-btn:hover { background: rgba(0,255,255,0.08); border-color: #0ff; color: #0ff; box-shadow: 0 0 12px rgba(0,255,255,0.3); }
+  #file-input { display: none; }
+
+  #drop-overlay {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.82); border: 2px dashed rgba(0,255,255,0.4);
+  }
+  #drop-overlay.show { display: flex; }
+  #drop-overlay p { font-size: 14px; letter-spacing: 0.4em; color: #0ff; text-shadow: 0 0 20px #0ff; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div id="loading-title">Cyberpunk City Viewer</div>
+  <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+  <div id="loading-text">INITIALIZING…</div>
+  <div id="error-msg"></div>
+</div>
+
+<div id="canvas-container"></div>
+<div id="hud"></div>
+<div id="title"><span>CYBERPUNK</span>CITY VIEWER / THREE.JS</div>
+<div id="controls-hint">左键拖动 · 右键平移<br>滚轮缩放 · 双击重置</div>
+
+<div id="post-controls">
+  <div class="ctrl-group">
+    <div class="ctrl-label">— Bloom —</div>
+    <div class="ctrl-row"><div class="ctrl-name">强度</div><input type="range" id="sl-bs" min="0" max="4" step="0.05" value="0.3"><div class="ctrl-val" id="v-bs">0.30</div></div>
+    <div class="ctrl-row"><div class="ctrl-name">半径</div><input type="range" id="sl-br" min="0" max="1.5" step="0.05" value="0.5"><div class="ctrl-val" id="v-br">0.50</div></div>
+    <div class="ctrl-row"><div class="ctrl-name">阈值</div><input type="range" id="sl-bt" min="0" max="1" step="0.01" value="0.85"><div class="ctrl-val" id="v-bt">0.85</div></div>
+  </div>
+  <div class="ctrl-group">
+    <div class="ctrl-label">— Render —</div>
+    <div class="ctrl-row"><div class="ctrl-name">曝光</div><input type="range" id="sl-exp" min="0.1" max="3" step="0.05" value="0.9"><div class="ctrl-val" id="v-exp">0.90</div></div>
+    <div class="ctrl-row"><div class="ctrl-name">饱和度</div><input type="range" id="sl-sat" min="0" max="3" step="0.05" value="1.0"><div class="ctrl-val" id="v-sat">1.00</div></div>
+  </div>
+  <div class="ctrl-group">
+    <div class="ctrl-label">— Passes —</div>
+    <div class="ctrl-row">
+      <button class="toggle-btn on" id="btn-bloom">Bloom</button>
+      <button class="toggle-btn on" id="btn-ssao">SSAO</button>
+    </div>
+    <div class="ctrl-row">
+      <button class="toggle-btn on" id="btn-fxaa">FXAA</button>
+      <button class="toggle-btn" id="btn-ssr">SSR</button>
+    </div>
+  </div>
+</div>
+
+<button id="file-btn" onclick="document.getElementById('file-input').click()">▸ 加载模型 (GLB)</button>
+<input type="file" id="file-input" accept=".glb,.gltf">
+<div id="drop-overlay"><p>拖放 GLB 文件到此处</p></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls }   from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader }      from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader }     from 'three/addons/loaders/DRACOLoader.js';
+import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { SSAOPass }        from 'three/addons/postprocessing/SSAOPass.js';
+import { ShaderPass }      from 'three/addons/postprocessing/ShaderPass.js';
+import { FXAAShader }      from 'three/addons/shaders/FXAAShader.js';
+import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
+
+// ── DOM refs ──────────────────────────────────────────────────────
+const loadingEl  = document.getElementById('loading');
+const barEl      = document.getElementById('loading-bar');
+const textEl     = document.getElementById('loading-text');
+const errEl      = document.getElementById('error-msg');
+
+function setProgress(p, msg) {
+  barEl.style.width = (p * 100) + '%';
+  if (msg) textEl.textContent = msg;
+}
+function showErr(msg) { errEl.textContent = '⚠ ' + msg; }
+function hideLoading() { loadingEl.classList.add('fade-out'); }
+
+// ── Renderer ──────────────────────────────────────────────────────
+setProgress(0.05, 'CREATING RENDERER…');
+
+const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+// ── Scene / Camera / Controls ─────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb); // 先设一个天蓝色占位，env map 加载后覆盖
+scene.fog = new THREE.Fog(0xd0e8f8, 100, 600);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+camera.position.set(0, 8, 22);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance   = 0.5;
+controls.maxDistance   = 500;
+controls.maxPolarAngle = Math.PI * 0.88;
+
+// ── Lights ────────────────────────────────────────────────────────
+// 极弱 ambient，依赖 env map 做间接光
+scene.add(new THREE.AmbientLight(0xffffff, 0.08));
+
+// 主光：太阳，暖白，强度适中不过爆
+const keyLight = new THREE.DirectionalLight(0xfff4d6, 1.8);
+keyLight.position.set(40, 80, 30);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.bias = -0.0003;
+const ksc = keyLight.shadow.camera;
+ksc.left = ksc.bottom = -60; ksc.right = ksc.top = 60; ksc.far = 300;
+scene.add(keyLight);
+
+// 天空补光，明显弱于主光，只补阴影面
+const skyFill = new THREE.DirectionalLight(0xb0cce8, 0.3);
+skyFill.position.set(-20, 40, -20);
+scene.add(skyFill);
+
+// ── Env map (procedural, no external HDRI needed) ─────────────────
+setProgress(0.2, 'BUILDING ENVIRONMENT…');
+
+(function buildEnv() {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  pmrem.compileEquirectangularShader();
+  const ss = new THREE.Scene();
+  ss.add(new THREE.Mesh(
+    new THREE.SphereGeometry(10, 32, 16),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      vertexShader: `varying vec3 vD; void main(){ vD=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+      fragmentShader: `
+        varying vec3 vD;
+        void main(){
+          vec3 d = normalize(vD);
+          float y = clamp(d.y, 0.0, 1.0);
+          // 天顶：深蓝，地平线：淡蓝白，地面：暖灰
+          vec3 zenith  = vec3(0.06, 0.14, 0.30);
+          vec3 horizon = vec3(0.22, 0.28, 0.36);
+          vec3 ground  = vec3(0.15, 0.13, 0.10);
+          vec3 c;
+          if(d.y >= 0.0)
+            c = mix(horizon, zenith, pow(y, 0.5));
+          else
+            c = mix(horizon, ground, pow(-d.y, 0.3));
+          // 太阳光晕（方向与主灯一致）
+          vec3 sunDir = normalize(vec3(40.0, 80.0, 30.0));
+          float sun = pow(max(0.0, dot(d, sunDir)), 64.0);
+          c += vec3(1.0, 0.95, 0.8) * sun * 1.5;
+          gl_FragColor = vec4(c, 1.0);
+        }
+      `,
+    })
+  ));
+  scene.environment = pmrem.fromScene(ss).texture;
+  // 同时设为背景
+  scene.background = pmrem.fromScene(ss).texture;
+  pmrem.dispose();
+})();
+
+// ── Default procedural city ───────────────────────────────────────
+const defaultGroup = new THREE.Group();
+defaultGroup.name  = 'defaultCity';
+
+(function buildCity() {
+  defaultGroup.add(new THREE.Mesh(
+    new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshStandardMaterial({ color: 0x888878, roughness: 0.85, metalness: 0.0, envMapIntensity: 0.5 })
+  ));
+  (defaultGroup.children[0]).rotation.x = -Math.PI / 2;
+  (defaultGroup.children[0]).receiveShadow = true;
+
+  const ems = [0xff003c, 0x00eeff, 0xee00ff, 0xff8800, 0x0055ff];
+  for (let i = 0; i < 55; i++) {
+    const w = 1 + Math.random()*3, h = 4 + Math.random()*22, d = 1 + Math.random()*3;
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(w,h,d),
+      new THREE.MeshStandardMaterial({
+        color: 0x0a0a18, roughness: 0.75, metalness: 0.15,
+        emissive: new THREE.Color(ems[i%ems.length]), emissiveIntensity: Math.random()*.25+.03,
+      })
+    );
+    const a = Math.random()*Math.PI*2, r = 6+Math.random()*32;
+    mesh.position.set(Math.cos(a)*r, h/2, Math.sin(a)*r);
+    mesh.rotation.y = Math.random()*Math.PI;
+    mesh.castShadow = mesh.receiveShadow = true;
+    defaultGroup.add(mesh);
+  }
+
+  const nc = [0xff0055,0x00ffcc,0xff6600,0xbb00ff];
+  for (let i = 0; i < 10; i++) {
+    const l = new THREE.PointLight(nc[i%nc.length], 3, 12, 2);
+    const a = (i/10)*Math.PI*2;
+    l.position.set(Math.cos(a)*9, 3+Math.random()*5, Math.sin(a)*9);
+    defaultGroup.add(l);
+  }
+  scene.add(defaultGroup);
+})();
+
+// ── Post-processing (built ONCE, passes toggled) ──────────────────
+setProgress(0.4, 'COMPILING POST-PROCESSING…');
+
+const W = window.innerWidth, H = window.innerHeight;
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+// SSAO – skip gracefully if driver fails
+let ssaoPass = null;
+try {
+  ssaoPass = new SSAOPass(scene, camera, W, H);
+  ssaoPass.kernelRadius = 10;
+  ssaoPass.minDistance  = 0.001;
+  ssaoPass.maxDistance  = 0.12;
+  composer.addPass(ssaoPass);
+} catch(e) { console.warn('SSAOPass unavailable:', e); }
+
+// Bloom
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(W, H), 0.3, 0.5, 0.85);
+composer.addPass(bloomPass);
+
+// 中性色彩校正（无偏色，只做轻微对比度）
+const cgPass = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, saturation: { value: 1.0 } },
+  vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader: `
+    uniform sampler2D tDiffuse; uniform float saturation; varying vec2 vUv;
+    void main(){
+      vec4 tex = texture2D(tDiffuse, vUv);
+      vec3 col = tex.rgb;
+      // 饱和度调整
+      float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+      col = mix(vec3(lum), col, saturation);
+      gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+    }
+  `,
+});
+composer.addPass(cgPass);
+composer.addPass(new OutputPass());
+
+const fxaaPass = new ShaderPass(FXAAShader);
+fxaaPass.material.uniforms['resolution'].value.set(1/W, 1/H);
+composer.addPass(fxaaPass);
+
+setProgress(0.9, 'READY — LOAD A GLB TO BEGIN');
+setTimeout(hideLoading, 500);
+
+// ── Slider & toggle bindings (ONCE) ──────────────────────────────
+function sl(id, vid, cb) {
+  const el = document.getElementById(id), vl = document.getElementById(vid);
+  el.addEventListener('input', () => { const v=parseFloat(el.value); vl.textContent=v.toFixed(2); cb(v); });
+}
+sl('sl-bs','v-bs', v => bloomPass.strength = v);
+sl('sl-br','v-br', v => bloomPass.radius   = v);
+sl('sl-bt','v-bt', v => bloomPass.threshold = v);
+sl('sl-exp','v-exp', v => renderer.toneMappingExposure = v);
+sl('sl-sat','v-sat', v => cgPass.uniforms.saturation.value = v);
+
+function tog(id, cb) {
+  const btn = document.getElementById(id);
+  btn.addEventListener('click', () => { btn.classList.toggle('on'); cb(btn.classList.contains('on')); });
+}
+tog('btn-bloom', v => bloomPass.enabled = v);
+tog('btn-ssao',  v => { if(ssaoPass) ssaoPass.enabled = v; });
+tog('btn-fxaa',  v => fxaaPass.enabled = v);
+tog('btn-ssr',   v => {
+  // Fake SSR: push ground/water roughness to near-zero for mirror reflection
+  scene.traverse(o => {
+    if (o.isMesh && (o.name === 'ground' || o.userData.isWater)) {
+      o.material.roughness = v ? 0.01 : 0.04;
+    }
+  });
+});
+
+// ── GLB loader ────────────────────────────────────────────────────
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/libs/draco/');
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
+
+let userModel = null;
+
+function loadGLB(url, isBlob) {
+  // Re-show loading
+  loadingEl.classList.remove('fade-out');
+  errEl.textContent = '';
+  setProgress(0, 'PARSING FILE…');
+
+  gltfLoader.load(url,
+    (gltf) => {
+      setProgress(0.88, 'BUILDING SCENE…');
+
+      if (userModel) { scene.remove(userModel); userModel = null; }
+      defaultGroup.visible = false;
+
+      const model = gltf.scene;
+      userModel   = model;
+
+      const box    = new THREE.Box3().setFromObject(model);
+      const center = new THREE.Vector3();
+      const size   = new THREE.Vector3();
+      box.getCenter(center);
+      box.getSize(size);
+      const maxDim = Math.max(size.x, size.y, size.z);
+
+      model.position.sub(center);     // center at origin
+
+      model.traverse(child => {
+        if (!child.isMesh) return;
+        child.castShadow = child.receiveShadow = true;
+        const mats = Array.isArray(child.material) ? child.material : [child.material];
+        mats.forEach(m => {
+          if (!m) return;
+          if (m.isMeshStandardMaterial || m.isMeshPhysicalMaterial) {
+            m.envMapIntensity = 0.6;
+            if (typeof m.emissiveIntensity === 'number' && m.emissiveIntensity > 0) {
+              m.emissiveIntensity = Math.min(m.emissiveIntensity * 1.8, 5.0);
+            }
+          }
+          if (typeof m.roughness === 'number' && m.roughness < 0.2) {
+            child.userData.isWater = true;
+          }
+        });
+      });
+
+      // Ground plane under the model
+      const gnd = new THREE.Mesh(
+        new THREE.PlaneGeometry(maxDim * 6, maxDim * 6),
+        new THREE.MeshStandardMaterial({ color: 0x999988, roughness: 0.85, metalness: 0.0, envMapIntensity: 0.5 })
+      );
+      gnd.rotation.x = -Math.PI / 2;
+      gnd.position.y = box.min.y - center.y - 0.01;
+      gnd.receiveShadow = true;
+      gnd.name = 'ground';
+      model.add(gnd);
+
+      scene.add(model);
+
+      // Fit camera
+      const dist = maxDim * 1.6;
+      camera.position.set(dist * 0.55, dist * 0.38, dist * 0.55);
+      controls.target.set(0, size.y * 0.1, 0);
+      camera.near = maxDim * 0.0008;
+      camera.far  = maxDim * 80;
+      camera.updateProjectionMatrix();
+      controls.update();
+
+      // Fit shadow camera
+      keyLight.shadow.camera.left = keyLight.shadow.camera.bottom = -maxDim * 1.5;
+      keyLight.shadow.camera.right = keyLight.shadow.camera.top   =  maxDim * 1.5;
+      keyLight.shadow.camera.far   = maxDim * 10;
+      keyLight.shadow.camera.updateProjectionMatrix();
+
+      setProgress(1.0, 'READY');
+      setTimeout(() => {
+        hideLoading();
+        if (isBlob) URL.revokeObjectURL(url);
+      }, 300);
+    },
+    (xhr) => {
+      if (xhr.total > 0)
+        setProgress(0.05 + (xhr.loaded / xhr.total) * 0.8, `LOADING  ${(xhr.loaded/1048576).toFixed(1)} MB`);
+    },
+    (err) => {
+      console.error(err);
+      showErr(err.message || String(err));
+    }
+  );
+}
+
+// ── File input ────────────────────────────────────────────────────
+document.getElementById('file-input').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (f) loadGLB(URL.createObjectURL(f), true);
+  e.target.value = '';
+});
+
+// ── Drag & drop ───────────────────────────────────────────────────
+const dropOverlay = document.getElementById('drop-overlay');
+let dragN = 0;
+document.addEventListener('dragenter', e => { e.preventDefault(); if(++dragN===1) dropOverlay.classList.add('show'); });
+document.addEventListener('dragleave', () => { if(--dragN<=0){ dragN=0; dropOverlay.classList.remove('show'); } });
+document.addEventListener('dragover',  e => e.preventDefault());
+document.addEventListener('drop', e => {
+  e.preventDefault(); dragN=0; dropOverlay.classList.remove('show');
+  const f = e.dataTransfer.files[0];
+  if (f && /\.(glb|gltf)$/i.test(f.name)) loadGLB(URL.createObjectURL(f), true);
+});
+
+// ── Double-click → reset camera ───────────────────────────────────
+renderer.domElement.addEventListener('dblclick', () => {
+  camera.position.set(0, 8, 22);
+  controls.target.set(0, 0, 0);
+  camera.near = 0.1; camera.far = 2000;
+  camera.updateProjectionMatrix();
+  controls.update();
+});
+
+// ── Resize ────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  const w = window.innerWidth, h = window.innerHeight;
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+  composer.setSize(w, h);
+  fxaaPass.material.uniforms['resolution'].value.set(1/w, 1/h);
+  if (ssaoPass) ssaoPass.setSize(w, h);
+});
+
+// ── Render loop ───────────────────────────────────────────────────
+let tick = 0;
+(function loop() {
+  requestAnimationFrame(loop);
+  tick++;
+  controls.update();
+  if (defaultGroup.visible) {
+    defaultGroup.traverse(o => {
+      if (o.isPointLight) o.intensity = 2.5 + Math.sin(tick*.025 + o.position.x*.5) * 1.0;
+    });
+  }
+  composer.render();
+})();
+</script>
+</body>
+</html>

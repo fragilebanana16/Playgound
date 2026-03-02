@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>自行车模型动画</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    gap: 16px;
+    min-height: 100vh;
+  }
+  h1 { font-size: 1.1rem; color: #58a6ff; letter-spacing: 0.05em; }
+
+  canvas {
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    background: #0d1117;
+  }
+
+  .controls {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  label { font-size: 0.75rem; color: #8b949e; }
+
+  input[type=range] {
+    width: 140px;
+    accent-color: #58a6ff;
+  }
+
+  .val { font-size: 0.8rem; color: #e6edf3; font-weight: bold; }
+
+  button {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  button:hover { background: #30363d; }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    font-size: 0.75rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .line-sample { width: 24px; height: 3px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<h1>自行车模型 — 前后轮轨迹</h1>
+
+<canvas id="c" width="600" height="500"></canvas>
+
+<div class="legend">
+  <div class="legend-item"><div class="line-sample" style="background:#3fb950"></div>后轮轨迹</div>
+  <div class="legend-item"><div class="line-sample" style="background:#f78166"></div>前轮轨迹</div>
+  <div class="legend-item"><div class="line-sample" style="background:#d29922; height:2px; border-top: 2px dashed #d29922; background:none;"></div>车身</div>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <label>转向角 θ</label>
+    <input type="range" id="steer" min="-40" max="40" value="20" step="1">
+    <div class="val" id="steerVal">20°</div>
+  </div>
+  <div class="control-group">
+    <label>速度</label>
+    <input type="range" id="speed" min="0.5" max="4" value="1.5" step="0.1">
+    <div class="val" id="speedVal">1.5</div>
+  </div>
+  <div class="control-group">
+    <label>轴距 L</label>
+    <input type="range" id="wb" min="30" max="100" value="60" step="5">
+    <div class="val" id="wbVal">60</div>
+  </div>
+  <button id="resetBtn">清除轨迹</button>
+  <button id="pauseBtn">暂停</button>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+// 车辆状态
+let state = {
+  x: W / 2,       // 后轮世界坐标
+  y: H / 2 + 50,
+  heading: -Math.PI / 2,  // 朝向（弧度），初始朝上
+  speed: 1.5,
+  steer: 20 * Math.PI / 180,
+  wheelbase: 60,
+};
+
+let rearTrail = [];
+let frontTrail = [];
+let paused = false;
+let animId;
+
+// 控件
+const steerSlider = document.getElementById('steer');
+const speedSlider = document.getElementById('speed');
+const wbSlider = document.getElementById('wb');
+const steerVal = document.getElementById('steerVal');
+const speedVal = document.getElementById('speedVal');
+const wbVal = document.getElementById('wbVal');
+
+steerSlider.addEventListener('input', () => {
+  state.steer = steerSlider.value * Math.PI / 180;
+  steerVal.textContent = steerSlider.value + '°';
+});
+speedSlider.addEventListener('input', () => {
+  state.speed = parseFloat(speedSlider.value);
+  speedVal.textContent = speedSlider.value;
+});
+wbSlider.addEventListener('input', () => {
+  state.wheelbase = parseInt(wbSlider.value);
+  wbVal.textContent = wbSlider.value;
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  rearTrail = [];
+  frontTrail = [];
+  state.x = W / 2;
+  state.y = H / 2 + 50;
+  state.heading = -Math.PI / 2;
+});
+document.getElementById('pauseBtn').addEventListener('click', () => {
+  paused = !paused;
+  document.getElementById('pauseBtn').textContent = paused ? '继续' : '暂停';
+  if (!paused) loop();
+});
+
+function getFrontWheel() {
+  return {
+    x: state.x + Math.cos(state.heading) * state.wheelbase,
+    y: state.y + Math.sin(state.heading) * state.wheelbase,
+  };
+}
+
+function update() {
+  const L = state.wheelbase;
+  const v = state.speed;
+  const theta = state.steer;
+
+  // 自行车模型运动学
+  // yaw_rate = v * tan(theta) / L
+  const yawRate = v * Math.tan(theta) / L;
+  state.heading += yawRate;
+
+  state.x += Math.cos(state.heading) * v;
+  state.y += Math.sin(state.heading) * v;
+
+  // 环绕边界
+  state.x = ((state.x % W) + W) % W;
+  state.y = ((state.y % H) + H) % H;
+
+  const front = getFrontWheel();
+
+  // 记录轨迹（限制长度）
+  rearTrail.push({ x: state.x, y: state.y });
+  frontTrail.push({ x: front.x, y: front.y });
+  if (rearTrail.length > 2000) rearTrail.shift();
+  if (frontTrail.length > 2000) frontTrail.shift();
+}
+
+function drawTrail(trail, color) {
+  if (trail.length < 2) return;
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.7;
+  ctx.moveTo(trail[0].x, trail[0].y);
+  for (let i = 1; i < trail.length; i++) {
+    // 如果两点距离太远（绕边界），断开
+    const dx = Math.abs(trail[i].x - trail[i-1].x);
+    const dy = Math.abs(trail[i].y - trail[i-1].y);
+    if (dx > 100 || dy > 100) {
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(trail[i].x, trail[i].y);
+    } else {
+      ctx.lineTo(trail[i].x, trail[i].y);
+    }
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+function drawCar() {
+  const front = getFrontWheel();
+  const L = state.wheelbase;
+  const theta = state.steer;
+
+  // 车身
+  ctx.beginPath();
+  ctx.strokeStyle = '#d29922';
+  ctx.lineWidth = 3;
+  ctx.moveTo(state.x, state.y);
+  ctx.lineTo(front.x, front.y);
+  ctx.stroke();
+
+  // 后轮
+  drawWheel(state.x, state.y, state.heading, '#3fb950', 'P 后轮');
+
+  // 前轮（转向）
+  drawWheel(front.x, front.y, state.heading + theta, '#f78166', 'Q 前轮');
+
+  // 标注转弯半径
+  if (Math.abs(theta) > 0.01) {
+    const R = L / Math.tan(theta);
+    // 圆心在后轮侧方
+    const cx = state.x - Math.sin(state.heading) * R;
+    const cy = state.y + Math.cos(state.heading) * R;
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#58a6ff';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(state.x, state.y);
+    ctx.lineTo(cx, cy);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 圆心点
+    ctx.beginPath();
+    ctx.fillStyle = '#58a6ff';
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // R 标注
+    const mx = (state.x + cx) / 2;
+    const my = (state.y + cy) / 2;
+    ctx.fillStyle = '#58a6ff';
+    ctx.font = '11px JetBrains Mono';
+    ctx.fillText(`R=${Math.abs(R).toFixed(0)}`, mx + 4, my);
+  }
+}
+
+function drawWheel(x, y, angle, color, label) {
+  const wl = 14, ww = 6;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.fillStyle = color;
+  ctx.fillRect(-wl/2, -ww/2, wl, ww);
+  ctx.restore();
+
+  // 轮子中心点
+  ctx.beginPath();
+  ctx.fillStyle = color;
+  ctx.arc(x, y, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawInfo() {
+  const L = state.wheelbase;
+  const theta = state.steer;
+  const R = Math.abs(theta) > 0.01 ? (L / Math.tan(theta)).toFixed(1) : '∞';
+  const Rfront = Math.abs(theta) > 0.01
+    ? (Math.sqrt(L*L + Math.pow(L/Math.tan(theta), 2))).toFixed(1)
+    : '∞';
+
+  ctx.fillStyle = '#161b22';
+  ctx.fillRect(8, 8, 220, 90);
+  ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(8, 8, 220, 90);
+
+  ctx.font = '11px JetBrains Mono';
+  ctx.fillStyle = '#8b949e';
+  ctx.fillText(`转向角 θ = ${(theta * 180 / Math.PI).toFixed(1)}°`, 16, 28);
+  ctx.fillStyle = '#3fb950';
+  ctx.fillText(`后轮半径 R  = ${R}`, 16, 48);
+  ctx.fillStyle = '#f78166';
+  ctx.fillText(`前轮半径 R前 = ${Rfront}`, 16, 68);
+  ctx.fillStyle = '#d29922';
+  ctx.fillText(`轴距 L = ${L}`, 16, 88);
+}
+
+function loop() {
+  if (paused) return;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // 网格
+  ctx.strokeStyle = '#161b22';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (let y = 0; y < H; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  update();
+  drawTrail(rearTrail, '#3fb950');
+  drawTrail(frontTrail, '#f78166');
+  drawCar();
+  drawInfo();
+
+  animId = requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DecalManager 使用示例</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #container {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script src="../../libs/three.min.js"></script>
+    <script src="../../libs/OrbitControls.js"></script>
+    <script src="../../libs/DecalGeometry.js"></script>
+    <script src="../../libs/GLTFLoader.js"></script>
+    <script src="../../libs/lil-gui@0.21.js"></script>
+    
+    <!-- 引入DecalManager类 -->
+    <script src="DecalManager.js"></script>
+
+    <script>
+        const container = document.getElementById('container');
+
+        let renderer, scene, camera, controls;
+        let mesh;
+        let decalManager;
+
+        // 初始化场景
+        function init() {
+            // 创建渲染器
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            // 创建场景
+            scene = new THREE.Scene();
+
+            // 创建相机
+            camera = new THREE.PerspectiveCamera(
+                45,
+                window.innerWidth / window.innerHeight,
+                1,
+                1000
+            );
+            camera.position.z = 120;
+
+            // 创建轨道控制器
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.minDistance = 50;
+            controls.maxDistance = 200;
+
+            // 添加光照
+            scene.add(new THREE.AmbientLight(0x443333));
+
+            const dirLight1 = new THREE.DirectionalLight(0xffddcc, 1);
+            dirLight1.position.set(1, 0.75, 0.5);
+            scene.add(dirLight1);
+
+            const dirLight2 = new THREE.DirectionalLight(0xccccff, 1);
+            dirLight2.position.set(-1, 0.75, -0.5);
+            scene.add(dirLight2);
+
+            // 创建DecalManager实例
+            decalManager = new DecalManager(scene, camera, renderer.domElement, {
+                minScale: 10,
+                maxScale: 20,
+                rotate: true,
+                decalDiffuseUrl: 'textures/decal/decal-diffuse.png',
+                decalNormalUrl: 'textures/decal/decal-normal.jpg'
+            });
+
+            // 当OrbitControls改变时，标记为已移动
+            controls.addEventListener('change', function() {
+                decalManager.markAsMoved();
+            });
+
+            // 加载模型
+            loadModel();
+
+            // 创建GUI控制面板
+            setupGUI();
+
+            // 监听窗口大小变化
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        // 加载3D模型
+        function loadModel() {
+            const loader = new THREE.GLTFLoader();
+            const textureLoader = new THREE.TextureLoader();
+
+            loader.load('models/LeePerrySmith/LeePerrySmith.glb', function(gltf) {
+                mesh = gltf.scene.children[0];
+                mesh.material = new THREE.MeshPhongMaterial({
+                    specular: 0x111111,
+                    map: textureLoader.load('models/LeePerrySmith/Map-COL.jpg'),
+                    specularMap: textureLoader.load('models/LeePerrySmith/Map-SPEC.jpg'),
+                    normalMap: textureLoader.load('models/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg'),
+                    shininess: 25
+                });
+
+                scene.add(mesh);
+                mesh.scale.set(10, 10, 10);
+
+                // 设置DecalManager的目标网格
+                decalManager.setTargetMesh(mesh);
+            });
+        }
+
+        // 设置GUI控制面板
+        function setupGUI() {
+            const gui = new lil.GUI();
+            
+            const params = decalManager.getParams();
+            
+            gui.add(params, 'minScale', 1, 30).onChange(value => {
+                decalManager.setParams({ minScale: value });
+            });
+            
+            gui.add(params, 'maxScale', 1, 30).onChange(value => {
+                decalManager.setParams({ maxScale: value });
+            });
+            
+            gui.add(params, 'rotate').onChange(value => {
+                decalManager.setParams({ rotate: value });
+            });
+            
+            gui.add({
+                clear: () => decalManager.clearDecals()
+            }, 'clear').name('清除贴花');
+            
+            gui.add({
+                toggleHelper: true
+            }, 'toggleHelper').name('显示辅助器').onChange(value => {
+                decalManager.setHelperVisible(value);
+            });
+            
+            gui.open();
+        }
+
+        // 窗口大小改变
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        // 启动
+        init();
+        animate();
+
+        // 清理资源
+        window.addEventListener('beforeunload', () => {
+            if (decalManager) {
+                decalManager.dispose();
+            }
+        });
+    </script>
+</body>
+</html>

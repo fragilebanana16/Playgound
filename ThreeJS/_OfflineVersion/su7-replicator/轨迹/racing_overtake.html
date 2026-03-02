@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>双车飙车超车演示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #000; font-family: 'Courier New', monospace; }
+        #ui {
+            position: absolute; top: 20px; left: 20px; color: #fff;
+            background: rgba(0,0,0,0.85); padding: 14px 18px;
+            border-radius: 4px; pointer-events: none;
+            border-left: 3px solid #ff3300;
+            font-size: 13px; line-height: 1.9;
+        }
+        #ui b { color: #ff9900; letter-spacing: 1px; font-size: 14px; }
+        .val  { color: #ff3300; font-weight: bold; }
+        .val2 { color: #00ccff; font-weight: bold; }
+        #speed-panel {
+            position: absolute; top: 20px; right: 20px;
+            color: #fff; background: rgba(0,0,0,0.85);
+            padding: 14px 18px; border-radius: 4px;
+            border-right: 3px solid #00ccff;
+            font-size: 13px; line-height: 2.1;
+            pointer-events: none;
+        }
+        #speed-panel b { color: #ffcc00; letter-spacing: 1px; }
+        .spd { font-size: 22px; font-weight: bold; }
+        #state-badge {
+            position: absolute; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            color: #fff; background: rgba(0,0,0,0.8);
+            padding: 8px 24px; border-radius: 20px;
+            font-size: 14px; letter-spacing: 2px;
+            border: 1px solid #444;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <b>⚡ 双车飙车 · 同向超车</b><br><br>
+        🔴 红车：<span class="val">79 km/h</span><br>
+        🔵 蓝车：<span class="val2">72 km/h</span><br>
+        ⬜ 前车：<span style="color:#aaa">43 km/h</span><br><br>
+        🏁 超完后各占一道并排
+    </div>
+    <div id="speed-panel">
+        <b>实时速度</b><br>
+        🔴 <span class="spd" id="red-spd"   style="color:#ff3300">--</span> km/h<br>
+        🔵 <span class="spd" id="blue-spd"  style="color:#00ccff">--</span> km/h<br>
+        ⬜ <span class="spd" id="white-spd" style="color:#aaa">--</span> km/h
+    </div>
+    <div id="state-badge">⏳ 接近前车...</div>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        const scene    = new THREE.Scene();
+        scene.fog      = new THREE.Fog(0x000000, 80, 400);
+        const camera   = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(innerWidth, innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        /* ── 光源 ─────────────────────────────────── */
+        scene.add(new THREE.AmbientLight(0x223355, 3));
+        const sun = new THREE.DirectionalLight(0xffffff, 2.5);
+        sun.position.set(30, 60, 40);
+        sun.castShadow = true;
+        scene.add(sun);
+        const redGlow  = new THREE.PointLight(0xff2200, 4, 20);
+        const blueGlow = new THREE.PointLight(0x0066ff, 4, 20);
+        scene.add(redGlow, blueGlow);
+
+        /* ── 道路布局 ─────────────────────────────
+           3条车道，每道宽 W=3.6，总宽 10.8
+           车道中心 X:  左=-3.6, 中=0, 右=+3.6
+           前车走中道(x=0)
+           红车起始左道(x=-3.6)，超车后切入左道(x=-3.6)并排
+           蓝车起始右道(x=+3.6)，超车后切入右道(x=+3.6)并排
+           超车过程：两车都短暂穿越中道两侧夹住前车
+        ─────────────────────────────────────────── */
+        const LANE_W  = 3.6;   // 单车道宽
+        const ROAD_W  = LANE_W * 3;  // 总宽 10.8
+        // 车宽略小于车道，视觉上撑满
+        const CAR_W   = 2.8;
+        const CAR_H   = 0.9;
+        const CAR_L   = 5.0;
+
+        const road = new THREE.Mesh(
+            new THREE.PlaneGeometry(ROAD_W, 3000),
+            new THREE.MeshStandardMaterial({ color: 0x161625, roughness: 0.95 })
+        );
+        road.rotation.x = -Math.PI / 2;
+        road.position.set(0, 0, 1000);
+        road.receiveShadow = true;
+        scene.add(road);
+
+        // 中心黄虚线
+        for (let i = 0; i < 500; i++) {
+            const dash = new THREE.Mesh(
+                new THREE.PlaneGeometry(0.14, 4.0),
+                new THREE.MeshBasicMaterial({ color: 0xffee44 })
+            );
+            dash.rotation.x = -Math.PI / 2;
+            dash.position.set(0, 0.01, i * 10);
+            scene.add(dash);
+        }
+        // 路边白实线
+        [-ROAD_W / 2, ROAD_W / 2].forEach(x => {
+            for (let i = 0; i < 500; i++) {
+                const l = new THREE.Mesh(
+                    new THREE.PlaneGeometry(0.14, 7),
+                    new THREE.MeshBasicMaterial({ color: 0xffffff })
+                );
+                l.rotation.x = -Math.PI / 2;
+                l.position.set(x, 0.01, i * 10);
+                scene.add(l);
+            }
+        });
+        // 车道分隔白虚线（左/右道与中道之间）
+        [-LANE_W, LANE_W].forEach(x => {
+            for (let i = 0; i < 500; i++) {
+                const l = new THREE.Mesh(
+                    new THREE.PlaneGeometry(0.10, 2.5),
+                    new THREE.MeshBasicMaterial({ color: 0x888888 })
+                );
+                l.rotation.x = -Math.PI / 2;
+                l.position.set(x, 0.01, i * 10 + 5);
+                scene.add(l);
+            }
+        });
+        // 路灯
+        for (let i = 0; i < 100; i++) {
+            const poleX = ROAD_W / 2 + 1.0;
+            const pole = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.08, 0.08, 7),
+                new THREE.MeshStandardMaterial({ color: 0x334455 })
+            );
+            pole.position.set(poleX, 3.5, i * 16);
+            scene.add(pole);
+            const lamp = new THREE.Mesh(
+                new THREE.SphereGeometry(0.28),
+                new THREE.MeshBasicMaterial({ color: 0xffffcc })
+            );
+            lamp.position.set(poleX, 7.2, i * 16);
+            scene.add(lamp);
+            const pl = new THREE.PointLight(0xffffcc, 0.6, 30);
+            pl.position.copy(lamp.position);
+            scene.add(pl);
+        }
+
+        /* ── 车体构造 ─────────────────────────────── */
+        function buildCar(bodyColor, hlColor) {
+            const g   = new THREE.Group();
+            const mat = c => new THREE.MeshStandardMaterial({ color: c, metalness: 0.75, roughness: 0.28 });
+
+            // 车身
+            const body = new THREE.Mesh(new THREE.BoxGeometry(CAR_W, CAR_H, CAR_L), mat(bodyColor));
+            body.castShadow = true;
+            g.add(body);
+
+            // 车顶
+            const roof = new THREE.Mesh(new THREE.BoxGeometry(CAR_W * 0.82, CAR_H * 0.85, CAR_L * 0.52), mat(bodyColor));
+            roof.position.set(0, CAR_H * 0.92, -CAR_L * 0.06);
+            roof.castShadow = true;
+            g.add(roof);
+
+            // 前风挡
+            const ws = new THREE.Mesh(
+                new THREE.PlaneGeometry(CAR_W * 0.76, CAR_H * 0.65),
+                new THREE.MeshStandardMaterial({ color: 0x88aaee, transparent: true, opacity: 0.42, side: THREE.DoubleSide })
+            );
+            ws.rotation.x = -0.38;
+            ws.position.set(0, CAR_H * 0.95, CAR_L * 0.30);
+            g.add(ws);
+
+            // 前大灯
+            [-CAR_W * 0.33, CAR_W * 0.33].forEach(x => {
+                const hl = new THREE.Mesh(new THREE.SphereGeometry(0.22), new THREE.MeshBasicMaterial({ color: hlColor }));
+                hl.position.set(x, 0.05, CAR_L * 0.50);
+                g.add(hl);
+            });
+
+            // 尾灯
+            [-CAR_W * 0.31, CAR_W * 0.31].forEach(x => {
+                const tl = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.22, 0.10), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+                tl.position.set(x, 0.05, -CAR_L * 0.50);
+                g.add(tl);
+            });
+
+            // 四轮（index 5-8）
+            const wGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.32, 12);
+            const wMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+            [[CAR_W*0.52, -0.35,  CAR_L*0.30], [-CAR_W*0.52, -0.35,  CAR_L*0.30],
+             [CAR_W*0.52, -0.35, -CAR_L*0.30], [-CAR_W*0.52, -0.35, -CAR_L*0.30]].forEach(([x, y, z]) => {
+                const w = new THREE.Mesh(wGeo, wMat);
+                w.rotation.z = Math.PI / 2;
+                w.position.set(x, y, z);
+                g.add(w);
+            });
+
+            return g;
+        }
+
+        /* ── Car 类 ───────────────────────────────────
+           状态机：
+             follow   → 跟在后面
+             overtake → 变道插到前车两侧夹住
+             passed   → 已超过，保持新车道(各占左/右道)并排跑，不再归位
+        ─────────────────────────────────────────────── */
+        class Car {
+            constructor(color, hlColor, speed, startX, startZ, laneX, overtakeX, finalX) {
+                this.mesh     = buildCar(color, hlColor);
+                this.mesh.position.set(startX, CAR_H * 0.5 - 0.05, startZ);
+                scene.add(this.mesh);
+
+                this.speed    = speed;
+                this.wbase    = CAR_L * 0.60;
+                this.maxSteer = Math.PI / 12;
+
+                this.laneX    = laneX;      // 起始车道
+                this.overtakeX= overtakeX;  // 超车时穿越的X
+                this.finalX   = finalX;     // 超完后并排的目标X
+                this.targetX  = laneX;
+                this.state    = 'follow';
+                this.trail    = [];
+            }
+
+            get position() { return this.mesh.position; }
+
+            update(delta, front, straight = false) {
+                if (straight) {
+                    // 前车：锁死中道，只直线前进
+                    this.mesh.rotation.y = 0;
+                    this.mesh.position.x = this.laneX;
+                    this.mesh.position.z += this.speed * delta;
+                    this._wheels(delta);
+                    return;
+                }
+                if (front) this._fsm(front);
+                this._drive(delta);
+                this._wheels(delta);
+                if (Math.random() > 0.72) this._spark();
+            }
+
+            _fsm(front) {
+                const gap = front.position.z - this.mesh.position.z;
+
+                if (this.state === 'follow') {
+                    // 接近前车时开始变道超车
+                    if (gap > 2 && gap < 28) {
+                        this.state   = 'overtake';
+                        this.targetX = this.overtakeX;
+                    }
+                } else if (this.state === 'overtake') {
+                    // 车头超过前车车头 4 单位后，切到并排车道
+                    if (gap < -4) {
+                        this.state   = 'passed';
+                        this.targetX = this.finalX;
+                    }
+                }
+                // passed 状态：维持 finalX 并排，不再改变
+            }
+
+            _drive(delta) {
+                const ahead = 16;
+                const tp    = new THREE.Vector3(this.targetX, 0, this.mesh.position.z + ahead);
+                const lp    = this.mesh.worldToLocal(tp.clone());
+                const dist  = lp.length();
+                const alpha = Math.atan2(lp.x, lp.z);
+                let   steer = Math.atan2(2 * this.wbase * Math.sin(alpha), dist);
+                steer = THREE.MathUtils.clamp(steer, -this.maxSteer, this.maxSteer);
+
+                const yr = (this.speed / this.wbase) * Math.tan(steer);
+                this.mesh.rotation.y += yr * delta;
+
+                const dir = new THREE.Vector3(0, 0, 1).applyQuaternion(this.mesh.quaternion);
+                this.mesh.position.addScaledVector(dir, this.speed * delta);
+            }
+
+            _wheels(delta) {
+                for (let i = 5; i <= 8; i++) {
+                    if (this.mesh.children[i]) this.mesh.children[i].rotation.x += this.speed * delta * 1.8;
+                }
+            }
+
+            _spark() {
+                const p = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.07),
+                    new THREE.MeshBasicMaterial({
+                        color: this.mesh.children[0].material.color,
+                        transparent: true, opacity: 0.9
+                    })
+                );
+                p.position.copy(this.mesh.position);
+                p.position.x += (Math.random() - 0.5) * 1.2;
+                p.position.z -= 2.8;
+                scene.add(p);
+                this.trail.push({ mesh: p, life: 1.0 });
+            }
+
+            updateTrail(delta) {
+                this.trail.forEach(t => {
+                    t.life -= delta * 2.2;
+                    t.mesh.material.opacity = Math.max(0, t.life * 0.8);
+                    t.mesh.scale.setScalar(Math.max(0.01, t.life));
+                });
+                this.trail = this.trail.filter(t => {
+                    if (t.life <= 0) { scene.remove(t.mesh); return false; }
+                    return true;
+                });
+            }
+        }
+
+        /*
+          车道X:  左=-3.6  中=0  右=+3.6
+
+          前车(灰): 中道 x=0，Z=70
+          红车: 起始左道 x=-3.6，超车时向右穿过 x=-1.2（夹左侧），超完后并排占左道 x=-3.6
+          蓝车: 起始右道 x=+3.6，超车时向左穿过 x=+1.2（夹右侧），超完后并排占右道 x=+3.6
+
+          效果：两车从两侧夹住前车超过，超完各占一道并排飙车
+        */
+        const slowCar = new Car(0x8899aa, 0xffffaa, 12,  0,       70,  0,       0,       0);
+        const redCar  = new Car(0xff2200, 0xffffff, 22, -LANE_W,   0, -LANE_W, -LANE_W/3, -LANE_W);
+        const blueCar = new Car(0x0088ff, 0xffffff, 20,  LANE_W,  10,  LANE_W,  LANE_W/3,  LANE_W);
+
+        const badge = document.getElementById('state-badge');
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = Math.min(clock.getDelta(), 0.05);
+
+            slowCar.update(delta, null, true);
+            redCar.update(delta, slowCar);
+            blueCar.update(delta, slowCar);
+            redCar.updateTrail(delta);
+            blueCar.updateTrail(delta);
+
+            redGlow.position.set(redCar.position.x,  1.5, redCar.position.z);
+            blueGlow.position.set(blueCar.position.x, 1.5, blueCar.position.z);
+
+            // 相机跟随两辆快车的中点，俯视角
+            const midX = (redCar.position.x + blueCar.position.x) * 0.5;
+            const midZ = (redCar.position.z + blueCar.position.z) * 0.5;
+            camera.position.lerp(new THREE.Vector3(midX, 22, midZ - 38), 0.05);
+            camera.lookAt(new THREE.Vector3(midX, 0, midZ + 22));
+
+            // 状态徽章
+            const rs = redCar.state, bs = blueCar.state;
+            if (rs === 'overtake' || bs === 'overtake') {
+                badge.textContent = '🚀 双车夹击超车！';
+                badge.style.borderColor = '#ff3300';
+            } else if (rs === 'passed' && bs === 'passed') {
+                badge.textContent = '🏁 各占一道，并排飙车！';
+                badge.style.borderColor = '#ffcc00';
+            } else if (rs === 'passed' || bs === 'passed') {
+                badge.textContent = '💨 超过！切道中...';
+                badge.style.borderColor = '#00ccff';
+            } else {
+                badge.textContent = '⏳ 接近前车...';
+                badge.style.borderColor = '#444';
+            }
+
+            document.getElementById('red-spd').textContent   = Math.round(redCar.speed  * 3.6);
+            document.getElementById('blue-spd').textContent  = Math.round(blueCar.speed * 3.6);
+            document.getElementById('white-spd').textContent = Math.round(slowCar.speed * 3.6);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth, innerHeight);
+        });
+    </script>
+</body>
+</html>

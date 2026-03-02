@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Pure Pursuit 几何推导</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Noto Serif SC', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    gap: 40px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #58a6ff;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  .container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .diagram-box {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .diagram-box h2 {
+    font-size: 0.95rem;
+    color: #8b949e;
+    font-weight: 400;
+    text-align: center;
+  }
+
+  .formula-box {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 24px 32px;
+    max-width: 360px;
+  }
+
+  .formula-box h2 {
+    font-size: 0.9rem;
+    color: #8b949e;
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  .formula-step {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #e6edf3;
+    padding: 8px 0;
+    border-bottom: 1px solid #21262d;
+    line-height: 1.8;
+  }
+
+  .formula-step:last-child { border-bottom: none; }
+
+  .formula-step .comment {
+    color: #8b949e;
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .highlight { color: #f78166; font-weight: 600; }
+  .blue { color: #58a6ff; }
+  .green { color: #3fb950; }
+  .yellow { color: #d29922; }
+
+  svg text {
+    font-family: 'JetBrains Mono', monospace;
+  }
+</style>
+</head>
+<body>
+
+<h1>Pure Pursuit — 转向角几何推导</h1>
+
+<div class="container">
+
+  <!-- 图1：自行车模型 -->
+  <div class="diagram-box">
+    <h2>自行车模型（俯视）</h2>
+    <svg width="320" height="280" viewBox="0 0 320 280">
+      <!-- 圆心 -->
+      <circle cx="60" cy="80" r="5" fill="#58a6ff"/>
+      <text x="40" y="72" fill="#58a6ff" font-size="13">O (圆心)</text>
+
+      <!-- 后轮 -->
+      <circle cx="60" cy="200" r="6" fill="#3fb950"/>
+      <text x="70" y="205" fill="#3fb950" font-size="13">P (后轮)</text>
+
+      <!-- 前轮 -->
+      <circle cx="220" cy="200" r="6" fill="#f78166"/>
+      <text x="228" y="205" fill="#f78166" font-size="13">Q (前轮)</text>
+
+      <!-- R：圆心到后轮 -->
+      <line x1="60" y1="80" x2="60" y2="200" stroke="#58a6ff" stroke-width="2" stroke-dasharray="6,3"/>
+      <text x="30" y="148" fill="#58a6ff" font-size="13">R</text>
+
+      <!-- wheelbase：后轮到前轮 -->
+      <line x1="60" y1="200" x2="220" y2="200" stroke="#3fb950" stroke-width="2.5"/>
+      <text x="125" y="220" fill="#3fb950" font-size="13">L (轴距)</text>
+
+      <!-- 圆心到前轮 (斜线) -->
+      <line x1="60" y1="80" x2="220" y2="200" stroke="#d29922" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="155" y="128" fill="#d29922" font-size="12">R前</text>
+
+      <!-- 直角符号 at P -->
+      <rect x="60" y="180" width="14" height="14" fill="none" stroke="#8b949e" stroke-width="1.5"/>
+
+      <!-- 前轮方向箭头（转向角） -->
+      <line x1="220" y1="200" x2="260" y2="140" stroke="#f78166" stroke-width="2"/>
+      <polygon points="260,140 248,150 255,162" fill="#f78166"/>
+      <text x="262" y="155" fill="#f78166" font-size="12">前轮方向</text>
+
+      <!-- steeringAngle 弧 -->
+      <path d="M 220,200 A 30,30 0 0,0 250,175" fill="none" stroke="#f78166" stroke-width="1.5"/>
+      <text x="240" y="198" fill="#f78166" font-size="12">θ</text>
+
+      <!-- 垂直线（车身方向参考） -->
+      <line x1="220" y1="200" x2="220" y2="155" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
+
+      <!-- 角标注 -->
+      <text x="20" y="260" fill="#8b949e" font-size="11">∠OPQ = 90°（圆心在后轮正侧方）</text>
+    </svg>
+  </div>
+
+  <!-- 图2：Pure Pursuit 圆弧 -->
+  <div class="diagram-box">
+    <h2>Pure Pursuit — 车走圆弧到目标点</h2>
+    <svg width="320" height="300" viewBox="0 0 320 300">
+
+      <!-- 大圆弧（转弯轨迹） -->
+      <path d="M 160,260 A 120,120 0 0,1 60,150" fill="none" stroke="#30363d" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+      <!-- 圆心 -->
+      <circle cx="60" cy="260" r="5" fill="#58a6ff"/>
+      <text x="12" y="275" fill="#58a6ff" font-size="12">圆心 O</text>
+
+      <!-- 车（后轮位置） -->
+      <circle cx="160" cy="260" r="7" fill="#3fb950"/>
+      <text x="168" y="265" fill="#3fb950" font-size="12">车 P</text>
+
+      <!-- 目标点 -->
+      <circle cx="60" cy="150" r="7" fill="#f78166"/>
+      <text x="18" y="145" fill="#f78166" font-size="12">目标 T</text>
+
+      <!-- R：圆心到车 -->
+      <line x1="60" y1="260" x2="160" y2="260" stroke="#58a6ff" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="100" y="278" fill="#58a6ff" font-size="12">R</text>
+
+      <!-- R：圆心到目标 -->
+      <line x1="60" y1="260" x2="60" y2="150" stroke="#58a6ff" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="28" y="210" fill="#58a6ff" font-size="12">R</text>
+
+      <!-- 弦：车到目标（distance） -->
+      <line x1="160" y1="260" x2="60" y2="150" stroke="#d29922" stroke-width="2.5"/>
+      <text x="120" y="196" fill="#d29922" font-size="12">distance</text>
+
+      <!-- 车头方向（+Z） -->
+      <line x1="160" y1="260" x2="160" y2="190" stroke="#3fb950" stroke-width="2"/>
+      <polygon points="160,190 154,204 166,204" fill="#3fb950"/>
+      <text x="165" y="220" fill="#3fb950" font-size="12">车头方向</text>
+
+      <!-- alpha 角 -->
+      <path d="M 160,260 A 40,40 0 0,0 133,230" fill="none" stroke="#d29922" stroke-width="1.5"/>
+      <text x="128" y="255" fill="#d29922" font-size="13">α</text>
+
+      <!-- 直角 at O（OP⊥OT 不对，这里标chord midpoint） -->
+      <!-- 弦的中点到圆心连线垂直于弦 -->
+      <line x1="60" y1="260" x2="110" y2="205" stroke="#8b949e" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <text x="10" y="295" fill="#8b949e" font-size="11">弦长 = 2R·sin(α)</text>
+    </svg>
+  </div>
+
+</div>
+
+<!-- 公式推导 -->
+<div class="formula-box">
+  <h2>推导过程</h2>
+
+  <div class="formula-step">
+    <span class="comment">① 弦长公式（圆几何）</span>
+    <span class="blue">distance</span> = 2R · sin(<span class="yellow">α</span>)
+    <span class="comment">→ R = distance / (2·sin(α))</span>
+  </div>
+
+  <div class="formula-step">
+    <span class="comment">② 自行车模型（直角三角形 OPQ）</span>
+    tan(<span class="highlight">θ</span>) = L / R
+    <span class="comment">→ R = L / tan(θ)</span>
+  </div>
+
+  <div class="formula-step">
+    <span class="comment">③ 联立①②</span>
+    L / tan(<span class="highlight">θ</span>) = distance / (2·sin(<span class="yellow">α</span>))
+  </div>
+
+  <div class="formula-step">
+    <span class="comment">④ 解出转向角</span>
+    tan(<span class="highlight">θ</span>) = 2·L·sin(<span class="yellow">α</span>) / <span class="blue">distance</span>
+    <br>
+    <span class="highlight">θ</span> = atan( 2·L·sin(<span class="yellow">α</span>) / <span class="blue">distance</span> )
+  </div>
+
+  <div class="formula-step">
+    <span class="comment">⑤ 代码实现</span>
+    <span style="color:#3fb950">Math.atan2</span>(2·wheelbase·sin(<span class="yellow">α</span>), <span class="blue">distance</span>)
+  </div>
+</div>
+
+</body>
+</html>
