@@ -241,13 +241,13 @@ async function main() {
     // 添加 SSR 效果
     ssrConfig = scene0.effectComposer.addConfig(new SSRConfig({
                 enabled: true,
-                opacity: 0.5,
-                maxDistance: 0.3, // 原来 0.2 × 6 = 1.2，控制反射能追踪多远
-                thickness: 0.1, // 原来 0.018 × 6 ≈ 0.1，控制物体厚度判断
+                opacity: 0.2,
+                maxDistance: 0.3,
+                thickness: 0.1,
                 infiniteThick: false,
                 output: 0,
             }));
-    //guiManager.addSSRToGUI("Start", ssrConfig);
+    guiManager.addSSRToGUI("Start", ssrConfig);
 
     //scene0.effectComposer.addConfig(new SMAAConfig()); // 作用不大
 
@@ -366,7 +366,7 @@ async function main() {
     // orbit
     sceneManager.enableAutoOrbit({
         target: new THREE.Vector3(0, 0.5, 0),
-        radius: 30
+        radius: 24
     });
     const bar = document.querySelector('#loading-bar');
     const text = document.querySelector('#loading-text');
@@ -708,9 +708,9 @@ class CustomScene {
         this.lights.ambient = ambient;
         this.scene.add(ambient);
 
-        const dirLight = new THREE.DirectionalLight(0xfff4e0, 1.07);
-        dirLight.position.set(424, 559, -518);
-        dirLight.castShadow = true;
+       /*  const dirLight = new THREE.DirectionalLight(0xfff4e0, 1.07);
+        dirLight.position.set(424, 559, -518); */
+       /*  dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 4096;
         dirLight.shadow.mapSize.height = 4096;
         dirLight.shadow.bias = -0.005;
@@ -722,16 +722,16 @@ class CustomScene {
         dirLight.shadow.camera.top = 500;
         dirLight.shadow.camera.bottom = -500;
         dirLight.shadow.camera.updateProjectionMatrix();
-        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.enabled = true; */
         /* const shadowCamHelper = new THREE.CameraHelper(dirLight.shadow.camera);
         this.scene.add(shadowCamHelper); */
-        this.lights.directional = dirLight;
+        /* this.lights.directional = dirLight; */
 
         // 加辅助线
         /*        const dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 50, 0xff0000);
         this.scene.add(dirLightHelper); */
 
-        this.scene.add(dirLight);
+        /* this.scene.add(dirLight); */
     }
 
     // 设置环境
@@ -891,6 +891,12 @@ class StartScene extends CustomScene {
             return;
         const clone = gltf.scene.clone(true);
         clone.name = name; // 设置唯一标识
+        clone.traverse((child) => {
+            if (child.isMesh && child.name === 'Obj_Shadow_Plane') {
+                // 丢弃指定的 阴影
+                child.parent.remove(child);
+            }
+        });
 
         if (this.carMixer === null) {
             this.carMixer = new THREE.AnimationMixer(clone);
@@ -973,7 +979,7 @@ class StartScene extends CustomScene {
     };
     _setupEnvironment() {
         // camera
-        this.camera.position.set(0, 10, 30);
+        this.camera.position.set(0,2, 24);
         this.camera.lookAt(0, 0, 0);
         // bg
         this.scene.background = new THREE.Color(StartScene.SCENE_COLOR);
@@ -1227,7 +1233,7 @@ class ForrestScene extends CustomScene {
         this.scene.add(new THREE.AmbientLight(0x223355, 0.4));
 
         // cube camera
-        this.cubeRT = new THREE.WebGLCubeRenderTarget(128, {
+        this.cubeRT = new THREE.WebGLCubeRenderTarget(32, {
             format: THREE.RGBAFormat,
             generateMipmaps: true,
             minFilter: THREE.LinearMipmapLinearFilter,
@@ -1367,6 +1373,7 @@ class ForrestScene extends CustomScene {
             "Mt_Reflector_BL": new THREE.Color(1, 0.1, 0.05),
             "Mt_Reflector_TL": new THREE.Color(1, 0.6, 0.0),
             "Mt_Reflector_RL": new THREE.Color(1, 1, 1),
+            "LIGT_RED.001":    new THREE.Color(1, 0, 0),
         };
 
         if (tailLightContainer) {
@@ -2141,7 +2148,6 @@ class SceneManager {
 
             this.renderer.render(this.transitionQuad, new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1));
         } else {
-
             // 这两个场景始终颜色空间不一致
             this.currentScene.effectComposer.render();
             this.transitionMaterial.uniforms.tCurrent.value = this.currentScene.effectComposer.composer.readBuffer.texture;
@@ -2271,7 +2277,7 @@ void main() {
         // renderer.toneMapping = THREE.NoToneMapping;
         document.body.appendChild(renderer.domElement);
         const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 2600);
-        camera.position.set(0, 2, 6);
+        camera.position.set(0, 2, 3);
         this.controls = new THREE.OrbitControls(camera, renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.01;
@@ -2756,7 +2762,6 @@ class SSRConfig extends PostProcessConfig {
         groundReflector.rotation.x = -Math.PI / 2;
         groundReflector.visible = false;
         scene.add(groundReflector);
-
         /* 			const boxHelper = new THREE.BoxHelper(groundReflector, 0xffff00);
         scene.add(boxHelper); */
         // 然后传给 SSRPass
@@ -2770,6 +2775,9 @@ class SSRConfig extends PostProcessConfig {
             groundReflector: groundReflector,
         });
 
+		groundReflector.maxDistance = this.pass.maxDistance;
+        groundReflector.opacity = this.pass.opacity;
+        
         // 打印SSRPass的所有属性，用于调试
         console.log('SSRPass properties:', this.pass);
 
@@ -3069,7 +3077,7 @@ class PostProcessManager {
 
         // 末尾pass按顺序重新加回：GammaCorrection -> SMAA
         finalConfigs
-        .sort((a, b) => FINAL_PASSES.indexOf(a.name) - FINAL_PASSES.indexOf(b.name))
+        .sort((a, b) => PostProcessManager.FINAL_PASSES.indexOf(a.name) - PostProcessManager.FINAL_PASSES.indexOf(b.name))
         .forEach(c => this.composer.addPass(c.getPass()));
 
         return config;

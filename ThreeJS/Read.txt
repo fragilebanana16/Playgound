@@ -1,3 +1,12 @@
+#### SSR (Screen Space Reflection)
+沿着反射方向做屏幕空间Ray Marching，这个位置的深度是否与射线相交？找到反射点，采样颜色
+
+#### AOMap相关
+AOMap纹理一定要  
+  aoTexture.needsUpdate = true;
+  aoTexture.flipY = false;
+ThreeJS关于应用AOMap时要有第二套uv，且flipY要设置为false的重要讲话
+
 under Playground\ThreeJS
 vscode go alive
 
@@ -8,4 +17,9 @@ https://gitee.com/mirrors/three.js 镜像
 
 #### 离线版加载跨域文件（NeedHttp后缀）
 OfflineVersion目录下cmd执行 python -m http.server 8000，打开http://localhost:8000
+
+或者chrome快捷方式-目标设置参数 "xxx.exe" --disable-web-security --user-data-dir="G:/Temp"，需要设置一个user-data-dir
+
+
+
 
