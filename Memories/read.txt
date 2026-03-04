@@ -12,6 +12,9 @@ npm run dev
 npm start build
 dist进入目录执行 node app.js
 
+#### 数据库
+psql -U postgres -d Memo
+
 # Production
 #### 运行
 ## Client
@@ -23,3 +26,6 @@ dist进入目录执行 node app.js
 2、npm start build
 3、dist进入目录执行 node app.js
 4、nginx
+
+#### 数据库
+pg_ctl -D $PREFIX/var/lib/postgresql start
