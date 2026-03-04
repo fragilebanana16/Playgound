@@ -1,0 +1,111 @@
+#### 安装
+一直使用pnpm不要用npm
+pnpm install three --registry=https://registry.npmmirror.com
+
+
+#### 前端部署
+1、win下 构建
+pnpm build
+2、拷贝目录
+scp -P 8022 -r "H:\jsProjects\RESUME\Playground\Memories\client\dist" u0_a465@192.168.0.108:~/storage/memo/client
+3、启动
+php -S 0.0.0.0:8081
+
+### 后端部署
+先装nodemodules后build
+
+#### nginx
+编辑
+nano /data/data/com.termux/files/usr/etc/nginx/nginx.conf
+nginx
+nginx -s reload
+ps aux | grep nginx
+#### win下postgres
+##### 连接
+psql -U postgres -d Memo
+##### 删除表
+DROP TABLE public.user CASCADE;
+
+#### termux下部署
+1、安装环境
+yarn run setup
+package.json删除sqlite3
+
+启动postgre
+pg_ctl -D $PREFIX/var/lib/postgresql start
+改密码
+ALTER USER u0_a465 WITH PASSWORD 'jaydean';
+进入memo库
+psql -U $(whoami) -d memo
+SELECT * FROM users;
+
+#### win下部署
+1、编译
+npm start build
+2、运行
+dist要进入目录执行 node app.js
+.env的目录要改文件格式为ts->js
+
+#### 开发
+pnpm dev
+
+pnpm install
+
+Termux
+whoami
+得到u0_a465
+ip a
+得到192.168.0.104
+passwd 
+设置密码123456
+sshd
+
+storage目录为符号链接，ls storage查看，~为同义
+
+Windows
+登录ssh 
+ssh -p 8022 u0_a465@192.168.0.104
+非ssh状态下拷贝构建dist 
+scp -P 8022 -r "H:\jsProjects\RESUME\Playground\Memories\dist" u0_a465@192.168.0.104:~/storage/app/
+启动
+~/.../app/dist $ php -S 0.0.0.0:8081
+
+避免每次输入密码
+（windows端）
+ scp -P 8022 -r "C:\Users\jaydean\.ssh\id_rsa.pub" u0_a465@192.168.0.104:~
+（termux端）
+mkdir -p ~/.ssh
+cat ~/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+
+
+
+
+完整流程
+Windows 开发机
+bash# 安装 ncc（只需装一次）
+npm install -g @vercel/ncc
+
+# 构建，把整个项目打包成单文件
+ncc build index.js -o dist
+```
+
+执行完后会生成 `dist/index.js`，这一个文件包含了你所有的代码和依赖。
+
+---
+
+**传输到 Termux**
+
+只需要传这一个文件：
+```
+dist/index.js
+可以用 adb、SSH、微信文件传输、U盘等任何方式。
+
+Termux 上
+bash# 确保装了 node（只需装一次）
+pkg install nodejs
+
+# 直接运行
+node dist/index.js
+没有 npm install，没有 node_modules，就这样。

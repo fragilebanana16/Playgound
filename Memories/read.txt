@@ -1,0 +1,25 @@
+# Develop
+## Client
+#### 运行
+pnpm dev
+#### 构建
+pnpm build
+
+## Server
+#### 运行
+npm run dev
+#### 构建
+npm start build
+dist进入目录执行 node app.js
+
+# Production
+#### 运行
+## Client
+1、Client构建完成后执行depoyTermuxClient.bat，选择N
+2、启动nginx
+
+## Server
+1、ssh上ssh -p 8022 u0_a465@192.168.0.104
+2、npm start build
+3、dist进入目录执行 node app.js
+4、nginx
