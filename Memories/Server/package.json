@@ -4,7 +4,7 @@
   "description": "Express + TypeScript + TypeORM + PostgreSQL + Swagger CRUD Boilerplate",
   "main": "dist/app.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only app.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
@@ -14,6 +14,7 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
+    "music-metadata": "^11.12.1",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.2.1",
     "swagger-jsdoc": "^6.2.8",

@@ -4,6 +4,7 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import { AppDataSource } from './data-source';
 import { userRouter } from './routes/user.routes';
+import { mediaRouter } from './routes/media.routes';
 import { authRouter } from './routes/auth.routes';
 import { swaggerSpec } from './swagger';
 import { printBanner } from './commands/banner';
@@ -37,6 +38,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/users', authMiddleware, userRouter);
+app.use('/api/media', mediaRouter);
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -47,8 +49,8 @@ AppDataSource.initialize()
   .then(() => {
     console.log('Database connected');
     app.listen(PORT, () => {
-      logger.info(`Server running on http://${host}:${PORT}`);
-      logger.info(`Swagger docs at http://${host}:${PORT}/api-docs`);
+      logger.info(`Server running on http://localhost:${PORT} , ip: ${host}`);
+      logger.info(`Swagger docs at http://localhost:${PORT}/api-docs , ip: ${host}`);
       printBanner();
     });
   })

@@ -1,4 +1,8 @@
 import { Request, Response } from 'express';
+
+interface AuthRequest extends Request {
+  userId?: number;
+}
 import { z } from 'zod';
 import { authService } from '../services/auth.service';
 import { ApiResponse } from '../utils/apiResponse'
@@ -26,13 +30,14 @@ export interface LoginResponse {
 
 export class AuthController {
   async register(req: Request, res: Response) {
+    console.log('tf')
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
       return res.status(400).json({ errors: parsed.error.flatten() });
     }
     try {
       const { username, email, password, phone } = parsed.data;
-      const user = await authService.register(username, email, password, phone);
+      const user = await authService.register(username, password, email, phone);
       const { password: _, ...safe } = user as any;
       res.status(201).json({ data: safe });
     } catch (err: any) {
@@ -46,7 +51,7 @@ export class AuthController {
     async login(req: Request, res: Response): Promise<void> {
       const parsed = loginSchema.safeParse(req.body);
       if (!parsed.success) {
-        res.status(400).json(ApiResponse.error(parsed.error.flatten()));
+        res.status(400).json(ApiResponse.error(JSON.stringify(parsed.error.flatten())));
         return;
       }
 

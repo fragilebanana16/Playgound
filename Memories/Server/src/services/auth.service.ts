@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
 const userRepo = AppDataSource.getRepository(User);
 
 export class AuthService {
-  async register(username: string, email: string, password: string, phone?: string): Promise<User> {
+  async register(username: string, password: string, email?: string, phone?: string): Promise<User> {
     const existingUsername = await userRepo.findOneBy({ username });
     if (existingUsername) throw new Error('USERNAME_EXISTS');
     const user = userRepo.create({ username, email, password, phone });
