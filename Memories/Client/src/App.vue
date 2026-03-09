@@ -12,6 +12,9 @@
   import { toggleTransition } from './utils/ui/animation'
   import { checkStorageCompatibility } from './utils/storage'
   import { initializeTheme } from './hooks/core/useTheme'
+  import { useMusicPlayer } from './hooks/music/useMusicPlayer'
+
+  provide('MusicPlayer', useMusicPlayer())
 
   const userStore = useUserStore()
   const { language } = storeToRefs(userStore)

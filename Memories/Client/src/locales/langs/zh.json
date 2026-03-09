@@ -344,5 +344,23 @@
     "zebra": "斑马纹",
     "border": "边框",
     "headerBackground": "表头背景"
+  },
+  "music": {
+    "aside": {
+      "explore": "发现",
+      "myMusic": "我的音乐",
+      "system": "系统",
+      "menu": {
+        "home": "首页",
+        "mv": "MV",
+        "charts": "排行榜",
+        "artists": "歌手",
+        "newAlbums": "新专辑",
+        "search": "搜索",
+        "recent": "最近播放",
+        "localMusic": "本地音乐",
+        "settings": "设置"
+      }
+    }
   }
 }

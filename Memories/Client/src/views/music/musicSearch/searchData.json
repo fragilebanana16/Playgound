@@ -1,0 +1,149 @@
+{
+  "songs": {
+    "songs": [
+      {
+        "id": 1393800989,
+        "name": "Cheating on You",
+        "ar": [{ "id": 90331, "name": "Charlie Puth", "alias": ["断眉"] }],
+        "al": { "id": 82004878, "name": "Cheating on You", "picUrl": "https://picsum.photos/200?random=1" },
+        "dt": 175000,
+        "mv": 123456
+      },
+      {
+        "id": 1813926556,
+        "name": "Peaches",
+        "ar": [{ "id": 35531, "name": "Justin Bieber" }, { "id": 12431, "name": "Daniel Caesar" }],
+        "al": { "id": 12345678, "name": "Justice", "picUrl": "https://picsum.photos/200?random=2" },
+        "dt": 198000,
+        "mv": 654321
+      },
+      {
+        "id": 1407551413,
+        "name": "Blinding Lights",
+        "ar": [{ "id": 10533, "name": "The Weeknd", "alias": ["盆栽哥"] }],
+        "al": { "id": 84381003, "name": "After Hours", "picUrl": "https://picsum.photos/200?random=3" },
+        "dt": 200000,
+        "mv": 998877
+      },
+      {
+        "id": 1860012345,
+        "name": "Stay",
+        "ar": [{ "id": 12519, "name": "The Kid LAROI" }, { "id": 35531, "name": "Justin Bieber" }],
+        "al": { "id": 11223344, "name": "F*CK LOVE 3", "picUrl": "https://picsum.photos/200?random=4" },
+        "dt": 141000,
+        "mv": 0
+      }
+    ],
+    "songCount": 4
+  },
+  "albums": {
+    "albums": [
+      {
+        "id": 82004878,
+        "name": "Nine Track Mind",
+        "picUrl": "https://picsum.photos/200?random=10",
+        "artist": { "id": 90331, "name": "Charlie Puth" },
+        "publishTime": 1452528000000,
+        "size": 12,
+        "company": "Atlantic Records"
+      },
+      {
+        "id": 12345678,
+        "name": "Justice",
+        "picUrl": "https://picsum.photos/200?random=11",
+        "artist": { "id": 35531, "name": "Justin Bieber" },
+        "publishTime": 1616112000000,
+        "size": 16,
+        "company": "Def Jam"
+      },
+      {
+        "id": 84381003,
+        "name": "After Hours",
+        "picUrl": "https://picsum.photos/200?random=12",
+        "artist": { "id": 10533, "name": "The Weeknd" },
+        "publishTime": 1584662400000,
+        "size": 14,
+        "company": "XO / Republic"
+      }
+    ],
+    "albumCount": 45
+  },
+  "artists": {
+    "artists": [
+      {
+        "id": 90331,
+        "name": "Charlie Puth",
+        "picUrl": "https://picsum.photos/200?random=20",
+        "alias": ["断眉"],
+        "musicSize": 150,
+        "albumSize": 12,
+        "mvSize": 45
+      },
+      {
+        "id": 35531,
+        "name": "Justin Bieber",
+        "picUrl": "https://picsum.photos/200?random=21",
+        "alias": ["比伯"],
+        "musicSize": 480,
+        "albumSize": 25,
+        "mvSize": 120
+      },
+      {
+        "id": 10533,
+        "name": "The Weeknd",
+        "picUrl": "https://picsum.photos/200?random=22",
+        "alias": ["盆栽哥"],
+        "musicSize": 320,
+        "albumSize": 18,
+        "mvSize": 80
+      }
+    ],
+    "artistCount": 30
+  },
+  "playlists": {
+    "playlists": [
+      {
+        "id": 7296386626,
+        "name": "Charlie Puth 精选",
+        "coverImgUrl": "https://picsum.photos/200?random=30",
+        "creator": { "userId": 101, "nickname": "流行乐教父" },
+        "playCount": 1250000,
+        "trackCount": 50,
+        "description": "收录断眉所有大热单曲"
+      },
+      {
+        "id": 50551234,
+        "name": "2020s 顶级流行金曲",
+        "coverImgUrl": "https://picsum.photos/200?random=31",
+        "creator": { "userId": 202, "nickname": "Billboard官方" },
+        "playCount": 9800000,
+        "trackCount": 100,
+        "description": "本世纪20年代最火的歌曲都在这里"
+      }
+    ],
+    "playlistCount": 85
+  },
+  "mvs": {
+    "mvs": [
+      {
+        "id": 123456,
+        "name": "Cheating on You MV",
+        "cover": "https://picsum.photos/200?random=40",
+        "artists": [{ "id": 90331, "name": "Charlie Puth" }],
+        "playCount": 850000,
+        "duration": 210000,
+        "publishTime": "2019-10-01"
+      },
+      {
+        "id": 654321,
+        "name": "Peaches Official Video",
+        "cover": "https://picsum.photos/200?random=41",
+        "artists": [{ "id": 35531, "name": "Justin Bieber" }],
+        "playCount": 15000000,
+        "duration": 230000,
+        "publishTime": "2021-03-19"
+      }
+    ],
+    "mvCount": 60
+  }
+}

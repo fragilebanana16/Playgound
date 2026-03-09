@@ -344,5 +344,23 @@
     "zebra": "Zebra",
     "border": "Border",
     "headerBackground": "Header BG"
+  },
+  "music": {
+    "aside": {
+      "explore": "Explore",
+      "myMusic": "My Music",
+      "system": "System",
+      "menu": {
+        "home": "Home",
+        "mv": "MV",
+        "charts": "Charts",
+        "artists": "Artists",
+        "newAlbums": "New Albums",
+        "search": "Search",
+        "recent": "Recent",
+        "localMusic": "Local Music",
+        "settings": "Settings"
+      }
+    }
   }
 }
