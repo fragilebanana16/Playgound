@@ -158,7 +158,7 @@
    * @returns 是否包含可见的子菜单
    */
   const hasChildren = (item: AppRouteRecord): boolean => {
-    if (!item.children || item.children.length === 0) {
+    if (!item.children || item.children.length === 0 || item.meta.isSingleModule) {
       return false
     }
     // 递归检查是否有可见的子菜单
