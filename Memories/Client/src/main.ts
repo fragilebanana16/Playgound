@@ -8,7 +8,8 @@ import '@styles/index.scss'                         // 样式
 import '@utils/sys/console.ts'                      // 控制台输出内容
 import { setupGlobDirectives } from './directives'
 import { setupErrorHandle } from './utils/sys/error-handle'
-
+import VueViewer from 'v-viewer'
+import 'viewerjs/dist/viewer.css'
 document.addEventListener(
   'touchstart',
   function () {},
@@ -22,4 +23,5 @@ setupGlobDirectives(app)
 setupErrorHandle(app)
 
 app.use(language)
+app.use(VueViewer)
 app.mount('#app')

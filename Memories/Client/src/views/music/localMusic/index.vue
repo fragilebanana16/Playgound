@@ -3,6 +3,17 @@ import { ref, onMounted, inject } from 'vue'
 import { Icon } from '@iconify/vue'
 import { ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
 import useMusicStore from '@/store/modules/music'
+import sound2 from '@/assets/Diviners & Azertion - Feelings Mp3 Download by NCS - Files Garage.mp3'
+import sound3 from '@/assets/Slow Down - Madnap,Pauline Herr.mp3'
+import sound4 from '@/assets/sun and moon - Anees.mp3'
+import sound5 from '@/assets/Anson Seabra - Kryptonite.mp3'
+
+import cover2 from '@/assets/Diviners & Azertion - Feelings Mp3 Download by NCS - Files Garage.jpeg'
+import cover3 from '@/assets/Slow Down - Madnap,Pauline Herr.jpg'
+import cover4 from '@/assets/sun and moon - Anees.jpg'
+import Album from '../musicSearch/modules/album.vue'
+
+import { formatTime } from '@/utils/ui'
 
 const musicStore = useMusicStore();
 const { playSong, setPlaylist } = inject('MusicPlayer')
@@ -17,13 +28,6 @@ const t = (key: string, opts?: any) => {
     'common.noData': '暂无数据',
   }
   return map[key] ?? key
-}
-
-// ---- 工具函数 ----
-function formatTime(seconds: number): string {
-  const min = Math.floor(seconds / 60)
-  const sec = Math.floor(seconds % 60)
-  return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`
 }
 
 // ---- Mock 数据 ----
@@ -48,15 +52,51 @@ const MOCK_MUSICS: MockMusic[] = [
     time: 260675,
   },
   {
-      id: "27591651",
-      title: "Intro AE 86",
-      singer: "陈光荣",
-      album: "頭文字[イニシャル]D THE MOVIE SOUND TUNE",
-      cover:
-          "http://p4.music.126.net/9KeyafHLjadqSQTRS_tN5Q==/5741649720318487.jpg",
-      source: "http://music.163.com/song/media/outer/url?id=27591651.mp3",
-      time: 149000,
+    id: "27591651",
+    title: "Intro AE 86",
+    singer: "陈光荣",
+    album: "頭文字[イニシャル]D THE MOVIE SOUND TUNE",
+    cover:
+      "http://p4.music.126.net/9KeyafHLjadqSQTRS_tN5Q==/5741649720318487.jpg",
+    source: "http://music.163.com/song/media/outer/url?id=27591651.mp3",
+    time: 149000,
   },
+  {
+    id: "3",
+    title: "Diviners & Azertion - Feelings Mp3 Download by NCS",
+    singer: "Files Garage",
+    album: "==x",
+    cover: cover2,
+    source: sound2,
+    time: 260675,
+  },
+  {
+    id: "4",
+    title: "Slow Down",
+    singer: "Madnap,Pauline Herr",
+    album: "==x",
+    cover: cover3,
+    source: sound3,
+    time: 260675,
+  },
+  {
+    id: "5",
+    title: "sun and moon",
+    singer: "Anees",
+    album: "==x",
+    cover: cover4,
+    source: sound4,
+    time: 260675,
+  },
+  {
+    id: "6",
+    title: "Anson Seabra",
+    singer: "Kryptonite",
+    album: "==x",
+    cover: cover4,
+    source: sound5,
+    time: 260675,
+  }
 ]
 
 // ---- 状态 ----
@@ -72,6 +112,7 @@ const convertToSong = (music: MockMusic) => ({
   cover: music.cover,
   source: music.source,
   time: music.time,
+  album: music.album,
 })
 
 // ---- 加载（用 mock 替代 API） ----
@@ -91,7 +132,7 @@ onMounted(() => {
 const handlePlayAll = () => {
   if (musics.value.length === 0) return
   const songs = musics.value.map(m => convertToSong(m))
-  if(songs.length === 0) return
+  if (songs.length === 0) return
   setPlaylist(songs)
   const song = convertToSong(songs[0])
   playSong(song)
@@ -119,8 +160,8 @@ const columns = [
     key: 'title',
     dataKey: 'title',
     title: '歌曲',
-    flexGrow: 1,
-    sortable: true, 
+    width: 240,
+    sortable: true,
     cellRenderer: ({ rowData }) => {
       const isPlaying = currentPlayingId.value === rowData.id
       return h('span', {
@@ -135,7 +176,7 @@ const columns = [
     dataKey: 'singer',
     title: '艺术家',
     width: 300,
-    sortable: true, 
+    sortable: true,
     cellRenderer: ({ rowData }) =>
       h('span', { class: 'truncate text-xs text-primary' }, rowData.singer)
   },
@@ -146,7 +187,7 @@ const columns = [
     dataKey: 'album',
     title: '专辑',
     width: 200,
-    sortable: true, 
+    sortable: true,
     cellRenderer: ({ rowData }) =>
       h('span', { class: 'truncate text-xs text-primary' }, rowData.album ?? '-')
   },
@@ -156,42 +197,42 @@ const columns = [
     key: 'time',
     dataKey: 'time',
     title: '时长',
-  width: 100,
+    width: 100,
     align: 'right',
-    sortable: true, 
+    sortable: true,
     cellRenderer: ({ rowData }) =>
       h('span', { class: 'text-xs tabular-nums text-primary' }, formatTime(rowData.time))
   },
   {
-  key: 'action',
-  dataKey: 'action',
-  title: '',
-  width: 60,
-  align: 'center',
-  cellRenderer: ({ rowData }) => {
-  const isPlaying = currentPlayingId.value === rowData.id
-  const isHovered = hoveredRowId.value === rowData.id
+    key: 'action',
+    dataKey: 'action',
+    title: '',
+    width: 60,
+    align: 'center',
+    cellRenderer: ({ rowData }) => {
+      const isPlaying = currentPlayingId.value === rowData.id
+      const isHovered = hoveredRowId.value === rowData.id
 
-  if (isPlaying) {
-    return h(Icon, {
-      icon: 'mdi:pause-circle',
-      class: 'h-5 w-5 text-blue-400 cursor-pointer',
-    })
-  }
+      if (isPlaying) {
+        return h(Icon, {
+          icon: 'mdi:pause-circle',
+          class: 'h-5 w-5 text-blue-400 cursor-pointer',
+        })
+      }
 
-  return h(Icon, {
-    icon: 'mdi:play-circle',
-    class: [
-      'h-5 w-5 text-primary/60 cursor-pointer transition-opacity duration-200',
-      isHovered ? 'opacity-100' : 'opacity-0'
-    ],
-    onClick: (e) => {
-      e.stopPropagation()
-      handlePlaySong(rowData)
+      return h(Icon, {
+        icon: 'mdi:play-circle',
+        class: [
+          'h-5 w-5 text-primary/60 cursor-pointer transition-opacity duration-200',
+          isHovered ? 'opacity-100' : 'opacity-0'
+        ],
+        onClick: (e) => {
+          e.stopPropagation()
+          handlePlaySong(rowData)
+        }
+      })
     }
-  })
-}
-},
+  },
   // 操作
   {
     key: 'actions',
@@ -200,29 +241,30 @@ const columns = [
     width: 60,
     align: 'center',
     cellRenderer: ({ rowData }) => {
-    return h(ElDropdown, { trigger: 'click' }, {
-      default: () => h(Icon, {
-        icon: 'mdi:dots-horizontal',
-        class: 'h-4 w-4 text-primary cursor-pointer hover:text-blue-400 transition-colors',
-        onClick: (e: MouseEvent) => e.stopPropagation()
-      }),
-      dropdown: () => h(ElDropdownMenu, {}, {
-        default: () => [
-          h(ElDropdownItem, { onClick: () => handlePlay(rowData) }, {
-            default: () => [h(Icon, { icon: 'mdi:play', class: 'mr-2' }), '播放']
-          }),
-          h(ElDropdownItem, { onClick: () => handleAddToQueue(rowData) }, {
-            default: () => [h(Icon, { icon: 'mdi:playlist-plus', class: 'mr-2' }), '添加到队列']
-          }),
-          h(ElDropdownItem, { onClick: () => handleFavorite(rowData) }, {
-            default: () => [h(Icon, { icon: 'mdi:heart-outline', class: 'mr-2' }), '收藏']
-          }),
-          h(ElDropdownItem, { divided: true, class: 'text-red-400', onClick: () => handleDelete(rowData) }, {
-            default: () => [h(Icon, { icon: 'mdi:delete-outline', class: 'mr-2' }), '删除']
-          }),
-        ]
+      return h(ElDropdown, { trigger: 'click' }, {
+        default: () => h(Icon, {
+          icon: 'mdi:dots-horizontal',
+          class: 'h-4 w-4 text-primary cursor-pointer hover:text-blue-400 transition-colors',
+          onClick: (e: MouseEvent) => e.stopPropagation()
+        }),
+        dropdown: () => h(ElDropdownMenu, {}, {
+          default: () => [
+            h(ElDropdownItem, { onClick: () => handlePlay(rowData) }, {
+              default: () => [h(Icon, { icon: 'mdi:play', class: 'mr-2' }), '播放']
+            }),
+            h(ElDropdownItem, { onClick: () => handleAddToQueue(rowData) }, {
+              default: () => [h(Icon, { icon: 'mdi:playlist-plus', class: 'mr-2' }), '添加到队列']
+            }),
+            h(ElDropdownItem, { onClick: () => handleFavorite(rowData) }, {
+              default: () => [h(Icon, { icon: 'mdi:heart-outline', class: 'mr-2' }), '收藏']
+            }),
+            h(ElDropdownItem, { divided: true, class: 'text-red-400', onClick: () => handleDelete(rowData) }, {
+              default: () => [h(Icon, { icon: 'mdi:delete-outline', class: 'mr-2' }), '删除']
+            }),
+          ]
+        })
       })
-    })}
+    }
   },
 ]
 
@@ -275,14 +317,13 @@ const sortedData = computed(() => {
 </script>
 
 <template>
-  <div class="glass-card overflow-hidden rounded-3xl transition-all">
+  <div class="glass-card overflow-hidden rounded-3xl transition-all  p-4">
     <!-- 头部操作栏 -->
-    <div class="flex items-center justify-between border-glass p-6">
+    <div class="flex items-center justify-between border-glass p-6  rounded-3xl bg-blue-500/10">
       <div class="flex items-center gap-4">
         <div
-          class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-emerald-600 shadow-md"
-        >
-        <Icon icon="material-symbols:folder" class="h-6 w-6 text-white" />
+          class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-emerald-600 shadow-md">
+          <Icon icon="material-symbols:folder" class="h-6 w-6 text-white" />
         </div>
         <div>
           <h3 class="text-primary text-base font-semibold">
@@ -295,12 +336,10 @@ const sortedData = computed(() => {
       </div>
 
       <!-- 全部播放按钮 -->
-      <button
-        v-if="musics.length > 0 && !isLoading"
+      <button v-if="musics.length > 0 && !isLoading"
         class="flex items-center gap-2 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-md transition-opacity hover:opacity-90 active:scale-95"
-        @click="handlePlayAll"
-      >
-      <Icon icon="material-symbols:play-circle" class="h-4 w-4 text-white"/>
+        @click="handlePlayAll">
+        <Icon icon="material-symbols:play-circle" class="h-4 w-4 text-white" />
         播放全部
       </button>
     </div>
@@ -314,10 +353,7 @@ const sortedData = computed(() => {
       </div>
 
       <!-- 空状态 -->
-      <div
-        v-else-if="musics.length === 0"
-        class="flex flex-col items-center justify-center py-12 text-center"
-      >
+      <div v-else-if="musics.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
         <div class="mb-4 rounded-full bg-white/5 p-6">
           <span class="icon-[mdi--music-note-off] text-primary/20 h-12 w-12" />
         </div>
@@ -328,24 +364,14 @@ const sortedData = computed(() => {
       <!-- 音乐列表 -->
       <div v-else class="space-y-0 h-[460px]">
         <el-auto-resizer class="">
-    <template #default="{ height, width }">
-      <el-table-v2
-        :columns="columns"
-        :data="sortedData"
-        :row-event-handlers="rowEventHandlers"
-        :width="width"
-        :height="height"
-        :row-height="66"
-        :sort-by="sortState"
-        @column-sort="onSort"
-      />
-    </template>
-  </el-auto-resizer>
-</div>
+          <template #default="{ height, width }">
+            <el-table-v2 :columns="columns" :data="sortedData" :row-event-handlers="rowEventHandlers" :width="width"
+              :height="height" :row-height="66" :sort-by="sortState" @column-sort="onSort" />
+          </template>
+        </el-auto-resizer>
+      </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

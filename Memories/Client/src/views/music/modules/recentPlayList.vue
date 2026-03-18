@@ -20,14 +20,14 @@ const playMusic = (id) => {
 </script>
 <template>
   <el-popover :width="450" trigger="click" placement="top-end">
-    <div class="py-4">
+    <div class="py-2">
       <h1 class="text-lg  mb-4 dark:text-white">最近播放 <span class="text-base">({{ musicStore.trackList.length }})</span></h1>
       <el-scrollbar class="!h-[400px] pr-2">
         <ul class="space-y-1">
           <li
             v-for="(song, index) in musicStore.trackList"
             :key="index"
-            class="flex items-center px-4 py-1 hover:bg-gray-300 dark:hover:bg-[#414243] rounded-lg transition justify-between"
+            class="flex items-center px-4 py-1 hover:bg-gray-100 rounded-lg transition-hover duration-300 justify-between group"
             @click="playMusic(song.id)"
           >
             <div class="flex items-center">
@@ -37,7 +37,7 @@ const playMusic = (id) => {
                 class="w-8 h-8 rounded-lg mr-4"
               />
               <div>
-                <h2 class="text-sm font-semibold dark:text-white line-clamp-1" :title="song.title">
+                <h2 class="text-sm font-semibold dark:text-white line-clamp-1 " :title="song.title">
                   {{ song.title }}
                 </h2>
                 <p class="text-gray-600 dark:text-gray-400">
@@ -46,17 +46,15 @@ const playMusic = (id) => {
               </div>
             </div>
             <div class="flex items-center">
-              <el-button type="primary" text circle @click="playMusic(song.id)">
-                <Icon :icon= "currentSong.id === song.id ? 'icon-park-outline:music-rhythm' : 'material-symbols:play-circle'" class="text-lg text-gray-500" />
-              </el-button>
-              <el-button
-                type="primary"
-                text
-                circle
-                v-if="song.mv && song.mv !== 0"
-                @click="router.push(`/video?id=${song.mv}`)"
-              >
-              <Icon class="text-lg text-gray-500" icon="solar:video-frame-linear" />
+              <el-button type="primary" text circle>
+                <div
+                v-if="currentSong.id === song.id"
+                  class="equalizer playing" >
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <Icon v-else icon="material-symbols:play-circle" class="text-lg opacity-10 group-hover:opacity-100 transition-opacity duration-500" />
               </el-button>
             </div>
           </li>
@@ -73,5 +71,33 @@ const playMusic = (id) => {
 <style scoped>
 .el-button + .el-button {
   margin-left: 0;
+}
+
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+
+.equalizer span {
+  width: 3px;
+  background: currentColor;
+  border-radius: 1px;
+  height: 4px; /* 暂停时都是矮的 */
+  transition: height 0.2s;
+}
+
+.equalizer.playing span {
+  animation: bar 0.8s ease-in-out infinite alternate;
+}
+
+.equalizer.playing span:nth-child(1) { animation-delay: 0s;    }
+.equalizer.playing span:nth-child(2) { animation-delay: 0.2s;  }
+.equalizer.playing span:nth-child(3) { animation-delay: 0.4s;  }
+
+@keyframes bar {
+  0%   { height: 3px;  }
+  100% { height: 14px; }
 }
 </style>

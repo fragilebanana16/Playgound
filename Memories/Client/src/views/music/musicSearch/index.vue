@@ -19,12 +19,29 @@ const typeMap = {
   '1004': 'mvs',
 }
 
- const mockSearch = (keywords, type = '1') => {
+const pageMap = {
+  '1': 8,
+  '10': 10,
+  '100': 10,
+  '1000': 10,
+  '1004': 2,
+}
+
+const mockSearch = (keywords, type = '1', offset = 0, limit = 6) => {
   const key = typeMap[type]
-  const data = mockData[key]
+  const limitPage = pageMap[type]
+  const allData = mockData[key] ?? {}
+  const embedded = allData[key] ?? []
+  const slice = embedded.slice(offset, offset + limitPage)
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({ code: 200, result: data })
+      resolve({
+        code: 200,
+        result: {
+          [`${key}Count`]: embedded.length,
+          [key]: slice                         // songs: 切片后的数据
+        }
+      })
     }, 300)
   })
 }
@@ -45,7 +62,6 @@ const state = reactive({
   songData: { playlists: [] },
   mvData: { mvs: [] },
   currentPage: 1,
-  pageSize: 30,
   size: 'small',
   total: 0,
 })
@@ -58,35 +74,35 @@ const {
   singerData,
   albumData,
   currentPage,
-  pageSize,
   size,
   total,
 } = toRefs(state)
 
 // 封装一个公共的搜索函数
-const performSearch = async (kw, type, offset, limit = 20) => {
+const performSearch = async (kw, type, page = 1, limit = 6) => {
+  const offset = (page - 1) * pageMap[state.activeName]
   const res = await mockSearch(kw, type, offset, limit)
   const result = res.result
   switch (state.activeName) {
     case '1':
       state.tableData = result
-      state.total = result.songCount
+      state.total = result.songsCount
       break
     case '10':
       state.albumData = result
-      state.total = result.albumCount
+      state.total = result.albumsCount
       break
     case '100':
       state.singerData = result
-      state.total = result.artistCount
+      state.total = result.artistsCount
       break
     case '1000':
       state.songData = result
-      state.total = result.playlistCount
+      state.total = result.playlistsCount
       break
     case '1004':
       state.mvData = result
-      state.total = result.mvCount
+      state.total = result.mvsCount
       break
   }
 }
@@ -105,22 +121,12 @@ watch(
   { immediate: true }
 )
 
-// handleClick 函数
-const handleClick = ({ props }) => {
-  state.currentPage = 1
+const handleTabClick = ({ props }) => {
+  state.currentPage = 1 // 用户切 tab 基本都是想从头看，重置到第 1 页反而更符合直觉
   performSearch(route.query.kw, props.name)
 }
 
-const handleSizeChange = (Size) => {
-  performSearch(
-    route.query.kw,
-    state.activeName,
-    state.currentPage,
-    Size
-  )
-}
-
-const handleCurrentChange = (current) => {
+const handleCurrentPageNumChange = (current) => {
   performSearch(
     route.query.kw,
     state.activeName,
@@ -136,14 +142,14 @@ export default {
 }
 </script>
 <template>
-  <div class="h-[calc(100vh-53px-84px-64px)]">
+  <div >
     <div
     class=" h-full py-4 gap-2 w-full box-border flex flex-1 flex-col overflow-x-hidden"
   >
     <div
       class="flex flex-col px-4 gap-8 md:gap-12 lg:gap-16 overflow-x-hidden"
     >
-      <el-tabs v-model="activeName" class="demo-tabs" @tabClick="handleClick">
+      <el-tabs v-model="activeName" class="demo-tabs" @tabClick="handleTabClick">
         <el-tab-pane name="1">
           <template #label>
             <div class="flex gap-1 items-center">
@@ -151,7 +157,7 @@ export default {
               <span>Songs</span>
             </div>
           </template>
-          <div class="h-[calc(100vh-340px)]">
+          <div class="tab-panel">
             <MusicList v-model="tableData.songs"/>
           </div>
         </el-tab-pane>
@@ -162,7 +168,9 @@ export default {
               <span>Album</span>
             </div>
           </template>
-          <Album v-model="albumData.albums" />
+          <div class="tab-panel">
+            <Album v-model="albumData.albums" />
+          </div>
         </el-tab-pane>
         <el-tab-pane name="100">
           <template #label>
@@ -171,7 +179,9 @@ export default {
               <span>Artists</span>
             </div>
           </template>
-          <Artists v-model="singerData.artists" />
+          <div class="tab-panel">
+            <Artists v-model="singerData.artists" />
+          </div>
         </el-tab-pane>
         <el-tab-pane name="1000">
           <template #label>
@@ -180,24 +190,27 @@ export default {
               <span>SongList</span>
             </div>
           </template>
-          <SongList v-model="songData.playlists" />
+          <div class="tab-panel">
+            <SongList v-model="songData.playlists" />
+          </div>
         </el-tab-pane>
       </el-tabs>
     </div>
     <el-pagination
       class="flex items-center justify-center"
       v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      :page-sizes="[10, 20, 30, 40]"
+      v-model:page-size="pageMap[activeName]"
       :size="size"
-      layout="total, sizes, prev, pager, next, jumper"
+      layout="total, prev, pager, next, jumper"
       :total="total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
+      @current-change="handleCurrentPageNumChange"
     />
   </div>
   </div>
 </template>
 
 <style scoped>
+.tab-panel {
+  height: calc( 100vh - 360px );
+}
 </style>

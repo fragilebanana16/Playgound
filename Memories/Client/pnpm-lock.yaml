@@ -47,9 +47,15 @@ importers:
       highlight.js:
         specifier: ^11.10.0
         version: 11.11.1
+      justified-layout:
+        specifier: ^4.1.0
+        version: 4.1.0
       mitt:
         specifier: ^3.0.1
         version: 3.0.1
+      moment:
+        specifier: ^2.30.1
+        version: 2.30.1
       nprogress:
         specifier: ^0.2.0
         version: 0.2.0
@@ -71,6 +77,12 @@ importers:
       three:
         specifier: ^0.183.1
         version: 0.183.1
+      v-viewer:
+        specifier: ^3.0.23
+        version: 3.0.23(viewerjs@1.11.7)(vue@3.5.22(typescript@5.6.3))
+      viewerjs:
+        specifier: ^1.11.7
+        version: 1.11.7
       vue:
         specifier: ^3.5.21
         version: 3.5.22(typescript@5.6.3)
@@ -83,6 +95,9 @@ importers:
       vue-router:
         specifier: ^4.5.1
         version: 4.5.1(vue@3.5.22(typescript@5.6.3))
+      vue-virtual-scroller:
+        specifier: 2.0.0-beta.5
+        version: 2.0.0-beta.5(vue@3.5.22(typescript@5.6.3))
       xgplayer:
         specifier: ^3.0.20
         version: 3.0.23(core-js@3.45.1)
@@ -2574,6 +2589,9 @@ packages:
     resolution: {integrity: sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==}
     engines: {'0': node >= 0.2.0}
 
+  justified-layout@4.1.0:
+    resolution: {integrity: sha512-M5FimNMXgiOYerVRGsXZ2YK9YNCaTtwtYp7Hb2308U1Q9TXXHx5G0p08mcVR5O53qf8bWY4NJcPBxE6zuayXSg==}
+
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
@@ -2695,6 +2713,9 @@ packages:
 
   lodash-es@4.17.21:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+
+  lodash-es@4.17.23:
+    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
 
   lodash-unified@1.0.3:
     resolution: {integrity: sha512-WK9qSozxXOD7ZJQlpSqOT+om2ZfcT4yO+03FuzAHD0wF6S0l0090LRPDx3vhTTLZ8cFKpBn+IOcVXK6qOcIlfQ==}
@@ -2858,11 +2879,17 @@ packages:
     resolution: {integrity: sha512-KZxYo1BUkWD2TVFLr0MQoM8vUUigWD3LlD83a/75BqC+4qE0Hb1Vo5v1FgcfaNXvfXzr+5EhQ6ing/CaBijTlw==}
     engines: {node: '>= 18'}
 
+  mitt@2.1.0:
+    resolution: {integrity: sha512-ILj2TpLiysu2wkBbWjAmww7TkZb65aiQO+DkVdUTBpBXq+MHYiETENkKFMtsJZX1Lf4pe4QOrTSjIfUwN5lRdg==}
+
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
+
+  moment@2.30.1:
+    resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
 
   mrmime@2.0.1:
     resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
@@ -3645,6 +3672,15 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  v-viewer@3.0.23:
+    resolution: {integrity: sha512-u/Zd/FXTdtdE2k2YeYMf6mU4oL0ILEZ9STHnZT7myyfRwQot68GO3O+6DwxNnHTaATiiAJTrz2MXjaqYKoB7iA==}
+    peerDependencies:
+      viewerjs: ^1.11.0
+      vue: ^3.0.0
+
+  viewerjs@1.11.7:
+    resolution: {integrity: sha512-0JuVqOmL5v1jmEAlG5EBDR3XquxY8DWFQbFMprOXgaBB0F7Q/X9xWdEaQc59D8xzwkdUgXEMSSknTpriq95igg==}
+
   vite-hot-client@2.1.0:
     resolution: {integrity: sha512-7SpgZmU7R+dDnSmvXE1mfDtnHLHQSisdySVR7lO8ceAXvM0otZeuQQ6C8LrS5d/aYyP/QZ0hI0L+dIPrm4YlFQ==}
     peerDependencies:
@@ -3754,6 +3790,16 @@ packages:
   vue-img-cutter@3.0.7:
     resolution: {integrity: sha512-fNw3kimawg9XVXDZCw2bI74NI+Jq+H42wjymatZVVSY46wuBty6LbQsu4GeVfo/yzpS9AHY0tzckpYzX3D2fmA==}
 
+  vue-observe-visibility@2.0.0-alpha.1:
+    resolution: {integrity: sha512-flFbp/gs9pZniXR6fans8smv1kDScJ8RS7rEpMjhVabiKeq7Qz3D9+eGsypncjfIyyU84saU88XZ0zjbD6Gq/g==}
+    peerDependencies:
+      vue: ^3.0.0
+
+  vue-resize@2.0.0-alpha.1:
+    resolution: {integrity: sha512-7+iqOueLU7uc9NrMfrzbG8hwMqchfVfSzpVlCMeJQe4pyibqyoifDNbKTZvwxZKDvGkB+PdFeKvnGZMoEb8esg==}
+    peerDependencies:
+      vue: ^3.0.0
+
   vue-router@4.5.1:
     resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
     peerDependencies:
@@ -3764,6 +3810,11 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
+
+  vue-virtual-scroller@2.0.0-beta.5:
+    resolution: {integrity: sha512-P7m/8D/7bzu45gWqCflQxyZomWL4cy75AZXz73Ri43VYRiSx1hW8QNIGr6PoAR1kZAcEqHZwYlvM76gUDA3wdA==}
+    peerDependencies:
+      vue: ^3.2.0
 
   vue@3.5.22:
     resolution: {integrity: sha512-toaZjQ3a/G/mYaLSbV+QsQhIdMo9x5rrqIpYRObsJ6T/J+RyCSFwN2LHNVH9v8uIcljDNa3QzPVdv3Y6b9hAJQ==}
@@ -6311,6 +6362,8 @@ snapshots:
 
   jsonparse@1.3.1: {}
 
+  justified-layout@4.1.0: {}
+
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
@@ -6420,6 +6473,8 @@ snapshots:
       p-locate: 6.0.0
 
   lodash-es@4.17.21: {}
+
+  lodash-es@4.17.23: {}
 
   lodash-unified@1.0.3(@types/lodash-es@4.17.12)(lodash-es@4.17.21)(lodash@4.17.21):
     dependencies:
@@ -6545,6 +6600,8 @@ snapshots:
     dependencies:
       minipass: 7.1.2
 
+  mitt@2.1.0: {}
+
   mitt@3.0.1: {}
 
   mlly@1.8.0:
@@ -6553,6 +6610,8 @@ snapshots:
       pathe: 2.0.3
       pkg-types: 1.3.1
       ufo: 1.6.1
+
+  moment@2.30.1: {}
 
   mrmime@2.0.1: {}
 
@@ -7330,6 +7389,14 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
+  v-viewer@3.0.23(viewerjs@1.11.7)(vue@3.5.22(typescript@5.6.3)):
+    dependencies:
+      lodash-es: 4.17.23
+      viewerjs: 1.11.7
+      vue: 3.5.22(typescript@5.6.3)
+
+  viewerjs@1.11.7: {}
+
   vite-hot-client@2.1.0(vite@7.1.7(@types/node@24.8.1)(jiti@2.6.0)(lightningcss@1.30.1)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
     dependencies:
       vite: 7.1.7(@types/node@24.8.1)(jiti@2.6.0)(lightningcss@1.30.1)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -7446,6 +7513,14 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
+  vue-observe-visibility@2.0.0-alpha.1(vue@3.5.22(typescript@5.6.3)):
+    dependencies:
+      vue: 3.5.22(typescript@5.6.3)
+
+  vue-resize@2.0.0-alpha.1(vue@3.5.22(typescript@5.6.3)):
+    dependencies:
+      vue: 3.5.22(typescript@5.6.3)
+
   vue-router@4.5.1(vue@3.5.22(typescript@5.6.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
@@ -7457,6 +7532,13 @@ snapshots:
       '@vue/language-core': 2.1.10(typescript@5.6.3)
       semver: 7.7.2
       typescript: 5.6.3
+
+  vue-virtual-scroller@2.0.0-beta.5(vue@3.5.22(typescript@5.6.3)):
+    dependencies:
+      mitt: 2.1.0
+      vue: 3.5.22(typescript@5.6.3)
+      vue-observe-visibility: 2.0.0-alpha.1(vue@3.5.22(typescript@5.6.3))
+      vue-resize: 2.0.0-alpha.1(vue@3.5.22(typescript@5.6.3))
 
   vue@3.5.22(typescript@5.6.3):
     dependencies:

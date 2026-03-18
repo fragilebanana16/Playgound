@@ -5,14 +5,17 @@
         "id": 1393800989,
         "name": "Cheating on You",
         "ar": [{ "id": 90331, "name": "Charlie Puth", "alias": ["断眉"] }],
-        "al": { "id": 82004878, "name": "Cheating on You", "picUrl": "https://picsum.photos/200?random=1" },
+        "al": { "id": 82004878, "name": "Nine Track Mind", "picUrl": "https://picsum.photos/200?random=1" },
         "dt": 175000,
         "mv": 123456
       },
       {
         "id": 1813926556,
         "name": "Peaches",
-        "ar": [{ "id": 35531, "name": "Justin Bieber" }, { "id": 12431, "name": "Daniel Caesar" }],
+        "ar": [
+          { "id": 35531, "name": "Justin Bieber" },
+          { "id": 12431, "name": "Daniel Caesar" }
+        ],
         "al": { "id": 12345678, "name": "Justice", "picUrl": "https://picsum.photos/200?random=2" },
         "dt": 198000,
         "mv": 654321
@@ -28,46 +31,305 @@
       {
         "id": 1860012345,
         "name": "Stay",
-        "ar": [{ "id": 12519, "name": "The Kid LAROI" }, { "id": 35531, "name": "Justin Bieber" }],
+        "ar": [
+          { "id": 12519, "name": "The Kid LAROI" },
+          { "id": 35531, "name": "Justin Bieber" }
+        ],
         "al": { "id": 11223344, "name": "F*CK LOVE 3", "picUrl": "https://picsum.photos/200?random=4" },
         "dt": 141000,
         "mv": 0
+      },
+
+      {
+        "id": 2010000001,
+        "name": "Levitating",
+        "ar": [{ "id": 56789, "name": "Dua Lipa" }],
+        "al": { "id": 56780001, "name": "Future Nostalgia", "picUrl": "https://picsum.photos/200?random=5" },
+        "dt": 203000,
+        "mv": 100001
+      },
+      {
+        "id": 2010000002,
+        "name": "Save Your Tears",
+        "ar": [{ "id": 10533, "name": "The Weeknd" }],
+        "al": { "id": 84381003, "name": "After Hours", "picUrl": "https://picsum.photos/200?random=6" },
+        "dt": 215000,
+        "mv": 100002
+      },
+      {
+        "id": 2010000003,
+        "name": "Bad Guy",
+        "ar": [{ "id": 33333, "name": "Billie Eilish" }],
+        "al": { "id": 44440001, "name": "When We All Fall Asleep", "picUrl": "https://picsum.photos/200?random=7" },
+        "dt": 194000,
+        "mv": 100003
+      },
+      {
+        "id": 2010000004,
+        "name": "As It Was",
+        "ar": [{ "id": 88888, "name": "Harry Styles" }],
+        "al": { "id": 77770001, "name": "Harry's House", "picUrl": "https://picsum.photos/200?random=8" },
+        "dt": 168000,
+        "mv": 100004
+      },
+      {
+        "id": 2010000005,
+        "name": "Watermelon Sugar",
+        "ar": [{ "id": 88888, "name": "Harry Styles" }],
+        "al": { "id": 77770002, "name": "Fine Line", "picUrl": "https://picsum.photos/200?random=9" },
+        "dt": 174000,
+        "mv": 100005
+      },
+
+      {
+        "id": 2010000011,
+        "name": "Seven",
+        "ar": [{ "id": 99996, "name": "Jung Kook" }, { "id": 99997, "name": "Latto" }],
+        "al": { "id": 77770007, "name": "Golden", "picUrl": "https://picsum.photos/200?random=15" },
+        "dt": 184000,
+        "mv": 100011
+      },
+      {
+        "id": 2010000012,
+        "name": "晴天",
+        "ar": [{ "id": 99998, "name": "周杰伦" }],
+        "al": { "id": 77770008, "name": "叶惠美", "picUrl": "https://picsum.photos/200?random=16" },
+        "dt": 269000,
+        "mv": 100012
+      },
+      {
+        "id": 2010000013,
+        "name": "アイドル",
+        "ar": [{ "id": 99999, "name": "YOASOBI" }],
+        "al": { "id": 77770009, "name": "Idol", "picUrl": "https://picsum.photos/200?random=17" },
+        "dt": 213000,
+        "mv": 100013
+      },
+      {
+        "id": 2010000014,
+        "name": "One Last Time",
+        "ar": [{ "id": 100001, "name": "Ariana Grande" }],
+        "al": { "id": 77770010, "name": "My Everything", "picUrl": "https://picsum.photos/200?random=18" },
+        "dt": 197000,
+        "mv": 100014
+      },
+      {
+        "id": 2010000015,
+        "name": "乌梅子酱",
+        "ar": [{ "id": 100002, "name": "李荣浩" }],
+        "al": { "id": 77770011, "name": "自由之声", "picUrl": "https://picsum.photos/200?random=19" },
+        "dt": 233000,
+        "mv": 100015
       }
     ],
-    "songCount": 4
+    "songsCount": 14
   },
+
   "albums": {
-    "albums": [
-      {
-        "id": 82004878,
-        "name": "Nine Track Mind",
-        "picUrl": "https://picsum.photos/200?random=10",
-        "artist": { "id": 90331, "name": "Charlie Puth" },
-        "publishTime": 1452528000000,
-        "size": 12,
-        "company": "Atlantic Records"
-      },
-      {
-        "id": 12345678,
-        "name": "Justice",
-        "picUrl": "https://picsum.photos/200?random=11",
-        "artist": { "id": 35531, "name": "Justin Bieber" },
-        "publishTime": 1616112000000,
-        "size": 16,
-        "company": "Def Jam"
-      },
-      {
-        "id": 84381003,
-        "name": "After Hours",
-        "picUrl": "https://picsum.photos/200?random=12",
-        "artist": { "id": 10533, "name": "The Weeknd" },
-        "publishTime": 1584662400000,
-        "size": 14,
-        "company": "XO / Republic"
-      }
+    "albums":
+      [
+        {
+          "id": 82004878,
+          "name": "Nine Track Mind",
+          "picUrl": "https://picsum.photos/200?random=10",
+          "artist": { "id": 90331, "name": "Charlie Puth" },
+          "publishTime": 1452528000000,
+          "size": 12,
+          "company": "Atlantic Records"
+        },
+        {
+          "id": 12345678,
+          "name": "Justice",
+          "picUrl": "https://picsum.photos/200?random=11",
+          "artist": { "id": 35531, "name": "Justin Bieber" },
+          "publishTime": 1616112000000,
+          "size": 16,
+          "company": "Def Jam"
+        },
+        {
+          "id": 84381003,
+          "name": "After Hours",
+          "picUrl": "https://picsum.photos/200?random=12",
+          "artist": { "id": 10533, "name": "The Weeknd" },
+          "publishTime": 1584662400000,
+          "size": 14,
+          "company": "XO / Republic"
+        },
+        {
+          "id": 56780001,
+          "name": "Future Nostalgia",
+          "picUrl": "https://picsum.photos/200?random=13",
+          "artist": { "id": 56789, "name": "Dua Lipa" },
+          "publishTime": 1584748800000,
+          "size": 11,
+          "company": "Warner Records"
+        },
+        {
+          "id": 44440001,
+          "name": "When We All Fall Asleep",
+          "picUrl": "https://picsum.photos/200?random=14",
+          "artist": { "id": 33333, "name": "Billie Eilish" },
+          "publishTime": 1553817600000,
+          "size": 14,
+          "company": "Interscope"
+        },
+        {
+          "id": 99887701,
+          "name": "Fine Line",
+          "picUrl": "https://picsum.photos/200?random=15",
+          "artist": { "id": 11223, "name": "Harry Styles" },
+          "publishTime": 1577404800000,
+          "size": 12,
+          "company": "Columbia Records"
+        },
+        {
+          "id": 77665502,
+          "name": "Reputation",
+          "picUrl": "https://picsum.photos/200?random=16",
+          "artist": { "id": 44556, "name": "Taylor Swift" },
+          "publishTime": 1504224000000,
+          "size": 15,
+          "company": "Big Machine"
+        },
+        {
+          "id": 55443303,
+          "name": "Lover",
+          "picUrl": "https://picsum.photos/200?random=17",
+          "artist": { "id": 44556, "name": "Taylor Swift" },
+          "publishTime": 1561507200000,
+          "size": 18,
+          "company": "Republic Records"
+        },
+        {
+          "id": 33221104,
+          "name": "Chromatica",
+          "picUrl": "https://picsum.photos/200?random=18",
+          "artist": { "id": 66778, "name": "Lady Gaga" },
+          "publishTime": 1592179200000,
+          "size": 16,
+          "company": "Interscope"
+        },
+        {
+          "id": 22110005,
+          "name": "25",
+          "picUrl": "https://picsum.photos/200?random=19",
+          "artist": { "id": 88990, "name": "Adele" },
+          "publishTime": 1449552000000,
+          "size": 11,
+          "company": "XL Recordings"
+        },
+        {
+          "id": 11009906,
+          "name": "30",
+          "picUrl": "https://picsum.photos/200?random=20",
+          "artist": { "id": 88990, "name": "Adele" },
+          "publishTime": 1637145600000,
+          "size": 12,
+          "company": "Columbia"
+        },
+        {
+          "id": 22334407,
+          "name": "My Universe",
+          "picUrl": "https://picsum.photos/200?random=21",
+          "artist": { "id": 10101, "name": "Coldplay" },
+          "publishTime": 1622505600000,
+          "size": 10,
+          "company": "Parlophone"
+        },
+        {
+          "id": 33445508,
+          "name": "Happier Than Ever",
+          "picUrl": "https://picsum.photos/200?random=22",
+          "artist": { "id": 33333, "name": "Billie Eilish" },
+          "publishTime": 1628985600000,
+          "size": 16,
+          "company": "Darkroom / Interscope"
+        },
+        {
+          "id": 44556609,
+          "name": "Justice (Deluxe)",
+          "picUrl": "https://picsum.photos/200?random=23",
+          "artist": { "id": 35531, "name": "Justin Bieber" },
+          "publishTime": 1616112000000,
+          "size": 20,
+          "company": "Def Jam"
+        },
+        {
+          "id": 55667710,
+          "name": "Dawn FM",
+          "picUrl": "https://picsum.photos/200?random=24",
+          "artist": { "id": 10533, "name": "The Weeknd" },
+          "publishTime": 1648771200000,
+          "size": 16,
+          "company": "XO / Republic"
+        },
+        {
+          "id": 66778811,
+          "name": "Black Panther: The Album",
+          "picUrl": "https://picsum.photos/200?random=25",
+          "artist": { "id": 12345, "name": "Various Artists" },
+          "publishTime": 1514764800000,
+          "size": 14,
+          "company": "Top Dawg / Aftermath"
+        },
+        {
+          "id": 77889912,
+          "name": "21",
+          "picUrl": "https://picsum.photos/200?random=26",
+          "artist": { "id": 88990, "name": "Adele" },
+          "publishTime": 1293840000000,
+          "size": 12,
+          "company": "XL Recordings"
+        },
+        {
+          "id": 88990013,
+          "name": "Confident",
+          "picUrl": "https://picsum.photos/200?random=27",
+          "artist": { "id": 55667, "name": "Demi Lovato" },
+          "publishTime": 1422748800000,
+          "size": 13,
+          "company": "Hollywood Records"
+        },
+        {
+          "id": 99001114,
+          "name": "Revival",
+          "picUrl": "https://picsum.photos/200?random=28",
+          "artist": { "id": 55667, "name": "Eminem" },
+          "publishTime": 1483228800000,
+          "size": 17,
+          "company": "Aftermath / Shady"
+        },
+        {
+          "id": 10111215,
+          "name": "Golden Hour",
+          "picUrl": "https://picsum.photos/200?random=29",
+          "artist": { "id": 66789, "name": "Kacey Musgraves" },
+          "publishTime": 1552521600000,
+          "size": 12,
+          "company": "MCA Nashville"
+        },
+        {
+          "id": 11121316,
+          "name": "Goodbye & Good Riddance",
+          "picUrl": "https://picsum.photos/200?random=30",
+          "artist": { "id": 77890, "name": "Juice WRLD" },
+          "publishTime": 1551398400000,
+          "size": 15,
+          "company": "Grade A / Interscope"
+        },
+        {
+          "id": 12131417,
+          "name": "Evermore",
+          "picUrl": "https://picsum.photos/200?random=31",
+          "artist": { "id": 44556, "name": "Taylor Swift" },
+          "publishTime": 1607990400000,
+          "size": 17,
+          "company": "Republic Records"
+        }
     ],
-    "albumCount": 45
+    "albumsCount": 22
   },
+
   "artists": {
     "artists": [
       {
@@ -96,10 +358,173 @@
         "musicSize": 320,
         "albumSize": 18,
         "mvSize": 80
+      },
+      {
+        "id": 56789,
+        "name": "Dua Lipa",
+        "picUrl": "https://picsum.photos/200?random=23",
+        "alias": [],
+        "musicSize": 210,
+        "albumSize": 8,
+        "mvSize": 35
+      },
+      {
+        "id": 33333,
+        "name": "Billie Eilish",
+        "picUrl": "https://picsum.photos/200?random=24",
+        "alias": [],
+        "musicSize": 180,
+        "albumSize": 6,
+        "mvSize": 40
+      },
+      {
+        "id": 11223,
+        "name": "Harry Styles",
+        "picUrl": "https://picsum.photos/200?random=25",
+        "alias": [],
+        "musicSize": 200,
+        "albumSize": 7,
+        "mvSize": 38
+      },
+      {
+        "id": 44556,
+        "name": "Taylor Swift",
+        "picUrl": "https://picsum.photos/200?random=26",
+        "alias": ["小天后"],
+        "musicSize": 550,
+        "albumSize": 21,
+        "mvSize": 90
+      },
+      {
+        "id": 66778,
+        "name": "Lady Gaga",
+        "picUrl": "https://picsum.photos/200?random=27",
+        "alias": ["小妖精"],
+        "musicSize": 300,
+        "albumSize": 10,
+        "mvSize": 60
+      },
+      {
+        "id": 88990,
+        "name": "Adele",
+        "picUrl": "https://picsum.photos/200?random=28",
+        "alias": [],
+        "musicSize": 180,
+        "albumSize": 4,
+        "mvSize": 20
+      },
+      {
+        "id": 10101,
+        "name": "Coldplay",
+        "picUrl": "https://picsum.photos/200?random=29",
+        "alias": [],
+        "musicSize": 400,
+        "albumSize": 12,
+        "mvSize": 50
+      },
+      {
+        "id": 55667,
+        "name": "Demi Lovato",
+        "picUrl": "https://picsum.photos/200?random=30",
+        "alias": [],
+        "musicSize": 230,
+        "albumSize": 7,
+        "mvSize": 28
+      },
+      {
+        "id": 77890,
+        "name": "Juice WRLD",
+        "picUrl": "https://picsum.photos/200?random=31",
+        "alias": [],
+        "musicSize": 250,
+        "albumSize": 6,
+        "mvSize": 25
+      },
+      {
+        "id": 66789,
+        "name": "Kacey Musgraves",
+        "picUrl": "https://picsum.photos/200?random=32",
+        "alias": [],
+        "musicSize": 160,
+        "albumSize": 5,
+        "mvSize": 12
+      },
+      {
+        "id": 12345,
+        "name": "BTS",
+        "picUrl": "https://picsum.photos/200?random=33",
+        "alias": ["防弹少年团"],
+        "musicSize": 700,
+        "albumSize": 15,
+        "mvSize": 130
+      },
+      {
+        "id": 54321,
+        "name": "BLACKPINK",
+        "picUrl": "https://picsum.photos/200?random=34",
+        "alias": [],
+        "musicSize": 400,
+        "albumSize": 5,
+        "mvSize": 75
+      },
+      {
+        "id": 13579,
+        "name": "Ed Sheeran",
+        "picUrl": "https://picsum.photos/200?random=35",
+        "alias": [],
+        "musicSize": 600,
+        "albumSize": 12,
+        "mvSize": 70
+      },
+      {
+        "id": 24680,
+        "name": "Shawn Mendes",
+        "picUrl": "https://picsum.photos/200?random=36",
+        "alias": [],
+        "musicSize": 280,
+        "albumSize": 8,
+        "mvSize": 30
+      },
+      {
+        "id": 36912,
+        "name": "Ariana Grande",
+        "picUrl": "https://picsum.photos/200?random=37",
+        "alias": ["小甜甜"],
+        "musicSize": 450,
+        "albumSize": 9,
+        "mvSize": 85
+      },
+      {
+        "id": 47123,
+        "name": "Travis Scott",
+        "picUrl": "https://picsum.photos/200?random=38",
+        "alias": [],
+        "musicSize": 350,
+        "albumSize": 7,
+        "mvSize": 40
+      },
+      {
+        "id": 58234,
+        "name": "Doja Cat",
+        "picUrl": "https://picsum.photos/200?random=39",
+        "alias": [],
+        "musicSize": 220,
+        "albumSize": 5,
+        "mvSize": 30
+      },
+      {
+        "id": 69345,
+        "name": "Olivia Rodrigo",
+        "picUrl": "https://picsum.photos/200?random=40",
+        "alias": [],
+        "musicSize": 180,
+        "albumSize": 3,
+        "mvSize": 15
       }
     ],
-    "artistCount": 30
+    "artistsCount": 200
   },
+
   "playlists": {
     "playlists": [
       {
@@ -119,10 +544,164 @@
         "playCount": 9800000,
         "trackCount": 100,
         "description": "本世纪20年代最火的歌曲都在这里"
+      },
+      {
+        "id": 50551235,
+        "name": "欧美超火流行歌",
+        "coverImgUrl": "https://picsum.photos/200?random=32",
+        "creator": { "userId": 303, "nickname": "流行榜单" },
+        "playCount": 5800000,
+        "trackCount": 120,
+        "description": "TikTok和Billboard爆火歌曲合集"
+      },
+      {
+        "id": 50551236,
+        "name": "Billie Eilish 全记录",
+        "coverImgUrl": "https://picsum.photos/200?random=33",
+        "creator": { "userId": 404, "nickname": "黑暗流行精选" },
+        "playCount": 3200000,
+        "trackCount": 45,
+        "description": "从出道到最新单曲，收录黑暗流行天后作品"
+      },
+      {
+        "id": 50551237,
+        "name": "Taylor Swift 流行必听",
+        "coverImgUrl": "https://picsum.photos/200?random=34",
+        "creator": { "userId": 505, "nickname": "粉丝精选" },
+        "playCount": 7500000,
+        "trackCount": 80,
+        "description": "Taylor Swift历年流行金曲合集"
+      },
+      {
+        "id": 50551238,
+        "name": "2020s K-Pop 热门榜",
+        "coverImgUrl": "https://picsum.photos/200?random=35",
+        "creator": { "userId": 606, "nickname": "韩流粉丝" },
+        "playCount": 6500000,
+        "trackCount": 110,
+        "description": "BTS、BLACKPINK等K-Pop大热歌曲合集"
+      },
+      {
+        "id": 50551239,
+        "name": "Lady Gaga 火爆精选",
+        "coverImgUrl": "https://picsum.photos/200?random=36",
+        "creator": { "userId": 707, "nickname": "舞台女王" },
+        "playCount": 4100000,
+        "trackCount": 55,
+        "description": "收录Lady Gaga经典及热门单曲"
+      },
+      {
+        "id": 50551240,
+        "name": "Ed Sheeran 超级歌单",
+        "coverImgUrl": "https://picsum.photos/200?random=37",
+        "creator": { "userId": 808, "nickname": "吉他情歌控" },
+        "playCount": 8600000,
+        "trackCount": 70,
+        "description": "Ed Sheeran的所有热门单曲和专辑精选"
+      },
+      {
+        "id": 50551241,
+        "name": "2020s TikTok 爆款",
+        "coverImgUrl": "https://picsum.photos/200?random=38",
+        "creator": { "userId": 909, "nickname": "短视频达人" },
+        "playCount": 5400000,
+        "trackCount": 95,
+        "description": "TikTok爆火背景音乐合集"
+      },
+      {
+        "id": 50551242,
+        "name": "R&B 流行精选",
+        "coverImgUrl": "https://picsum.photos/200?random=39",
+        "creator": { "userId": 1010, "nickname": "R&B达人" },
+        "playCount": 3800000,
+        "trackCount": 60,
+        "description": "欧美R&B流行金曲精选"
+      },
+      {
+        "id": 50551243,
+        "name": "Justin Bieber 金曲精选",
+        "coverImgUrl": "https://picsum.photos/200?random=40",
+        "creator": { "userId": 1111, "nickname": "比伯粉丝会" },
+        "playCount": 4700000,
+        "trackCount": 50,
+        "description": "Justin Bieber经典歌曲合集"
+      },
+      {
+        "id": 50551244,
+        "name": "Dua Lipa 舞曲精选",
+        "coverImgUrl": "https://picsum.photos/200?random=41",
+        "creator": { "userId": 1212, "nickname": "电音舞曲控" },
+        "playCount": 3600000,
+        "trackCount": 40,
+        "description": "收录Dua Lipa热门舞曲"
+      },
+      {
+        "id": 50551245,
+        "name": "Coldplay 心灵之声",
+        "coverImgUrl": "https://picsum.photos/200?random=42",
+        "creator": { "userId": 1313, "nickname": "摇滚控" },
+        "playCount": 2900000,
+        "trackCount": 60,
+        "description": "Coldplay经典抒情及摇滚歌曲合集"
+      },
+      {
+        "id": 50551246,
+        "name": "Adele 流行情歌精选",
+        "coverImgUrl": "https://picsum.photos/200?random=43",
+        "creator": { "userId": 1414, "nickname": "灵魂乐迷" },
+        "playCount": 5500000,
+        "trackCount": 35,
+        "description": "Adele动人情歌合集"
+      },
+      {
+        "id": 50551247,
+        "name": "Travis Scott 热门单曲",
+        "coverImgUrl": "https://picsum.photos/200?random=44",
+        "creator": { "userId": 1515, "nickname": "嘻哈控" },
+        "playCount": 4200000,
+        "trackCount": 45,
+        "description": "收录Travis Scott热门嘻哈单曲"
+      },
+      {
+        "id": 50551248,
+        "name": "Olivia Rodrigo 新世代金曲",
+        "coverImgUrl": "https://picsum.photos/200?random=45",
+        "creator": { "userId": 1616, "nickname": "新生代粉丝" },
+        "playCount": 3400000,
+        "trackCount": 30,
+        "description": "Olivia Rodrigo最火单曲精选"
+      },
+      {
+        "id": 50551249,
+        "name": "Doja Cat 热门舞曲",
+        "coverImgUrl": "https://picsum.photos/200?random=46",
+        "creator": { "userId": 1717, "nickname": "电音达人" },
+        "playCount": 3100000,
+        "trackCount": 40,
+        "description": "Doja Cat热门舞曲合集"
+      },
+      {
+        "id": 50551250,
+        "name": "Shawn Mendes 流行精选",
+        "coverImgUrl": "https://picsum.photos/200?random=47",
+        "creator": { "userId": 1818, "nickname": "吉他男神" },
+        "playCount": 2800000,
+        "trackCount": 35,
+        "description": "Shawn Mendes经典流行单曲合集"
+      },
+      {
+        "id": 50551251,
+        "name": "欧美情歌浪漫合集",
+        "coverImgUrl": "https://picsum.photos/200?random=48",
+        "creator": { "userId": 1919, "nickname": "浪漫歌迷" },
+        "playCount": 4600000,
+        "trackCount": 90,
+        "description": "欧美最浪漫情歌合集"
       }
     ],
-    "playlistCount": 85
+    "playlistsCount": 300
   },
+
   "mvs": {
     "mvs": [
       {
@@ -142,8 +721,17 @@
         "playCount": 15000000,
         "duration": 230000,
         "publishTime": "2021-03-19"
+      },
+      {
+        "id": 100001,
+        "name": "Levitating MV",
+        "cover": "https://picsum.photos/200?random=42",
+        "artists": [{ "id": 56789, "name": "Dua Lipa" }],
+        "playCount": 12000000,
+        "duration": 220000,
+        "publishTime": "2020-10-02"
       }
     ],
-    "mvCount": 60
+    "mvsCount": 180
   }
 }

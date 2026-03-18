@@ -20,7 +20,7 @@ const sections = [
   {
     titleKey: 'music.aside.myMusic',
     items: [
-    { to: '/music/my-music', labelKey: 'music.aside.menu.recent', icon: 'mdi:music-box-multiple' },
+    { to: '/media/music/recentMusic', labelKey: 'music.aside.menu.recent', icon: 'mdi:music-box-multiple' },
     { to: '/media/music/localMusic', labelKey: 'music.aside.menu.localMusic', icon: 'mdi:folder-music-outline' },
     ],
   },

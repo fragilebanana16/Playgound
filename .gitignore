@@ -46,3 +46,5 @@
 /Memories/OldServer
 /Memories/TermuxClientDist
 /Memories/TermuxServerSrc
+/Memories/Client/**/*.mp3
+/Memories/Client/**/*.lrc

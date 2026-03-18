@@ -47,21 +47,21 @@ const playMusic = async (row) => {
 <template>
     <div class="w-full box-border flex flex-1 flex-col overflow-x-hidden overflow-auto" >
         <el-table :data="tableData" :row-style="{ height: '50px' }" style="
-  width: 100%;
-  --el-table-border: none;
-  --el-table-border-color: none;
-" @row-dblclick="playMusic" class="!text-xs !flex-1">
-    <el-table-column prop="name" label="歌名">
-        <template #default="{ row }">
-            <div class="flex items-center gap-3">
-                <div class="min-w-10 h-10 ml-1">
-                    <el-image class="w-full h-full rounded-lg" lazy 
-                        :src="row.al?.picUrl" 
-                        :alt="row.name" />
-                </div>
-                <span class="line-clamp-1" :title="row.name">{{ row.name }}</span>
-            </div>
-        </template>
+        width: 100%;
+        --el-table-border: none;
+        --el-table-border-color: none;
+        " @row-dblclick="playMusic" class="!text-xs !flex-1">
+            <el-table-column prop="name" label="歌名">
+                <template #default="{ row }">
+                    <div class="flex items-center gap-3">
+                        <div class="min-w-10 h-10 ml-1">
+                            <el-image class="w-full h-full rounded-lg" lazy 
+                                :src="row.al?.picUrl" 
+                                :alt="row.name" />
+                        </div>
+                        <span class="line-clamp-1" :title="row.name">{{ row.name }}</span>
+                    </div>
+                </template>
     </el-table-column>
     <el-table-column label="歌手">
         <template #default="{ row }">
