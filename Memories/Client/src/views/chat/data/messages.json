@@ -1,0 +1,20 @@
+[
+  { "id": 1,  "from": 1, "to": 2, "content": "李四你好啊！",       "type": "text", "timestamp": 1710000000000 },
+  { "id": 2,  "from": 2, "to": 1, "content": "张三好久不见！",      "type": "text", "timestamp": 1710000060000 },
+  { "id": 3,  "from": 1, "to": 2, "content": "最近在忙什么呢",      "type": "text", "timestamp": 1710000120000 },
+  { "id": 4,  "from": 2, "to": 1, "content": "在学 Java，你呢",     "type": "text", "timestamp": 1710000180000 },
+  { "id": 5,  "from": 1, "to": 2, "content": "我也是！一起学",      "type": "text", "timestamp": 1710000240000 },
+  { "id": 6,  "from": 1, "to": 3, "content": "王五在吗",            "type": "text", "timestamp": 1710000300000 },
+  { "id": 7,  "from": 3, "to": 1, "content": "在的，什么事",        "type": "text", "timestamp": 1710000360000 },
+  { "id": 8,  "from": 1, "to": 3, "content": "周末打球吗",          "type": "text", "timestamp": 1710000420000 },
+  { "id": 9,  "from": 3, "to": 1, "content": "可以啊，几点",        "type": "text", "timestamp": 1710000480000 },
+  { "id": 10, "from": 1, "to": 3, "content": "下午三点怎么样",      "type": "text", "timestamp": 1710000540000 },
+  { "id": 11, "from": 2, "to": 3, "content": "王五，周末有空吗",    "type": "text", "timestamp": 1710000600000 },
+  { "id": 12, "from": 3, "to": 2, "content": "有空，怎么了",        "type": "text", "timestamp": 1710000660000 },
+  { "id": 13, "from": 2, "to": 3, "content": "一起出去吃饭",        "type": "text", "timestamp": 1710000720000 },
+  { "id": 14, "from": 3, "to": 2, "content": "好啊，叫上张三",      "type": "text", "timestamp": 1710000780000 },
+  { "id": 15, "from": 1, "to": 4, "content": "赵六好久不见",        "type": "text", "timestamp": 1710000840000 },
+  { "id": 16, "from": 4, "to": 1, "content": "是啊，最近怎么样",    "type": "text", "timestamp": 1710000900000 },
+  { "id": 17, "from": 3, "to": 4, "content": "赵六，在吗",          "type": "text", "timestamp": 1710000960000 },
+  { "id": 18, "from": 4, "to": 3, "content": "在呢",                "type": "text", "timestamp": 1710001020000 }
+]

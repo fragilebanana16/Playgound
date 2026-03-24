@@ -32,3 +32,4 @@ export * from './form'
 
 // socket 相关
 export * from './socket'
+export * from './socketio'

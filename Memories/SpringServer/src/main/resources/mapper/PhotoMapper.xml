@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.PhotoMapper">
+
+    <resultMap id="photoResultMap" type="com.example.domain.PhotoInfo">
+        <id property="id" column="id"/>
+        <result property="filename" column="filename"/>
+        <result property="filePath" column="file_path"/>
+        <result property="thumbnailUrl" column="thumbnail_url"/>
+        <result property="originalUrl" column="original_url"/>
+        <result property="lat" column="lat"/>
+        <result property="lng" column="lng"/>
+        <result property="altitude" column="altitude"/>
+        <result property="shootTime" column="shoot_time"/>
+        <result property="location" column="location"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+    </resultMap>
+
+    <insert id="batchInsertIgnore">
+        INSERT IGNORE INTO photo (filename, file_path, thumbnail_url, original_url,
+            lat, lng, altitude, shoot_time, location, width, height)
+        VALUES
+        <foreach collection="list" item="p" separator=",">
+            (#{p.filename}, #{p.filePath}, #{p.thumbnailUrl}, #{p.originalUrl},
+             #{p.lat}, #{p.lng}, #{p.altitude}, #{p.shootTime}, #{p.location}, #{p.width}, #{p.height})
+        </foreach>
+    </insert>
+
+</mapper>

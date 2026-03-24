@@ -143,3 +143,31 @@ export interface DialogConfig {
   // 自定义类名
   customClass?: string
 }
+export interface ChatUser {
+  userId: number
+  userName: string
+  friends: number[]
+}
+
+export interface ChatMessage {
+  id?: number
+  from: number
+  to: number
+  content: string
+  type: 'text' | 'image' | 'video' | 'file'
+  timestamp: number
+  filename?: string
+  fileSize?: number
+  downloadUrl?: string
+}
+
+export interface SocketMessage {
+  from: string
+  to: string
+  content: string
+  type: string
+  timestamp?: string
+  filename?: string
+  fileSize?: number
+  downloadUrl?: string
+}

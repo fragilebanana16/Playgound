@@ -84,6 +84,24 @@ declare namespace Api {
     }
   }
 
+  namespace Media{
+    interface PhotoInfo {
+      filename: string
+      thumbnailUrl: string
+      originalUrl: string
+      lat: number
+      lng: number
+      altitude?: number
+      shootTime?: string
+      deviceModel?: string
+      aperture?: string
+      shutterSpeed?: string
+      iso?: number
+      focalLength?: string
+      width?: number
+      height?: number
+    }
+  }
   /** 系统管理类型 */
   namespace SystemManage {
     /** 用户列表 */
@@ -132,3 +150,4 @@ declare namespace Api {
     >
   }
 }
+

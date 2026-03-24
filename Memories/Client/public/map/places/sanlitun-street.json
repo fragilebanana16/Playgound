@@ -1,0 +1,12 @@
+{
+  "id": 2,
+  "name": "三里屯街景",
+  "rating": 4.1,
+  "reviewCount": 6,
+  "tags": ["街道", "商业"],
+  "description": "...",
+  "reviews": [
+    { "user": "张四", "content": "也很漂亮", "score": 5 }
+  ],
+  "photos": ["/images/1-1.jpg", "/images/1-2.jpg"]
+}

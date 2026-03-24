@@ -48,3 +48,6 @@
 /Memories/TermuxServerSrc
 /Memories/Client/**/*.mp3
 /Memories/Client/**/*.lrc
+/Memories/Client/.env
+/Memories/Client/.env.development
+/Memories/Client/.env.production

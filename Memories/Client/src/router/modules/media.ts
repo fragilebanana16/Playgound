@@ -104,7 +104,32 @@ export const mediaRoutes: AppRouteRecord = {
         noTransition: true,
       }
     },
-    
+    {
+      path: 'map',
+      name: 'GISMap',
+      component: () => import('@/views/map/index.vue'),
+      meta: {
+        title: '地图',
+        icon: 'ri:home-smile-2-line',
+        keepAlive: false,
+        fixedTab: true,
+        isSingleModule: true, // 只渲染父级，不展开 children
+        noTransition: true,
+      }
+    },
+    {
+      path: 'chatting',
+      name: 'Chatting',
+      component: () => import('@/views/chat/index.vue'),
+      meta: {
+        title: '聊天',
+        icon: 'ri:home-smile-2-line',
+        keepAlive: false,
+        fixedTab: true,
+        isSingleModule: true, // 只渲染父级，不展开 children
+        noTransition: true,
+      }
+    },
     // {
     //   path: 'analysis',
     //   name: 'Analysis',

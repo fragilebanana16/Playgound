@@ -1,0 +1,4 @@
+[
+  { "id": 1, "name": "国贸夜景", "key": "guomao-night", "lon": 116.4615, "lat": 39.9093, "cover": "/images/1.jpg" },
+  { "id": 2, "name": "三里屯街景", "key": "sanlitun-street", "lon": 116.4551, "lat": 39.9373, "cover": "/images/2.jpg" }
+]

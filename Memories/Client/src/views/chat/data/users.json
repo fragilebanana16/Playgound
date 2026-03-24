@@ -1,0 +1,6 @@
+[
+  { "userId": 1, "userName": "张三", "friends": [2, 3, 4] },
+  { "userId": 2, "userName": "李四", "friends": [1, 3] },
+  { "userId": 3, "userName": "王五", "friends": [1, 2, 4] },
+  { "userId": 4, "userName": "赵六", "friends": [1, 3] }
+]

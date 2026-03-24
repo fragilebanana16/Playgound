@@ -10,6 +10,7 @@ import ElementPlus from 'unplugin-element-plus/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import tailwindcss from '@tailwindcss/vite'
 // import { visualizer } from 'rollup-plugin-visualizer'
+import cesium from 'vite-plugin-cesium'
 
 export default ({ mode }: { mode: string }) => {
   const root = process.cwd()
@@ -18,6 +19,7 @@ export default ({ mode }: { mode: string }) => {
 
   console.log(`🚀 API_URL = ${VITE_API_URL}`)
   console.log(`🚀 VERSION = ${VITE_VERSION}`)
+  console.log(`🚀 PROXY = ${VITE_API_PROXY_URL}`)
 
   return defineConfig({
     define: {
@@ -29,7 +31,8 @@ export default ({ mode }: { mode: string }) => {
       proxy: {
         '/api': {
           target: VITE_API_PROXY_URL,
-          changeOrigin: true
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '') // 后端去掉api
         }
       },
       host: true
@@ -67,6 +70,7 @@ export default ({ mode }: { mode: string }) => {
     },
     plugins: [
       vue(),
+      cesium(),
       tailwindcss(),
       // 自动按需导入 API
       AutoImport({
