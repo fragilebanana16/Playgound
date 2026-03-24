@@ -56,7 +56,7 @@ export default {
             } else if (this.data.flag & c.FLAG_LOAD_FAIL) {
                 return errorsvg;
             } else {
-                return this.data.url ? this.data.url : errorsvg;
+                return this.data.thumbnail_url ? this.data.thumbnail_url + '?quality=0.9&size=500' : errorsvg;
             }
         },
         getCurrentImage() {
@@ -91,6 +91,7 @@ export default {
                 options: {
                     initialViewIndex: curIndex,
                     hidden: this.processDeleted, // https://github.com/fengyuanchen/viewerjs?tab=readme-ov-file#options
+                    transition: false,
                     toolbar: {
                         zoomIn: 4,
                         zoomOut: 4,

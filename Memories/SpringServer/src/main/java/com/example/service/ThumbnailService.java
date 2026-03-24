@@ -8,15 +8,12 @@ import java.io.OutputStream;
 
 @Service
 public class ThumbnailService {
-
-    private static final int THUMB_SIZE = 200;
-
-    public void writeThumbnail(File file, OutputStream out) throws Exception {
+    public void writeThumbnail(File file, OutputStream out, float  quality, int size) throws Exception {
         Thumbnails.of(file)
-                .size(THUMB_SIZE, THUMB_SIZE)
+                .size(size, size)
                 .keepAspectRatio(true)
                 .outputFormat("jpg")
-                .outputQuality(0.85)
+                .outputQuality(quality)
                 .toOutputStream(out);
     }
 }

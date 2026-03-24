@@ -81,6 +81,17 @@ public class FileController {
         return photoService.listPhotosWithLocation();
     }
     
+
+    @GetMapping("/day")
+    public List<Map<String, Object>> getDay(@RequestParam Long dayId) {
+        return photoMapper.findTimelineDay(dayId);
+    }
+    
+    @GetMapping("/days")
+    public List<Map<String, Object>> getDays() {
+        return photoMapper.findGroupByDay();
+    }
+    
     @GetMapping("/photosBbox")
     public List<PhotoInfo> list(
         @RequestParam Double west,
@@ -94,7 +105,7 @@ public class FileController {
 
     // 获取缩略图（动态生成，不落盘）
     @GetMapping("/thumbnail/{filename}")
-    public void thumbnail(@PathVariable String filename, HttpServletResponse response) throws Exception {
+    public void thumbnail(@PathVariable String filename, @RequestParam(defaultValue = "0.8f") float quality, @RequestParam(defaultValue = "200") int size, HttpServletResponse response) throws Exception {
         Path file = fileService.findMediaFile(filename);
         if (file == null) {
             response.setStatus(404);
@@ -103,7 +114,7 @@ public class FileController {
         response.setContentType("image/jpeg");
         // 浏览器缓存 1 天
         response.setHeader("Cache-Control", "max-age=86400");
-        thumbnailService.writeThumbnail(file.toFile(), response.getOutputStream());
+        thumbnailService.writeThumbnail(file.toFile(), response.getOutputStream(), quality, size);
     }
     
     @GetMapping("/preview/{type}/{filename}")

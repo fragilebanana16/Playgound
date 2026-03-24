@@ -28,5 +28,42 @@
              #{p.lat}, #{p.lng}, #{p.altitude}, #{p.shootTime}, #{p.location}, #{p.width}, #{p.height})
         </foreach>
     </insert>
+    
+	<select id="findGroupByDay" resultType="map">
+	    SELECT
+	        DATEDIFF(DATE(shoot_time), '1970-01-01') AS dayid,
+	        COUNT(*) AS count,
+	        JSON_ARRAYAGG(
+	            JSON_OBJECT(
+	                'fileid', id,
+	                'dayid', DATEDIFF(DATE(shoot_time), '1970-01-01'),
+	                'w', width,
+	                'h', height,
+	                'isfavorite', 0
+	            )
+	        ) AS detail
+	    FROM photo
+	    WHERE shoot_time IS NOT NULL
+	    GROUP BY DATE(shoot_time), DATEDIFF(DATE(shoot_time), '1970-01-01')
+	    ORDER BY DATE(shoot_time) DESC
+	</select>
 
+	
+	<select id="findTimelineDay" resultType="map">
+	    SELECT
+	        id AS fileid,
+	        filename AS name,
+	        original_url AS url,
+	        thumbnail_url AS thumbnail_url,
+	        width AS w,
+	        height AS h,
+	        0 AS isvideo,
+	        0 AS isfavorite,
+	        0 AS isfolder,
+	        DATEDIFF(DATE(shoot_time), '1970-01-01') AS datetaken
+	    FROM photo
+	    WHERE shoot_time IS NOT NULL
+	    AND DATEDIFF(DATE(shoot_time), '1970-01-01') = #{dayid}
+	    ORDER BY shoot_time ASC
+	</select>
 </mapper>

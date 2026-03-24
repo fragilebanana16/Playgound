@@ -27,3 +27,18 @@ export function fetchPhotosByBbox(params: {
   })
 }
 
+export function fetchTimelineDays() {
+   return request.get({
+     url: '/api/file/days',
+  })
+}
+
+export function fetchTimelineDay(params: {
+  dayId: number
+}) {
+   return request.get({
+     url: '/api/file/day',
+     params
+  })
+}
+

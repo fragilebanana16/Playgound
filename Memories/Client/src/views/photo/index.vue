@@ -64,6 +64,7 @@ import ScrollerManager from './components/ScrollerManager.vue';
 import justifiedLayout from "justified-layout";
 import useUserStore from '../../../store/modules/user'
 import { generateImage } from '@/utils'
+import { fetchTimelineDays, fetchTimelineDay  } from '@/api/media'
 
 const router = useRoute()
 const MOBILE_ROW_HEIGHT = 120; // Approx row height on mobile
@@ -433,23 +434,30 @@ export default {
             head.name = name;
             return head.name;
         },
-
+        dateToDayId(dateStr: string): number {
+          const date = new Date(dateStr.substring(0, 10))
+          const epoch = new Date('1970-01-01')
+          return Math.floor((date.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24))
+        },
         /** Fetch timeline main call */
         async fetchDays(noCache=false) {
-            const data = Array.from({ length: 5 }, (_, index) => {
-                const today = new Date();
-                const epoch = new Date(0); // January 1, 1970
-                const diffTime = Math.floor((today.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24)); // Difference in days
-                const yearInterval = Math.floor(Math.random() * 30 + 365) * index; // Increment by 1 year for each index
-                const dayid = diffTime + yearInterval;
-                return {
-                    id: '00' + index,
-                    dayid: dayid,
-                    count: 16, // 这里要和fetchDay的每天数量一致，否则recycle高度和timeline高度不匹配
-                    detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
-                    rows: new Set()
-                }}
-            );
+            //const data = Array.from({ length: 5 }, (_, index) => {
+            //    const today = new Date();
+            //    const epoch = new Date(0); // January 1, 1970
+            //    const diffTime = Math.floor((today.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24)); // Difference in days
+            //    const yearInterval = Math.floor(Math.random() * 30 + 365) * index; // Increment by 1 year for each index
+            //    const dayid = diffTime + yearInterval;
+            //    return {
+            //        id: '00' + index,
+            //        dayid: dayid,
+            //        count: 16, 
+            //        detail: [], // [{"fileid": 6580,"dayid": 19355, "w": 4032,"h": 2268, "isfavorite": 1}]
+            //        rows: new Set()
+            //    }}
+            // );
+            
+
+            const data = await fetchTimelineDays();
             let url = '/apps/memories/api/days';
             let params = {};
 
@@ -629,45 +637,47 @@ export default {
                     h: number;
                     datetaken: number;
                 };
-                    const commonImageSizes = [
-                    { w: 1920, h: 1080 }, // 16:9
-                    { w: 1280, h: 720}, // 16:9
-                    { w: 800, h: 600 }, // 4:3
-                    { w: 1024, h: 768 }, // 4:3
-                    { w: 640, h: 480 }, // 4:3
-                    { w: 1080, h: 1920 }, // 9:16
-                    { w: 720, h: 1280 }, // 9:16
-                    { w: 600, h: 800 }, // 3:4
-                    { w: 768, h: 1024 }, // 3:4
-                    { w: 480, h: 640 }, // 3:4
-                ];
-                function getRandomImageSize() {
-                    const randomIndex = Math.floor(Math.random() * commonImageSizes.length);
-                    return commonImageSizes[randomIndex];
-                }
-                function getRandomElements(arr, count) {
-                    const shuffled = [...arr].sort(() => Math.random() - 0.5);
-                    return shuffled.slice(0, count);
-                }
-                const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
-
-                // this.isMock = await useUserStore().getInfo().then((res) => {
-                //     return res.user.userName === 'mock'
-                // })
-                this.isMock = false;
-                randomArray.forEach((img, index) => {
-                    const fileid = `fileid${index * Math.random() + 1}`;
-                    let url = this.isMock ? generateImage() : `${prefix}${img}`;
-                    url = `https://picsum.photos/400/300?random=${Math.random()}`;
-                    let {w, h} = getRandomImageSize()
-                    const isfolder = index % 5 === 0
-                    if (isfolder) {
-                        w = h
-                    }
-                    const randomHourInMs = Math.floor(Math.random() * 24) * 60 * 60 * 1000
-                    data.push({ w, h ,fileid, url, isvideo: index % 3 === 0, isfolder, name: 'folder' + index / 5, isfavorite: index % 6 === 0, datetaken: dayId * 24 * 60 * 60 * 1000 + randomHourInMs });
-                });
-
+                //    const commonImageSizes = [
+                //    { w: 1920, h: 1080 }, // 16:9
+                //    { w: 1280, h: 720}, // 16:9
+                //    { w: 800, h: 600 }, // 4:3
+                //    { w: 1024, h: 768 }, // 4:3
+                //    { w: 640, h: 480 }, // 4:3
+                //    { w: 1080, h: 1920 }, // 9:16
+                //    { w: 720, h: 1280 }, // 9:16
+                //    { w: 600, h: 800 }, // 3:4
+                //    { w: 768, h: 1024 }, // 3:4
+                //    { w: 480, h: 640 }, // 3:4
+                //];
+                //function getRandomImageSize() {
+                //    const randomIndex = Math.floor(Math.random() * commonImageSizes.length);
+                //    return commonImageSizes[randomIndex];
+                //}
+                //function getRandomElements(arr, count) {
+                //    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+                //    return shuffled.slice(0, count);
+                //}
+                //const randomArray = getRandomElements(MOCK_IMG_DATA, 16); // 单日16张
+                //
+                //// this.isMock = await useUserStore().getInfo().then((res) => {
+                ////     return res.user.userName === 'mock'
+                //// })
+                //this.isMock = false;
+                //randomArray.forEach((img, index) => {
+                //    const fileid = `fileid${index * Math.random() + 1}`;
+                //    let url = this.isMock ? generateImage() : `${prefix}${img}`;
+                //    url = `https://picsum.photos/400/300?random=${Math.random()}`;
+                //    let {w, h} = getRandomImageSize()
+                //    const isfolder = index % 5 === 0
+                //    if (isfolder) {
+                //        w = h
+                //    }
+                //    const randomHourInMs = Math.floor(Math.random() * 24) * 60 * 60 * 1000
+                //    data.push({ w, h ,fileid, url, isvideo: index % 3 === 0, isfolder, name: 'folder' + index / 5, isfavorite: index % 6 === 0, datetaken: dayId * 24 * 60 * 60 * 1000 + randomHourInMs });
+                //});
+                const params = { dayId };
+                data = await fetchTimelineDay(params);
+                
                 if (this.state !== startState) return;
                 // Store cache asynchronously
                 // Do this regardless of whether the state has
@@ -727,15 +737,21 @@ export default {
 
             // Create justified layout with correct params
             const justify = justifiedLayout(day.detail.map(p => {
-                return {
-                    width: (this.squareMode ? null : p.w) || this.rowHeight,
-                    height: (this.squareMode ? null : p.h) || this.rowHeight,
-                };
+              const maxRatio = 1.5  // 最大宽高比
+              const ratio = Math.min((p.w || this.rowHeight) / (p.h || this.rowHeight), maxRatio)
+              return {
+                width: ratio * this.rowHeight,
+                height: this.rowHeight,
+              }
+                //return {
+                //    width: (this.squareMode ? null : p.w) || this.rowHeight,
+                //    height: (this.squareMode ? null : p.h) || this.rowHeight,
+                //};
             }), {
                 containerWidth: this.rowWidth,
                 containerPadding: 0,
                 boxSpacing: 0,
-                targetRowHeight: this.rowHeight,
+                targetRowHeight: this.rowWidth / 4,
                 targetRowHeightTolerance: 0.1,
             });
             // Check if some rows were added

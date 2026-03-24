@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import com.example.domain.PhotoInfo;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface PhotoMapper {
@@ -32,4 +33,8 @@ public interface PhotoMapper {
     List<PhotoInfo> findByBbox(@Param("west") Double west, @Param("east") Double east,
                                @Param("south") Double south, @Param("north") Double north,
                                @Param("limit") int limit);
+    
+    List<Map<String, Object>> findGroupByDay();
+    
+    List<Map<String, Object>> findTimelineDay(@Param("dayid") Long dayid);
 }
