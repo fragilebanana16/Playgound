@@ -88,11 +88,11 @@ export function useSettingsPanel() {
           }
         } else {
           // 恢复桌面端布局
-          if (hasChangedMenu.value && beforeMenuType.value) {
-            useSettingsState().switchMenuLayouts(beforeMenuType.value)
-            settingStore.setMenuOpen(true)
-            hasChangedMenu.value = false
-          }
+          // if (hasChangedMenu.value && beforeMenuType.value) {
+          //   useSettingsState().switchMenuLayouts(beforeMenuType.value)
+          //   settingStore.setMenuOpen(true)
+          //   hasChangedMenu.value = false
+          // }
         }
       },
       { immediate: true }

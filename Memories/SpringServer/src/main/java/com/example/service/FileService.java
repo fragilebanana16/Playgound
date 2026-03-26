@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.config.StorageConfig;
+import com.example.domain.FileMetadata;
+import com.example.mapper.FileMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +22,20 @@ public class FileService {
     private FileStorageService storageService;
     @Autowired
     private StorageConfig storageConfig;
+    @Autowired
+    private FileMapper fileMapper;
+    
+    public Map<String, Object> getFilesByPage(int page, int size) {
+        int offset = (page - 1) * size;
+        List<FileMetadata> list = fileMapper.selectPage(offset, size);
+        long total = fileMapper.countAll();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("items", list);
+        result.put("total", total);
+        return result;
+    }
+    
     // 普通上传
     public Map<String, Object> upload(MultipartFile file) throws Exception {
     	log.info("upload==>");

@@ -42,3 +42,19 @@ export function fetchTimelineDay(params: {
   })
 }
 
+export function fetchSyncUpload() {
+   return request.post({
+     url: '/api/file/syncUpload',
+  })
+}
+
+export function fetchFileMetas(params: {
+  page: number
+  size: number
+}) {
+   return request.get({
+     url: '/api/file/fileMetas',
+     params
+  })
+}
+

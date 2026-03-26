@@ -14,3 +14,16 @@ CREATE TABLE photo (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_filename (filename)
 );
+
+CREATE TABLE `file_metadata` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `file_name` VARCHAR(255) NOT NULL,
+    `file_path` VARCHAR(500) NOT NULL,
+    `size` BIGINT DEFAULT 0,
+    `extension` VARCHAR(20),
+    `is_directory` TINYINT(1) DEFAULT 0,
+    `last_modified` DATETIME,
+    `sync_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_path` (`file_path`) -- 关键：路径唯一
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -130,6 +130,19 @@ export const mediaRoutes: AppRouteRecord = {
         noTransition: true,
       }
     },
+    {
+      path: 'cloud',
+      name: 'Cloud',
+      component: () => import('@/views/cloud/index.vue'),
+      meta: {
+        title: '云盘',
+        icon: 'ri:home-smile-2-line',
+        keepAlive: false,
+        fixedTab: true,
+        isSingleModule: true, // 只渲染父级，不展开 children
+        noTransition: true,
+      }
+    },
     // {
     //   path: 'analysis',
     //   name: 'Analysis',

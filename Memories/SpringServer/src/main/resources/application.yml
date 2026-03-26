@@ -18,4 +18,4 @@ mybatis:
 
 storage:
     media-path: G:/media
-    upload-path: uploads
+    upload-path: G:/uploads

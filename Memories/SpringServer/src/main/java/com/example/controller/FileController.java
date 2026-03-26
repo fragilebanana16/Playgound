@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.service.FileService;
 import com.example.service.PhotoService;
+import com.example.service.MediaSyncService;
 import com.example.service.ThumbnailService;
 import com.example.domain.PhotoInfo;
 import com.example.mapper.PhotoMapper;
@@ -36,18 +37,37 @@ public class FileController {
     
     @Autowired
     private PhotoService photoService;
-
+    
+    @Autowired
+    private MediaSyncService mediaSyncService;
+    
     @Autowired
     private ThumbnailService thumbnailService;
     
     @Autowired
     private PhotoMapper photoMapper;
+
+    @GetMapping("/fileMetas")
+    public Map<String, Object> list(@RequestParam(defaultValue = "1") int page, 
+                                    @RequestParam(defaultValue = "50") int size) {
+        return fileService.getFilesByPage(page, size);
+    }
     
     @PostMapping("/upload")
     public Map<String, Object> upload(@RequestParam("file") MultipartFile file) throws Exception {
         return fileService.upload(file);
     }
-
+    
+    @PostMapping("/syncUpload")
+    public ResponseEntity<String> syncLocalFiles() {
+        try {
+        	int cnt = mediaSyncService.scanAndSyncUpload();
+            return ResponseEntity.ok("同步成功！" + cnt + "条");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("同步失败: " + e.getMessage());
+        }
+    }
+    
     @GetMapping("/check")
     public Map<String, Object> check(@RequestParam String md5,
                                      @RequestParam String filename) throws Exception {

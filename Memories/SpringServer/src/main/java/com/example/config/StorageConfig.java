@@ -11,7 +11,7 @@ public class StorageConfig {
     private String mediaPath = "G:/media";
 
     /** 上传文件存储路径 */
-    private String uploadPath = "uploads";
+    private String uploadPath = "G:/uploads";
 
     public String getMediaPath() { return mediaPath; }
     public void setMediaPath(String mediaPath) { this.mediaPath = mediaPath; }
