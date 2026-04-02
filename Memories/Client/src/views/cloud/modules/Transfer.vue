@@ -1,10 +1,9 @@
 <template>
-  <div class="transfer-page">
-
+  <div class="transfer-page" style="height: calc(-90px + 100vh);">
     <!-- 页头 -->
     <div class="page-header">
       <div class="header-left">
-        <router-link to="/drive/all" class="back-btn">
+        <router-link to="/media/cloud/cloudMain" class="back-btn">
           <Icon icon="solar:arrow-left-line-duotone" />
         </router-link>
         <div>
@@ -78,7 +77,7 @@
     </div>
 
     <!-- 传输列表 -->
-    <div class="transfer-list">
+    <div class="transfer-list overflow-y-auto">
       <transition-group name="list-item">
         <div
           v-for="item in filteredTransfers"
@@ -405,8 +404,8 @@ function getFileColor(item) {
   --c-success: #22C55E;
   --c-danger: #EF4444;
   --radius: 12px;
-
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--c-bg);
   padding: 28px 32px;
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;

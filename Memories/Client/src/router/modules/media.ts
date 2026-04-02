@@ -134,6 +134,7 @@ export const mediaRoutes: AppRouteRecord = {
       path: 'cloud',
       name: 'Cloud',
       component: () => import('@/views/cloud/index.vue'),
+      redirect: { name: 'CloudMain' }, 
       meta: {
         title: '云盘',
         icon: 'ri:home-smile-2-line',
@@ -141,7 +142,29 @@ export const mediaRoutes: AppRouteRecord = {
         fixedTab: true,
         isSingleModule: true, // 只渲染父级，不展开 children
         noTransition: true,
-      }
+      },
+      children: [
+        {
+          path: 'cloudMain/:type?',
+          name: 'CloudMain',
+          component: () => import('@/views/cloud/modules/CloudMain.vue'),
+          meta: {
+            title: '网盘主页',
+            icon: 'ri:align-item-bottom-line',
+            keepAlive: true,
+          },
+        },
+        {
+          path: 'transfer',
+          name: 'Transfer',
+          component: () => import('@/views/cloud/modules/Transfer.vue'),
+          meta: {
+            title: '传输',
+            icon: 'ri:align-item-bottom-line',
+            keepAlive: true,
+          },
+        }
+      ]
     },
     // {
     //   path: 'analysis',

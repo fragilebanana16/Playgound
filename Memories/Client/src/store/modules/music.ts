@@ -6,10 +6,6 @@ import sound3 from '@/assets/Slow Down - Madnap,Pauline Herr.mp3'
 import sound4 from '@/assets/sun and moon - Anees.mp3'
 import sound5 from '@/assets/Anson Seabra - Kryptonite.mp3'
 
-import cover1 from '@/assets/我记得.jpg'
-import cover2 from '@/assets/Diviners & Azertion - Feelings Mp3 Download by NCS - Files Garage.jpeg'
-import cover3 from '@/assets/Slow Down - Madnap,Pauline Herr.jpg'
-import cover4 from '@/assets/sun and moon - Anees.jpg'
 
 const useMusicStore = defineStore('useAudioStore', {
     state: () => ({
@@ -20,7 +16,6 @@ const useMusicStore = defineStore('useAudioStore', {
                 title: "我记得",
                 singer: "赵雷",
                 album: "==x",
-                cover: cover1,
                 source: sound1,
                 time: 260675,
             },
@@ -32,7 +27,6 @@ const useMusicStore = defineStore('useAudioStore', {
             title: "我记得",
             singer: "赵雷",
             album: "==x",
-            cover: cover1,
             source: sound1,
             time: 260675,
         },

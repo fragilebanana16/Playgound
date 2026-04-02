@@ -107,3 +107,15 @@ export const useMenuStore = defineStore('menuStore', () => {
     clearRemoveRouteFns
   }
 })
+
+export const useCloudStore = defineStore('cloud', {
+  state: () => ({
+    // 默认选中的分类
+    currentCategory: 'all',
+  }),
+  actions: {
+    setCategory(type) {
+      this.currentCategory = type;
+    },
+  }
+});
