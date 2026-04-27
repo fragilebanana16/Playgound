@@ -45,10 +45,10 @@ namespace LLMChat
                 // Views and ViewModels
                 services.AddSingleton<Views.Pages.DashboardPage>();
                 services.AddSingleton<ViewModels.DashboardViewModel>();
-                //services.AddSingleton<Views.Pages.DataPage>();
-                //services.AddSingleton<ViewModels.DataViewModel>();
-                //services.AddSingleton<Views.Pages.SettingsPage>();
-                //services.AddSingleton<ViewModels.SettingsViewModel>();
+                services.AddSingleton<Views.Pages.DataPage>();
+                services.AddSingleton<ViewModels.DataViewModel>();
+                services.AddSingleton<Views.Pages.SettingsPage>();
+                services.AddSingleton<ViewModels.SettingsViewModel>();
 
                 // Configuration
                 //services.Configure<AppConfig>(context.Configuration.GetSection(nameof(AppConfig)));

@@ -48,7 +48,7 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 Content = "Data",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
-                //TargetPageType = typeof(Views.Pages.DataPage)
+                TargetPageType = typeof(Views.Pages.DataPage)
             }
         };
 
@@ -58,7 +58,7 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 Content = "Settings",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.Settings24 },
-                //TargetPageType = typeof(Views.Pages.SettingsPage)
+                TargetPageType = typeof(Views.Pages.SettingsPage)
             }
         };
 

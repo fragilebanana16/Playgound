@@ -35,7 +35,6 @@
             x:Name="RootNavigation"
             OpenPaneLength="210"
             FooterMenuItemsSource="{Binding ViewModel.NavigationFooter, Mode=OneWay}"
-            BreadcrumbBar="{Binding ElementName=BreadcrumbBar}"
             TitleBar="{Binding ElementName=TitleBar, Mode=OneWay}"
             MenuItemsSource="{Binding ViewModel.NavigationItems, Mode=OneWay}">
             <ui:NavigationView.AutoSuggestBox>
@@ -48,8 +47,8 @@
                 </ui:AutoSuggestBox>
             </ui:NavigationView.AutoSuggestBox>
             <ui:NavigationView.Header>
-                <StackPanel Margin="42,32,42,20">
-                    <ui:BreadcrumbBar x:Name="BreadcrumbBar" />
+                <StackPanel Margin="0,0,0,0">
+                    <!--<ui:BreadcrumbBar x:Name="BreadcrumbBar" /> title -->
                 </StackPanel>
             </ui:NavigationView.Header>
         </ui:NavigationView>
