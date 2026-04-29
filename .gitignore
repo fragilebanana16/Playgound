@@ -8,6 +8,8 @@
 /MVVM/**/obj
 /MVVM/**/*.config
 /MVVM/SimpleTrader.Domain/.vs
+/MVVM/LLMChat/LLMChat/appsettings.json
+/MVVM/LLMChat/LLMChat/.vs
 
 /VueBasic/blog/src/firebase
 

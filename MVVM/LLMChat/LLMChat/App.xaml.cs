@@ -1,12 +1,13 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using System.Windows.Threading;
-using System.IO;
+﻿using LLMChat.Services;
+using LLMChat.ViewModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using LLMChat.Services;
+using System.Configuration;
+using System.Data;
+using System.IO;
+using System.Windows;
+using System.Windows.Threading;
 using Wpf.Ui;
 namespace LLMChat
 {
@@ -49,9 +50,11 @@ namespace LLMChat
                 services.AddSingleton<ViewModels.DataViewModel>();
                 services.AddSingleton<Views.Pages.SettingsPage>();
                 services.AddSingleton<ViewModels.SettingsViewModel>();
+                services.AddSingleton<Views.Pages.LLMChat>();
+                services.AddSingleton<ViewModels.LLMChatViewModel>();
 
                 // Configuration
-                //services.Configure<AppConfig>(context.Configuration.GetSection(nameof(AppConfig)));
+                services.Configure<Models.AppConfig>(context.Configuration.GetSection(nameof(Models.AppConfig)));
             }
         )
         .Build();

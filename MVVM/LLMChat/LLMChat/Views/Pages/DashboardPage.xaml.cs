@@ -14,21 +14,20 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Wpf.Ui.Controls;
 
-namespace LLMChat.Views.Pages
+namespace LLMChat.Views.Pages;
+
+/// <summary>
+/// DashboardPage.xaml 的交互逻辑
+/// </summary>
+public partial class DashboardPage : INavigableView<ViewModels.DashboardViewModel>
 {
-    /// <summary>
-    /// DashboardPage.xaml 的交互逻辑
-    /// </summary>
-    public partial class DashboardPage : INavigableView<ViewModels.DashboardViewModel>
+    public ViewModels.DashboardViewModel ViewModel { get; }
+
+    public DashboardPage(ViewModels.DashboardViewModel viewModel)
     {
-        public ViewModels.DashboardViewModel ViewModel { get; }
+        ViewModel = viewModel;
+        DataContext = this;
 
-        public DashboardPage(ViewModels.DashboardViewModel viewModel)
-        {
-            ViewModel = viewModel;
-            DataContext = this;
-
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

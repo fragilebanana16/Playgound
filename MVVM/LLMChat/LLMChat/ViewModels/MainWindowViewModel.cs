@@ -40,6 +40,12 @@ public partial class MainWindowViewModel : ObservableObject
         {
             new NavigationViewItem()
             {
+                Content = "LLMChat",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.Chat12 },
+                TargetPageType = typeof(Views.Pages.LLMChat)
+            },
+            new NavigationViewItem()
+            {
                 Content = "Home",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.Home24 },
                 TargetPageType = typeof(Views.Pages.DashboardPage)

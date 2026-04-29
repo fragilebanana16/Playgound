@@ -14,4 +14,5 @@ public class CommonProto
         public string command { get; set; }
         public int percent { get; set; }
     }
+
 }
