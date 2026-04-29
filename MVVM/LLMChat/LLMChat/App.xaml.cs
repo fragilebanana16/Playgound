@@ -43,6 +43,9 @@ namespace LLMChat
                 services.AddSingleton<INavigationWindow, Views.MainWindow>();
                 services.AddSingleton<ViewModels.MainWindowViewModel>();
 
+                // Services
+                services.AddSingleton<Services.KernelService>();
+                
                 // Views and ViewModels
                 services.AddSingleton<Views.Pages.DashboardPage>();
                 services.AddSingleton<ViewModels.DashboardViewModel>();
@@ -52,6 +55,8 @@ namespace LLMChat
                 services.AddSingleton<ViewModels.SettingsViewModel>();
                 services.AddSingleton<Views.Pages.LLMChat>();
                 services.AddSingleton<ViewModels.LLMChatViewModel>();
+                services.AddSingleton<Views.Pages.NotesChatPage>();
+                services.AddSingleton<ViewModels.NotesChatPageViewModel>();
 
                 // Configuration
                 services.Configure<Models.AppConfig>(context.Configuration.GetSection(nameof(Models.AppConfig)));

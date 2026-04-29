@@ -55,7 +55,13 @@ public partial class MainWindowViewModel : ObservableObject
                 Content = "Data",
                 Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
                 TargetPageType = typeof(Views.Pages.DataPage)
-            }
+            },
+            new NavigationViewItem()
+            {
+                Content = "Notes Agent",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.Chat20 },
+                TargetPageType = typeof(Views.Pages.NotesChatPage)
+            },
         };
 
         NavigationFooter = new ObservableCollection<object>

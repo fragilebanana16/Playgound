@@ -15,6 +15,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.74.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.SqliteVec" Version="1.74.0-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.74.0" />
     <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
     <PackageReference Include="WPF-UI" Version="3.1.1" />
     <PackageReference Include="WPF-UI.Tray" Version="3.1.1" />

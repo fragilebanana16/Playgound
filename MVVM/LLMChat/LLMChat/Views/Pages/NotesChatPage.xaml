@@ -1,0 +1,64 @@
+﻿<Page x:Class="LLMChat.Views.Pages.NotesChatPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:LLMChat.Views.Pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      mc:Ignorable="d"
+       d:DataContext="{d:DesignInstance local:TestChatPage,
+                                IsDesignTimeCreatable=False}"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="TestChatPage">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- 显示区（只读 TextBox，便于换行与滚动） -->
+        <TextBox Grid.Row="0"
+                 Text="{Binding ViewModel.ResponseText}"
+                 IsReadOnly="True"
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"
+                 HorizontalScrollBarVisibility="Disabled"
+                 AcceptsReturn="True"
+                 FontSize="14"
+                 Background="#FFF"
+                 Padding="10" />
+
+
+        <!-- 输入区 -->
+        <Grid Grid.Row="1" Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Import(.md)" 
+        Command="{Binding ViewModel.ImportFolderCommand}" Margin="0,0,10,0"
+        />
+            <ui:TextBox Grid.Column="1"
+                       x:Name="InputBox"
+                       Text="{Binding ViewModel.InputText, UpdateSourceTrigger=PropertyChanged}"
+                       PlaceholderText="在此输入问题，按 Enter 发送"
+                       AcceptsReturn="True"
+                       MaxHeight="120"
+                       VerticalScrollBarVisibility="Auto">
+                <ui:TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding ViewModel.SendCommand}" />
+                </ui:TextBox.InputBindings>
+            </ui:TextBox>
+
+            <ui:Button Grid.Column="2"
+                       Content="发送"
+                       Icon="Send24"
+                       Appearance="Primary"
+                       Command="{Binding ViewModel.SendCommand}"
+                       Margin="10,0,0,0"
+                       VerticalAlignment="Bottom" />
+        </Grid>
+    </Grid>
+</Page>
