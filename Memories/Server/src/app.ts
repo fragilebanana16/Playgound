@@ -12,7 +12,7 @@ import { logger } from './logger';
 import { authMiddleware } from './middlewares/auth.middleware';
 import morgan from 'morgan';
 import os from 'os';
-
+import cors from 'cors';
 function getLocalIP() {
   const interfaces = os.networkInterfaces();
   for (const name in interfaces) {
@@ -29,6 +29,7 @@ const host = getLocalIP();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -36,8 +37,8 @@ app.use(morgan('dev'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
-app.use('/api/auth', authRouter);
-app.use('/api/users', authMiddleware, userRouter);
+//app.use('/api/auth', authRouter);
+//app.use('/api/users', authMiddleware, userRouter);
 app.use('/api/media', mediaRouter);
 
 // Health check
@@ -45,18 +46,30 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-AppDataSource.initialize()
-  .then(() => {
-    console.log('Database connected');
-    app.listen(PORT, () => {
-      logger.info(`Server running on http://localhost:${PORT} , ip: ${host}`);
-      logger.info(`Swagger docs at http://localhost:${PORT}/api-docs , ip: ${host}`);
-      printBanner();
-    });
-  })
-  .catch((err) => {
-    logger.warn('❌ Database connection failed:', err);
-    process.exit(1);
+
+try {
+  app.listen(PORT, () => {
+    logger.info(`Server running on http://localhost:${PORT} , ip: ${host}`);
+    logger.info(`Swagger docs at http://localhost:${PORT}/api-docs , ip: ${host}`);
+    printBanner();
   });
+} catch (err) {
+  logger.error('❌ Server failed to start:', err);
+  process.exit(1);
+}
+
+//AppDataSource.initialize()
+//  .then(() => {
+//    console.log('Database connected');
+//    app.listen(PORT, () => {
+//      logger.info(`Server running on http://localhost:${PORT} , ip: ${host}`);
+//      logger.info(`Swagger docs at http://localhost:${PORT}/api-docs , ip: ${host}`);
+//      printBanner();
+//    });
+//  })
+//  .catch((err) => {
+//    logger.warn('❌ Database connection failed:', err);
+//    process.exit(1);
+//  });
 
 export default app;

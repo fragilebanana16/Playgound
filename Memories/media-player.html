@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐播放器 - API 测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .player-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .now-playing {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .now-playing-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .now-playing-info {
+            font-size: 12px;
+            color: #999;
+        }
+
+        audio {
+            width: 100%;
+            margin-bottom: 15px;
+            height: 32px;
+        }
+
+        .list-section {
+            margin-top: 20px;
+        }
+
+        .list-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn {
+            margin-left: auto;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+
+        .refresh-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .music-list {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .music-item {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .music-item:last-child {
+            border-bottom: none;
+        }
+
+        .music-item:hover {
+            background: #f0f0f0;
+        }
+
+        .music-item.active {
+            background: #e8eaf6;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .music-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .music-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 音乐播放器</h1>
+            <p>API 测试工具 - http://localhost:3000</p>
+        </div>
+
+        <div class="content">
+            <div id="error" class="error" style="display: none;"></div>
+
+            <div class="player-section">
+                <div class="now-playing">
+                    <div class="now-playing-title" id="nowPlayingTitle">未选择音乐</div>
+                    <div class="now-playing-info" id="nowPlayingInfo"></div>
+                </div>
+                <audio id="audioPlayer" controls></audio>
+                <div class="status" id="status"></div>
+            </div>
+
+            <div class="list-section">
+                <div class="list-title">
+                    📝 音乐列表
+                    <button class="refresh-btn" id="refreshBtn" onclick="loadMusicList()">刷新</button>
+                </div>
+                <div id="listContainer">
+                    <div class="loading">
+                        <div class="spinner"></div> 加载中...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/media';
+        const audioPlayer = document.getElementById('audioPlayer');
+        const errorDiv = document.getElementById('error');
+        const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+        const nowPlayingInfo = document.getElementById('nowPlayingInfo');
+        const listContainer = document.getElementById('listContainer');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const statusDiv = document.getElementById('status');
+
+        let currentMusicId = null;
+        let musicList = [];
+
+        // 显示错误信息
+        function showError(message) {
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 加载音乐列表
+        async function loadMusicList() {
+            try {
+                refreshBtn.disabled = true;
+                listContainer.innerHTML = '<div class="loading"><div class="spinner"></div> 加载中...</div>';
+
+                const response = await fetch(API_BASE);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                musicList = await response.json();
+
+                if (!Array.isArray(musicList.data) || musicList.data.length === 0) {
+                    listContainer.innerHTML = '<div class="empty">暂无音乐文件</div>';
+                    return;
+                }
+
+                renderMusicList();
+            } catch (error) {
+                console.error('加载列表失败:', error);
+                showError(`加载列表失败: ${error.message}`);
+                listContainer.innerHTML = `<div class="empty">❌ 加载失败<br><small>${error.message}</small></div>`;
+            } finally {
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // 渲染音乐列表
+        function renderMusicList() {
+            const list = document.createElement('ul');
+            list.className = 'music-list';
+
+            musicList.data.forEach((music) => {
+                const li = document.createElement('li');
+                li.className = 'music-item';
+                if (music.id === currentMusicId) {
+                    li.classList.add('active');
+                }
+
+                li.innerHTML = `
+                    <div class="music-icon">🎵</div>
+                    <div class="music-name" title="${music.name || music.filePath}">${music.name || music.filePath}</div>
+                `;
+
+                li.onclick = () => playMusic(music.id, music.name || music.filePath);
+                list.appendChild(li);
+            });
+
+            listContainer.innerHTML = '';
+            listContainer.appendChild(list);
+        }
+
+        // 播放音乐
+        function playMusic(id, name) {
+            currentMusicId = id;
+            const streamUrl = `${API_BASE}/${id}/stream`;
+
+            nowPlayingTitle.textContent = name;
+            nowPlayingInfo.textContent = `ID: ${id}`;
+            statusDiv.textContent = '▶ 正在加载...';
+
+            audioPlayer.src = streamUrl;
+            audioPlayer.play();
+
+            // 更新列表高亮
+            document.querySelectorAll('.music-item').forEach((item) => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
+
+        // 音乐事件监听
+        audioPlayer.addEventListener('play', () => {
+            statusDiv.textContent = '▶ 正在播放';
+        });
+
+        audioPlayer.addEventListener('pause', () => {
+            statusDiv.textContent = '⏸ 暂停';
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            statusDiv.textContent = '⏹ 已结束';
+        });
+
+        audioPlayer.addEventListener('error', (e) => {
+            console.error('音乐播放错误:', e);
+            showError('音乐播放失败，请检查文件或网络');
+            statusDiv.textContent = '❌ 播放错误';
+        });
+
+        // 初始加载
+        loadMusicList();
+    </script>
+</body>
+</html>
