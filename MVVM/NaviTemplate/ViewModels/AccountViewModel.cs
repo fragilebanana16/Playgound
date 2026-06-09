@@ -1,4 +1,6 @@
-﻿using System.Windows.Input;
+﻿using NaviTemplate.Commands;
+using NaviTemplate.Stores;
+using System.Windows.Input;
 
 namespace NaviTemplate.ViewModels
 {
@@ -7,5 +9,10 @@ namespace NaviTemplate.ViewModels
         public string Name => "SingletonSean";
 
         public ICommand NavigateHomeCommand { get; }
+
+        public AccountViewModel(NavigationStore navigationStore)
+        {
+            NavigateHomeCommand = new NavigateCommand<HomeViewModel>(navigationStore, () => new HomeViewModel(navigationStore));
+        }
     }
 }

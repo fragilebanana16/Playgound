@@ -1,4 +1,6 @@
-﻿using System.Windows.Input;
+﻿using NaviTemplate.Commands;
+using NaviTemplate.Stores;
+using System.Windows.Input;
 
 namespace NaviTemplate.ViewModels
 {
@@ -7,5 +9,11 @@ namespace NaviTemplate.ViewModels
         public string WelcomeMessage => "Welcome to my application.";
 
         public ICommand NavigateAccountCommand { get; }
+
+
+        public HomeViewModel(NavigationStore navigationStore)
+        {
+            NavigateAccountCommand = new NavigateCommand<AccountViewModel>(navigationStore, () => new AccountViewModel(navigationStore));
+        }
     }
 }
