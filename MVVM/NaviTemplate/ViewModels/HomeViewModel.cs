@@ -1,4 +1,5 @@
 ﻿using NaviTemplate.Commands;
+using NaviTemplate.Services;
 using NaviTemplate.Stores;
 using System.Windows.Input;
 
@@ -13,7 +14,8 @@ namespace NaviTemplate.ViewModels
 
         public HomeViewModel(NavigationStore navigationStore)
         {
-            NavigateAccountCommand = new NavigateCommand<AccountViewModel>(navigationStore, () => new AccountViewModel(navigationStore));
+            NavigateAccountCommand = new NavigateCommand<AccountViewModel>(new NavigationService<AccountViewModel>(
+                navigationStore, () => new AccountViewModel(navigationStore)));
         }
     }
 }
