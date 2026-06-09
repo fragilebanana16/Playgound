@@ -10,7 +10,7 @@
 /MVVM/SimpleTrader.Domain/.vs
 /MVVM/LLMChat/LLMChat/appsettings.json
 /MVVM/LLMChat/LLMChat/.vs
-
+/MVVM/**/.vs
 /VueBasic/blog/src/firebase
 
 /**/.metadata
