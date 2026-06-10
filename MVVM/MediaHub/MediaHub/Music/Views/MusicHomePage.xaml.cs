@@ -14,7 +14,7 @@ public partial class MusicHomePage : Page
         ViewModel = viewModel;
         DataContext = viewModel;
         InitializeComponent();
-        Loaded += OnLoaded;
+        //Loaded += OnLoaded;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

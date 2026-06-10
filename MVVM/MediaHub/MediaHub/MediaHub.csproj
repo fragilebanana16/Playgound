@@ -32,6 +32,8 @@
 
   <ItemGroup>
     <Folder Include="Movie\" />
+    <Folder Include="Music\Controls\" />
+    <Folder Include="Music\Models\" />
   </ItemGroup>
 
 </Project>

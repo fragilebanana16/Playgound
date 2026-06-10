@@ -1,0 +1,624 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Helper="clr-namespace:MediaHub.Music.Helpers"
+    xmlns:converters="clr-namespace:MediaHub.Music.Helpers.Converters"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+
+    <!--  进度到宽度转换器  -->
+    <converters:ProgressToWidthConverter x:Key="ProgressToWidthConverter" />
+
+    <!--  按钮样式 - 为所有WPF UI按钮提供统一的样式设置  -->
+    <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="MinHeight" Value="35" />
+        <Setter Property="MinWidth" Value="40" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type ui:ToggleSwitch}}" TargetType="ui:ToggleSwitch">
+        <Setter Property="Background" Value="Black" />
+    </Style>
+    <!--  全局 ComboBox 样式：仅设置圆角为 8，其余保持默认  -->
+    <Style TargetType="ComboBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <!--  主容器：只加 CornerRadius="8"  -->
+                    <Border
+                        x:Name="MainBorder"
+                        Background="#E6FFFFFF"
+                        BorderBrush="#40FFFFFF"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="8">
+
+                        <Grid>
+                            <!--  下拉箭头按钮：覆盖整个ComboBox  -->
+                            <ToggleButton
+                                x:Name="ToggleButton"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                ClickMode="Press"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!--  内容区域  -->
+                                    <ContentPresenter
+                                        x:Name="ContentPresenter"
+                                        Margin="6,0,23,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Content="{TemplateBinding SelectionBoxItem}"
+                                        ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" />
+
+                                    <!--  可编辑文本框（仅在 IsEditable=True 时显示）  -->
+                                    <TextBox
+                                        x:Name="PART_EditableTextBox"
+                                        Margin="6,0,23,0"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        FontFamily="{TemplateBinding FontFamily}"
+                                        FontSize="{TemplateBinding FontSize}"
+                                        FontStyle="{TemplateBinding FontStyle}"
+                                        FontWeight="{TemplateBinding FontWeight}"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        Visibility="Collapsed" />
+
+                                    <!--  箭头图标  -->
+                                    <Path
+                                        x:Name="Arrow"
+                                        Grid.Column="1"
+                                        Margin="2"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Data="M0,0 L4,4 L8,0 Z"
+                                        Fill="{TemplateBinding Foreground}" />
+                                </Grid>
+                            </ToggleButton>
+
+                            <!--  下拉弹出框  -->
+                            <Popup
+                                x:Name="PART_Popup"
+                                AllowsTransparency="True"
+                                Focusable="False"
+                                IsOpen="{TemplateBinding IsDropDownOpen}"
+                                Placement="Bottom"
+                                PopupAnimation="Slide">
+                                <Border
+                                    x:Name="DropDownBorder"
+                                    MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                    Background="#E6FFFFFF"
+                                    BorderBrush="#40FFFFFF"
+                                    BorderThickness="1"
+                                    CornerRadius="8">
+                                    <ScrollViewer x:Name="DropDownScrollViewer" SnapsToDevicePixels="True">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEditable" Value="True">
+                            <Setter TargetName="ContentPresenter" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.WindowTextBrush}}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+                            <Setter TargetName="MainBorder" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  必须提供 ToggleButton 模板（简化版）  -->
+    <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="20" />
+            </Grid.ColumnDefinitions>
+            <Border
+                x:Name="Border"
+                Grid.ColumnSpan="2"
+                Background="Transparent"
+                BorderBrush="Transparent"
+                BorderThickness="0" />
+            <Path
+                x:Name="Arrow"
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Data="M0,0 L4,4 L8,0 Z"
+                Fill="Black" />
+        </Grid>
+    </ControlTemplate>
+
+    <!--  CustomIcon全局样式 - 为所有CustomIcon添加鼠标悬停缩放动效  -->
+    <Style TargetType="Helper:CustomIcon">
+        <!--  设置默认的缩放变换  -->
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <ScaleTransform CenterX="12" CenterY="12" ScaleX="1" ScaleY="1" />
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <!--  鼠标悬停时缩小图标  -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <!--  使用RenderTransform缩放，从1.0缩小到0.9  -->
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                To="0.9"
+                                Duration="0:0:0.1" />
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                To="0.9"
+                                Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <!--  恢复原始大小1.0  -->
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                To="1.0"
+                                Duration="0:0:0.1" />
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="RenderTransform.ScaleY"
+                                To="1.0"
+                                Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  自定义滑块样式 - 完美对齐（解决WPF默认滑块对齐问题）  -->
+    <!--  修改：滑块默认隐藏，悬浮显示，双色调进度条  -->
+    <Style x:Key="AlignedSliderStyle" TargetType="Slider">
+        <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Border
+                        x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!--  轨道背景 - 未播放部分（右边）  -->
+                            <Border
+                                x:Name="TrackBackground"
+                                Grid.Row="1"
+                                Height="4"
+                                Margin="8,0"
+                                VerticalAlignment="center"
+                                Background="#40FFFFFF"
+                                BorderBrush="#80FFFFFF"
+                                CornerRadius="3" />
+
+                            <!--  已播放部分（左边）- 使用主题色  -->
+                            <Border
+                                x:Name="ProgressFill"
+                                Grid.Row="1"
+                                Height="4"
+                                Margin="8,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="center"
+                                Background="#80FFFFFF"
+                                CornerRadius="3">
+                                <Border.Width>
+                                    <MultiBinding Converter="{StaticResource ProgressToWidthConverter}">
+                                        <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="Maximum" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding ElementName="TrackBackground" Path="ActualWidth" />
+                                    </MultiBinding>
+                                </Border.Width>
+                            </Border>
+
+                            <!--  轨道 - 零边距实现完美对齐  -->
+                            <Track
+                                x:Name="PART_Track"
+                                Grid.Row="1"
+                                Margin="0,0">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Style>
+                                            <Style TargetType="RepeatButton">
+                                                <Setter Property="SnapsToDevicePixels" Value="true" />
+                                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                                <Setter Property="IsTabStop" Value="false" />
+                                                <Setter Property="Focusable" Value="false" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="RepeatButton">
+                                                            <Border Background="Transparent" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </RepeatButton.Style>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Style>
+                                            <Style TargetType="RepeatButton">
+                                                <Setter Property="SnapsToDevicePixels" Value="true" />
+                                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                                <Setter Property="IsTabStop" Value="false" />
+                                                <Setter Property="Focusable" Value="false" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="RepeatButton">
+                                                            <Border Background="Transparent" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </RepeatButton.Style>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb
+                                        x:Name="Thumb"
+                                        Width="16"
+                                        Height="16"
+                                        VerticalAlignment="Center"
+                                        Focusable="False"
+                                        Opacity="0">
+                                        <Thumb.Style>
+                                            <Style TargetType="Thumb">
+                                                <Setter Property="SnapsToDevicePixels" Value="true" />
+                                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Thumb">
+                                                            <Grid>
+                                                                <Ellipse
+                                                                    Fill="White"
+                                                                    Stroke="Gray"
+                                                                    StrokeThickness="2">
+                                                                    <Ellipse.Effect>
+                                                                        <DropShadowEffect
+                                                                            BlurRadius="3"
+                                                                            Direction="270"
+                                                                            Opacity="0.3"
+                                                                            ShadowDepth="1"
+                                                                            Color="Black" />
+                                                                    </Ellipse.Effect>
+                                                                </Ellipse>
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Cursor" Value="Hand" />
+                                                                </Trigger>
+                                                                <Trigger Property="IsDragging" Value="True">
+                                                                    <Setter Property="Cursor" Value="Hand" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--  鼠标悬浮时显示滑块  -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="Thumb"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="Thumb"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="0"
+                                            Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  竖向滑块样式  -->
+    <Style x:Key="VerticalSliderStyle" TargetType="Slider">
+        <Setter Property="Orientation" Value="Vertical" />
+        <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Border
+                        x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        SnapsToDevicePixels="True">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" MinWidth="{TemplateBinding MinWidth}" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  轨道背景 - 竖向  -->
+                            <Border
+                                x:Name="TrackBackground"
+                                Grid.Column="1"
+                                Width="6"
+                                Margin="0,8"
+                                HorizontalAlignment="Center"
+                                Background="#40FFFFFF"
+                                BorderBrush="#60FFFFFF"
+                                CornerRadius="3" />
+
+                            <!--  轨道 - 竖向  -->
+                            <Track
+                                x:Name="PART_Track"
+                                Grid.Column="1"
+                                Margin="0,0">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.DecreaseLarge}">
+                                        <RepeatButton.Style>
+                                            <Style TargetType="RepeatButton">
+                                                <Setter Property="SnapsToDevicePixels" Value="true" />
+                                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                                <Setter Property="IsTabStop" Value="false" />
+                                                <Setter Property="Focusable" Value="false" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="RepeatButton">
+                                                            <Border Background="Transparent" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </RepeatButton.Style>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static Slider.IncreaseLarge}">
+                                        <RepeatButton.Style>
+                                            <Style TargetType="RepeatButton">
+                                                <Setter Property="SnapsToDevicePixels" Value="true" />
+                                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                                <Setter Property="IsTabStop" Value="false" />
+                                                <Setter Property="Focusable" Value="false" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="RepeatButton">
+                                                            <Border Background="Transparent" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </RepeatButton.Style>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb
+                                        x:Name="Thumb"
+                                        Width="16"
+                                        Height="16"
+                                        HorizontalAlignment="Center"
+                                        Focusable="False">
+                                        <Thumb.Style>
+                                            <Style TargetType="Thumb">
+                                                <Setter Property="SnapsToDevicePixels" Value="true" />
+                                                <Setter Property="OverridesDefaultStyle" Value="true" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Thumb">
+                                                            <Grid>
+                                                                <Ellipse
+                                                                    Fill="White"
+                                                                    Stroke="Gray"
+                                                                    StrokeThickness="2">
+                                                                    <Ellipse.Effect>
+                                                                        <DropShadowEffect
+                                                                            BlurRadius="3"
+                                                                            Direction="270"
+                                                                            Opacity="0.3"
+                                                                            ShadowDepth="1"
+                                                                            Color="Black" />
+                                                                    </Ellipse.Effect>
+                                                                </Ellipse>
+                                                            </Grid>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Cursor" Value="Hand" />
+                                                                </Trigger>
+                                                                <Trigger Property="IsDragging" Value="True">
+                                                                    <Setter Property="Cursor" Value="Hand" />
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  列表项样式  -->
+    <Style x:Key="PlaylistItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="15,10" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#2CFFFFFF" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#1AFFFFFF" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+
+    <!--  背景容器样式  -->
+    <Style x:Key="BackgroundContainerStyle" TargetType="Border">
+        <Setter Property="Opacity" Value="0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding CurrentSong.AlbumArt}" Value="{x:Null}">
+                <Setter Property="Opacity" Value="0" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding CurrentSong.AlbumArt}" Value="">
+                <Setter Property="Opacity" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  默认背景容器样式  -->
+    <Style x:Key="DefaultBackgroundContainerStyle" TargetType="Border">
+        <Setter Property="Opacity" Value="0.3" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding CurrentSong.AlbumArt}" Value="{x:Null}">
+                <Setter Property="Opacity" Value="0.3" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding CurrentSong.AlbumArt}" Value="">
+                <Setter Property="Opacity" Value="0.3" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding CurrentSong.AlbumArt}">
+                <Setter Property="Opacity" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+
+    <!--  控件颜色定义  -->
+    <Color x:Key="PrimaryColor">#007ACC</Color>
+    <Color x:Key="AccentColor">#FF0078D7</Color>
+    <Color x:Key="TextColor">#FF000000</Color>
+    <Color x:Key="BackgroundColor">#FFFFFF</Color>
+
+
+    <!--  画刷定义  -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource TextColor}" />
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
+
+    <!--  阴影效果  -->
+    <DropShadowEffect
+        x:Key="MediumShadow"
+        BlurRadius="10"
+        Opacity="0.3"
+        ShadowDepth="3"
+        Color="Black" />
+    <DropShadowEffect
+        x:Key="LightShadow"
+        BlurRadius="5"
+        Opacity="0.2"
+        ShadowDepth="1"
+        Color="Black" />
+
+    <!--  TabItem样式  -->
+    <Style TargetType="TabItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border
+                        x:Name="TabBorder"
+                        Width="auto"
+                        Height="auto"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="8">
+                        <ContentPresenter
+                            x:Name="Content"
+                            Margin="10"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            ContentSource="Header"
+                            RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="TabBorder" Property="Background" Value="#80FFFFFF" />
+                            <Setter TargetName="TabBorder" Property="CornerRadius" Value="8" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
