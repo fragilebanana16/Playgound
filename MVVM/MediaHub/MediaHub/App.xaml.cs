@@ -3,9 +3,11 @@ using Microsoft.Extensions.Hosting;
 using System.Windows;
 using Wpf.Ui;
 using MediaHub.Services;
-using MediaHub.ViewModels;
+using MediaHub.Music.ViewModels;
+using MediaHub.Music.Views;
 using MediaHub.Views.Modules;
 using MediaHub.Views.Pages;
+using MediaHub.ViewModels;
 
 namespace MediaHub;
 

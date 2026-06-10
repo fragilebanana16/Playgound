@@ -1,15 +1,15 @@
 using System.Windows;
 using Wpf.Ui.Controls;
-using MediaHub.ViewModels;
+using MediaHub.Music.ViewModels;
 using System.Windows.Controls;
 
-namespace MediaHub.Views.Pages;
+namespace MediaHub.Music.Views;
 
-public partial class MusicFavoritePage : Page
+public partial class MusicHomePage : Page
 {
-    public MusicFavoriteViewModel ViewModel { get; }
+    public MusicHomeViewModel ViewModel { get; }
 
-    public MusicFavoritePage(MusicFavoriteViewModel viewModel)
+    public MusicHomePage(MusicHomeViewModel viewModel)
     {
         ViewModel = viewModel;
         DataContext = viewModel;

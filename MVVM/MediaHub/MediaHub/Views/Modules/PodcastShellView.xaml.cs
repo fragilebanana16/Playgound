@@ -8,7 +8,7 @@ namespace MediaHub.Views.Modules;
 
 public partial class PodcastShellView : UserControl
 {
-    public PodcastShellView(MusicShellViewModel viewModel, IServiceProvider serviceProvider)
+    public PodcastShellView(PodcastShellViewModel viewModel, IServiceProvider serviceProvider)
     {
         DataContext = viewModel;
         InitializeComponent();

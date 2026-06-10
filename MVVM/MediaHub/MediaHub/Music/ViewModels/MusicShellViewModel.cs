@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MediaHub.ViewModels;
+namespace MediaHub.Music.ViewModels;
 
 public partial class MusicShellViewModel : ObservableObject
 {

@@ -1,9 +1,9 @@
 using System.Windows;
 using Wpf.Ui.Controls;
-using MediaHub.ViewModels;
+using MediaHub.Music.ViewModels;
 using System.Windows.Controls;
 
-namespace MediaHub.Views.Pages;
+namespace MediaHub.Music.Views;
 
 public partial class MusicRecentPage : Page
 {

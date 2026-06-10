@@ -1,5 +1,5 @@
-using MediaHub.ViewModels;
-using MediaHub.Views.Pages;
+using MediaHub.Music.ViewModels;
+using MediaHub.Music.Views;
 using System.Windows;
 using System.Windows.Controls;
 using Wpf.Ui;

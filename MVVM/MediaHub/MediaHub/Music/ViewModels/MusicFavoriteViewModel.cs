@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows;
 
-namespace MediaHub.ViewModels;
+namespace MediaHub.Music.ViewModels;
 
 public partial class MusicFavoriteViewModel : ObservableObject
 {
