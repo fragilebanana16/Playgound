@@ -53,3 +53,8 @@
 /Memories/Client/.env
 /Memories/Client/.env.development
 /Memories/Client/.env.production
+
+
+/ASP.Net Mvc/**/.vs
+/ASP.Net Mvc/**/bin
+/ASP.Net Mvc/**/Debug
