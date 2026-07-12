@@ -1,0 +1,39 @@
+﻿using CrashCourse.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+
+namespace CrashCourse.Controllers
+{
+    public class ItemsController : Controller
+    {
+        private readonly MyDbContext _context;
+        public ItemsController(MyDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var item = await _context.Items.ToListAsync();
+            return View(item);
+        }
+
+        public IActionResult Create()
+        {
+            //ViewData["Categories"] = new SelectList(_context.Categories, "Id", "Name");
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create([Bind("Id, Name, Price, CategoryId")] Item item)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Items.Add(item);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            return View(item);
+        }
+    }
+}
