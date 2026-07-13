@@ -7,4 +7,18 @@ public class MyDbContext : DbContext
     public MyDbContext(DbContextOptions<MyDbContext> options) : base(options) { }
 
     public DbSet<Item> Items { get; set; }
+
+    public DbSet<SerialNumber> SerialNumbers { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Item>().HasData(
+            new Item { Id = 4, Name = "microphone", Price = 40 }
+            );
+        modelBuilder.Entity<SerialNumber>().HasData(
+            new SerialNumber { Id = 10, Name = "MIC150", ItemId = 4 }
+            );
+
+        base.OnModelCreating(modelBuilder);
+    }
 }

@@ -15,7 +15,7 @@ namespace CrashCourse.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var item = await _context.Items.ToListAsync();
+            var item = await _context.Items.Include(t => t.SerialNumber).ToListAsync();
             return View(item);
         }
 
