@@ -13,6 +13,11 @@ public class MyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ItemClient>().HasKey(ic => new
+        {
+            ic.ItemId,
+            ic.ClientId
+        });
         modelBuilder.Entity<Item>().HasData(
             new Item { Id = 4, Name = "microphone", Price = 40 }
             );

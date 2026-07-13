@@ -13,6 +13,7 @@
             <th>Category</th>
             <th>Id</th>
             <th>SerialNumber</th>
+            <th>Client</th>
         </tr>
     </thead>
     <tbody>
@@ -24,6 +25,12 @@
                 <td>@item.Category?.Name</td>
                 <td>@item.Id</td>
                 <td>@item.SerialNumber?.Id.ToString()</td>
+                <td>
+                    @foreach(var client in item.ItemClients)
+                    {
+                        @client.Client.Name<text> </text>
+                    }
+                </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
                     <a asp-action="delete" asp-route-id="@item.Id">delete</a>

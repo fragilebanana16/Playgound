@@ -11,5 +11,7 @@ public class Item
     public int? CategoryId { get; set; }
     [ForeignKey("CategoryId")]
     public Category? Category { get; set; }
+
+    public List<ItemClient> ItemClients { get; set; } = new();
 }
 
