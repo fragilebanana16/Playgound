@@ -35,5 +35,23 @@ namespace CrashCourse.Controllers
             }
             return View(item);
         }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            //ViewData["Categories"] = new SelectList(_context.Categories, "Id", "Name");
+            var item = await _context.Items.FirstOrDefaultAsync(x => x.Id == id);
+            return View(item);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, [Bind("Id, Name, Price, CategoryId")] Item item)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Update(item);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            return View(item);
+        }
     }
 }
