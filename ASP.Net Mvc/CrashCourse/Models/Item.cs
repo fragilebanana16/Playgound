@@ -9,5 +9,7 @@ public class Item
     public double Price { get; set; }
     public SerialNumber? SerialNumber { get; set; }
     public int? CategoryId { get; set; }
+    [ForeignKey("CategoryId")]
+    public Category? Category { get; set; }
 }
 

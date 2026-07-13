@@ -21,7 +21,7 @@
             <tr>
                 <td>@item.Name</td>
                 <td>@item.Price.ToString("N2") $</td>
-                <td>@item.CategoryId</td>
+                <td>@item.Category?.Name</td>
                 <td>@item.Id</td>
                 <td>@item.SerialNumber?.Id.ToString()</td>
                 <td>

@@ -9,6 +9,7 @@ public class MyDbContext : DbContext
     public DbSet<Item> Items { get; set; }
 
     public DbSet<SerialNumber> SerialNumbers { get; set; }
+    public DbSet<Category> Categories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,7 +19,10 @@ public class MyDbContext : DbContext
         modelBuilder.Entity<SerialNumber>().HasData(
             new SerialNumber { Id = 10, Name = "MIC150", ItemId = 4 }
             );
-
+        modelBuilder.Entity<Category>().HasData(
+            new Category { Id = 1, Name = "Electronics" },
+            new Category { Id = 2, Name = "Books" }
+            );
         base.OnModelCreating(modelBuilder);
     }
 }
