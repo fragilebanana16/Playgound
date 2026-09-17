@@ -4,6 +4,92 @@
   "source": "https://excalidraw.com",
   "elements": [
     {
+      "id": "IFz4A0aeyQMGv7n1PjfTy",
+      "type": "ellipse",
+      "x": 4874.899022741878,
+      "y": 2390.9496757490683,
+      "width": 712.3270729690539,
+      "height": 289.3423475854014,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b97",
+      "roundness": null,
+      "seed": 1848838368,
+      "version": 343,
+      "versionNonce": 657941728,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "_0maGX7iN6cyb6JxCpaN5"
+        },
+        {
+          "id": "LlyxLKteHwGaCyJnWFn4n",
+          "type": "arrow"
+        },
+        {
+          "id": "SSiMTdXp55MS3-r-Zu0s7",
+          "type": "arrow"
+        },
+        {
+          "id": "CKHJs9ral3mmlSt8o-CDX",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789655355255,
+      "created": 1789654115608,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "_0maGX7iN6cyb6JxCpaN5",
+      "type": "text",
+      "x": 4984.216907366814,
+      "y": 2438.3228815107327,
+      "width": 40,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "b98",
+      "roundness": null,
+      "seed": 1218374880,
+      "version": 328,
+      "versionNonce": 414697696,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789654115608,
+      "link": null,
+      "locked": false,
+      "text": "聚合",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": "IFz4A0aeyQMGv7n1PjfTy",
+      "originalText": "聚合",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
       "id": "IcBHTi-OHWAbynBc_qHNG",
       "type": "rectangle",
       "x": 4216.310732291011,
@@ -70,7 +156,9 @@
       "originalText": "云计算、容器化、Linux服务器普及",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "P35w24LRdzr8BTrWU7mHQ",
@@ -108,7 +196,9 @@
       "originalText": "1.1 为什么要跨平台",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "uzu0jfL6MyjjYXgmslwQu",
@@ -151,7 +241,9 @@
       "originalText": ".NET Core",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "WoOPVGXpoZSUi52UfyDBb",
@@ -189,7 +281,9 @@
       "originalText": ".NET Standard",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "7PKF7rdEtdceLlLFMO1Bl",
@@ -227,7 +321,9 @@
       "originalText": "统一的API规范，类似接口，Framework、Core、Xamarin都可以自己实现",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "r_FWW5IRPXOchlXpATVjd",
@@ -266,7 +362,8 @@
       ],
       "updated": 1788352950505,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "SLALCC832vuNMpk6oKW0p",
@@ -304,7 +401,9 @@
       "originalText": "不再用csproj包含文件",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "vZ07InELW3diLSBFPbvKn",
@@ -364,7 +463,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "GA-4JLrFA25e5vMOggiQs",
@@ -402,7 +502,9 @@
       "originalText": "C# 9.0 ",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "_XBMLH4BP0aDhzLp6vovO",
@@ -440,7 +542,9 @@
       "originalText": "2.1 新语法",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "8tvl_0pvsIpxrePJCjuO7",
@@ -478,7 +582,9 @@
       "originalText": "C# 10.0 ",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "kU4d6KAm3zmNwVyJPClGA",
@@ -516,7 +622,9 @@
       "originalText": "global using System;",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "oxnpbb7t-obcaQOuCfTBT",
@@ -554,7 +662,9 @@
       "originalText": "C# 8.0 ",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "6mNDm4avGUn2VwkHwB0gz",
@@ -592,7 +702,9 @@
       "originalText": "using var stream = new FileStream(\"test.txt\", FileMode.Open);",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Xx_YoBzJOlZA9RxivZczv",
@@ -630,7 +742,9 @@
       "originalText": "namespace MyProject.Services;\npublic class UserService\n{\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "EgNM8wpcTUMmc4bQ8nWnS",
@@ -668,7 +782,9 @@
       "originalText": "文件范围命名空间",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "6kD_EOpimbIiHmtqWPM9n",
@@ -706,7 +822,9 @@
       "originalText": "全局 using在一个文件中统一定义一次",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "JF2WSsaRq60zVp4r52Qum",
@@ -744,7 +862,9 @@
       "originalText": "using 单行：变量在离开当前作用域时自动释放",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "FqtU3F4LQwdv1iUkd1Ts9",
@@ -782,7 +902,9 @@
       "originalText": "可空引用类型",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "rzTiWlO0NqeArhHSAcyyx",
@@ -822,7 +944,9 @@
       "originalText": "引入版本        C# 2.0               C# 8.0\n\n针对对象        值类型 (int)        引用类型 (string)",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "r2WmX7xTVMJqKRB414a5W",
@@ -862,7 +986,9 @@
       "originalText": "解决数据库字段允许 NULL",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "UTJ4va0D0EharnkyV9YTx",
@@ -902,7 +1028,9 @@
       "originalText": "默认情况下，引用类型“不允许”为 null\n必须显式加上 ?，才能被赋值为 null",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "W9q7i4N4IUzYI2LHoDJvc",
@@ -942,7 +1070,9 @@
       "originalText": "解决问题",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "jMNVN-AjtKVlN9uxlHm3F",
@@ -950,7 +1080,7 @@
       "x": 1659.3213116998586,
       "y": 464.9841462029042,
       "width": 533.4932428859881,
-      "height": 194.26546788000724,
+      "height": 194.26546788000726,
       "angle": 0,
       "strokeColor": "transparent",
       "backgroundColor": "#b2f2bb",
@@ -983,8 +1113,8 @@
           -2.842170943040401e-14
         ],
         [
-          483.49324288598825,
-          1.2210779388885271
+          483.4932428859883,
+          1.2210779388884703
         ],
         [
           493.49324288598814,
@@ -1004,7 +1134,7 @@
         ],
         [
           499.49324288598814,
-          183.27576643000975
+          183.2757664300097
         ],
         [
           493.49324288598825,
@@ -1063,7 +1193,8 @@
       "endBinding": null,
       "startArrowhead": null,
       "endArrowhead": null,
-      "polygon": true
+      "polygon": true,
+      "created": null
     },
     {
       "id": "zaK9CTnQ8Cb6yWuGu7G5j",
@@ -1103,7 +1234,9 @@
       "originalText": "EF Core 10.0    .NET 10             C# 14\nEF Core 9.0     .NET 8              C# 12\nEF Core 8.0     .NET 8              C# 12\nEF Core 7.0     .NET 6              C# 10\nEF Core 6.0     .NET 6              C# 10\nEF Core 5.0     .NET Standard 2.1   C# 8.0\nEF Core 3.1     .NET Standard 2.0   C# 7.3",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "v30EB1o823Yq2isZvegwe",
@@ -1143,7 +1276,9 @@
       "originalText": "C# 与 .NET 版本对照表",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "m7v_PLoYPsYYcovvVJx4d",
@@ -1175,7 +1310,8 @@
       "boundElements": [],
       "updated": 1789353753455,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "QyjayOJqOv6c-z0hjqfWn",
@@ -1213,7 +1349,9 @@
       "originalText": "顶级语句：不用写Main",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "PWkhS4gFZv2yjiwxn25Sq",
@@ -1251,7 +1389,9 @@
       "originalText": "record 类型",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "nmJmpCb3qX_yhVoU4vHFt",
@@ -1289,7 +1429,9 @@
       "originalText": "public record Person(string First, string Last);",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "LiKMLNFUXmsvdKPmnHCbs",
@@ -1327,7 +1469,9 @@
       "originalText": "默认属性为 init-only，只能在构造时赋值",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "0CcFKz7g2mvp37j8a454i",
@@ -1365,7 +1509,9 @@
       "originalText": "2.2 异步编程",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "oHTrf4mVSQcUa7G9IOPiI",
@@ -1403,7 +1549,9 @@
       "originalText": "原理",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "qsyopZrdir-mkAxonwDKp",
@@ -1450,7 +1598,8 @@
       ],
       "updated": 1788839635948,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "oP3kVsp9iFaFkJcW_WGKe",
@@ -1488,7 +1637,9 @@
       "originalText": "public async Task ProcessAsync()\n{\n    int a = 1;\n    await Task.Delay(1000); // await 点 1\n    int b = a + 2;\n    await Task.Delay(1000); // await 点 2\n    Console.WriteLine(b);\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "RTXblWuHK1nlWXZjuUkAW",
@@ -1527,7 +1678,8 @@
       ],
       "updated": 1788839409058,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "kxkp_tORFhOuqLK9bGfvW",
@@ -1565,7 +1717,9 @@
       "originalText": "struct <ProcessAsync>d__0 : IAsyncStateMachine\n{\n    public int <>1__state; // 状态记录：-1:初始, 0:停在 await1, 1:停在 await2\n    public AsyncTaskMethodBuilder <>t__builder;\n \n    private int <a>5__1;\n    private int <b>5__2;\n\n    public void MoveNext()\n    {\n        // 1. 回来时，通过 switch 一秒定位到上一次停下的位置\n        switch (this.<>1__state)\n        {\n            case 0: goto State0_Resume; // 从 await 1 恢复\n            case 1: goto State1_Resume; // 从 await 2 恢复\n        }\n\n        // ====== 段落 0：初始执行 ======\n        <a>5__1 = 1;\n        if (!Delay1.IsCompleted)\n        {\n            this.<>1__state = 0; // 记下状态 0\n            return;              // 挂起！释放线程\n        }\n\n    State0_Resume:\n        // ====== 段落 1：第一个 await 结束后的代码 ======\n        <b>5__2 = <a>5__1 + 2;\n        if (!Delay2.IsCompleted)\n        {\n            this.<>1__state = 1; // 记下状态 1\n            return;              // 挂起！释放线程\n        }\n\n    State1_Resume:\n        // ====== 段落 2：第二个 await 结束后的代码 ======\n        Console.WriteLine(<b>5__2);\n        this.<>t__builder.SetResult(); // 全部结束\n    }\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "zqVyTzLXIM8B0VGClPKJX",
@@ -1628,7 +1782,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "Q2dh02_3rXpEf_F65euc_",
@@ -1666,7 +1821,9 @@
       "originalText": "编译",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": 0.5
+      "labelPosition": 0.5,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "_CFMUJncqSDBP8xEZR4ev",
@@ -1703,7 +1860,8 @@
       ],
       "updated": 1788840289551,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "Kmz5NCUte-i_gYphxXH84",
@@ -1743,7 +1901,9 @@
       "originalText": "编译器会把异步方法拆解，生成一个隐藏的实现了 IAsyncStateMachine 接口的结构体",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "OuthBLCni9SNUZ8kJ5bPd",
@@ -1775,7 +1935,8 @@
       "boundElements": [],
       "updated": 1788840076631,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "XgZ47e6ep44mLG_d3ZlK7",
@@ -1807,7 +1968,8 @@
       "boundElements": [],
       "updated": 1788840145785,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "b6f0VRM8KUuGp4uS0S2wV",
@@ -1850,7 +2012,9 @@
       "originalText": "状态机",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "IasgG11P4sIrSOPDvdMlc",
@@ -1885,7 +2049,8 @@
       ],
       "updated": 1788839509259,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "AObcNGMLhb9CLmPx_Y3c9",
@@ -1943,7 +2108,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "XeXjpfSW_X27blSBuclju",
@@ -1983,7 +2149,9 @@
       "originalText": "【调用 ProcessAsync()】\n        │\n   (当前主线程) ───────> 1. 首次调用 MoveNext()\n                               │\n                      (遇到 await，未完成，挂起 return)\n                               │\n                       等待硬件 / IO / 定时器完成...\n                               │\n   (线程池 / UI线程) ───> 2. 回调触发第二次 MoveNext()",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "EocJMc_vHPRFl87xfQUpd",
@@ -2016,7 +2184,8 @@
       "boundElements": [],
       "updated": 1788840010010,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "fuGJodZrUYqy6hKvByQOS",
@@ -2063,7 +2232,9 @@
       "originalText": "前后是不同线程，由线程池调度（webapi）",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "j8OfbwL_WRpKm17CBzpQV",
@@ -2121,7 +2292,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "-eOYEckBvlrvBScxd0RB9",
@@ -2179,7 +2351,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "R0DWefRZ54-hBE-qGx4ec",
@@ -2214,7 +2387,8 @@
       ],
       "updated": 1788839919406,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "NaX5265_vrLRjB7-oxvxn",
@@ -2252,7 +2426,9 @@
       "originalText": "纯透传（不加逻辑、无 using、无 try-catch） 不要写 async/await，直接 return Task",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "lM7pINLpBoMtQ97RrwVru",
@@ -2295,7 +2471,9 @@
       "originalText": "// 编译器会为此生成完整的状态机 struct\npublic async Task<string> GetDataAsync()\n{\n    return await _repository.GetDataAsync(); \n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "YKF0okK367Ghj5W4mVjNg",
@@ -2338,7 +2516,9 @@
       "originalText": "// 没有 async/await，直接返回内部返回的 Task\npublic Task<string> GetDataAsync()\n{\n    return _repository.GetDataAsync(); \n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "CiHYU4B3xHtsIF5VIKFXL",
@@ -2396,7 +2576,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "GEN2SXVJ6dd4HdwhXVt8V",
@@ -2431,7 +2612,8 @@
       ],
       "updated": 1788839991176,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "yvLm2JbWCka5QdTyooq1j",
@@ -2469,7 +2651,9 @@
       "originalText": "不会生成 IAsyncStateMachine 结构体",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "VpuVb6K64flO2D6pVv0rk",
@@ -2507,7 +2691,9 @@
       "originalText": "零状态机开销",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "KHOtGQZjd3UpPkjuyLRw7",
@@ -2542,7 +2728,8 @@
       ],
       "updated": 1788840285052,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "afeQOnabPglKqfUfAkGJa",
@@ -2580,7 +2767,9 @@
       "originalText": "线程切换？",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "rdSInl97lAcZC01hSETGJ",
@@ -2623,7 +2812,9 @@
       "originalText": "虽然 await 前后可能是不同的线程\n线程 1 运行到 await，把当前状态机的局部变量存好后，立即 return 退出了\n线程 2 在未来的某个时间点被唤醒，接管状态机，继续往下跑",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "iRC5VXaTD7IOchgTCdSOf",
@@ -2661,7 +2852,9 @@
       "originalText": "状态机隔离",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "5GZ2gla4U-3sEJItzwMfu",
@@ -2700,7 +2893,8 @@
       ],
       "updated": 1788840385707,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "nt8o8f4026J4BbxElcSuB",
@@ -2738,7 +2932,9 @@
       "originalText": "这两个线程绝对不会同时执行同一个方法里的代码",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "qUEzg2bdBXOuyHdd76SLO",
@@ -2796,7 +2992,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "eXgYmGZDZk14uyZS-GJZ7",
@@ -2834,7 +3031,9 @@
       "originalText": "2.3 LINQ",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "vHW9rPK9MShKqMagLIWYr",
@@ -2872,7 +3071,9 @@
       "originalText": "从委托开始",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "aGtwMEPZQ9V_YJVENNEBb",
@@ -2910,7 +3111,9 @@
       "originalText": "内置的 Action / Func 泛型委托最多支持 16 个参数：",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "GvO9R5G2rXjC_BfeL1u8T",
@@ -2948,7 +3151,9 @@
       "originalText": "Action<T1, T2, ..., T16> \n\nFunc<T1, T2, ..., T16, TResult>",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "pMZR3PhDeccDxV6CFaZ9R",
@@ -2991,7 +3196,9 @@
       "originalText": "public static IEnumerable<T> Where<T>(\n    this IEnumerable<T> source,  // 扩展方法\n    Func<T, bool> predicate\n)\n{\n\n}",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "FOglzcSdgblan2Dah-ZH3",
@@ -3034,7 +3241,9 @@
       "originalText": "list.Where(x => x > 2)",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "S9oroI2RlfoEN1lOvFLAf",
@@ -3092,7 +3301,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "6PZJU15_J22z9X5VVsw75",
@@ -3127,7 +3337,8 @@
       ],
       "updated": 1788852716116,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "xkTiYNxIJIYgsu0Ibho4C",
@@ -3165,7 +3376,9 @@
       "originalText": "linq的关键功能是提供了集合类的扩展方法",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "sNdvPkcPVWiokSgwntcCL",
@@ -3203,7 +3416,9 @@
       "originalText": "定义在 System.Linq.Enumerable 静态类中",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "b438m-6z--MRZDK1OKOD7",
@@ -3238,7 +3453,8 @@
       ],
       "updated": 1788852932947,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "v3CjErtaoBi1D6bNN1kbI",
@@ -3276,7 +3492,9 @@
       "originalText": "委托是 LINQ 的\"引擎\": LINQ 的每个扩展方法都依赖委托来执行你传入的自定义逻辑",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "b233m4wP8awmn-vVyVrqU",
@@ -3333,7 +3551,9 @@
       "originalText": "First()\n\nFirstOrDefault()\n\nSingle()\n\nSingleOrDefault()",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "0S0DuO3CTRJAak-LD3Cen",
@@ -3373,7 +3593,9 @@
       "originalText": "获取单条数据",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "14lR14tOzIQOZ4HKdRfyA",
@@ -3891,7 +4113,8 @@
       "strokeOptions": {
         "variability": "constant",
         "streamline": 0.5
-      }
+      },
+      "created": null
     },
     {
       "id": "m1-csPAqvGew2iL0wiSE4",
@@ -3934,7 +4157,8 @@
       ],
       "updated": 1788856862423,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "H3leUk18Ausoq91I80OKd",
@@ -3972,7 +4196,9 @@
       "originalText": "立即返回，不继续遍历",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "-zVPmQbZi3b7fTOTG8E49",
@@ -4032,7 +4258,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "1FHqGcNhe4HwWrJPgW6iP",
@@ -4092,7 +4319,8 @@
       "startArrowhead": null,
       "endArrowhead": null,
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "0yRVYSuy6UcQHH7rq6nQL",
@@ -4139,7 +4367,8 @@
       ],
       "updated": 1788856877377,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "tqeg8_y3vSywXBAvT6OGN",
@@ -4177,7 +4406,9 @@
       "originalText": "继续遍历到结尾，检查是否还有第二个匹配",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "7GbfrgWtuksvo0-GZOpSy",
@@ -4236,7 +4467,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "huvE9wC43hPrAQQ0U-wXc",
@@ -4295,7 +4527,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": null,
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "OoBZsvcPHbgrE8Dx_qEHH",
@@ -4342,7 +4575,9 @@
       "originalText": "大数据量时性能灾难",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "isK1OYT5e7fl28-0xD8YD",
@@ -4401,7 +4636,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "uzdcfC71e_hO-cPcyAVr2",
@@ -4448,7 +4684,9 @@
       "originalText": "既然如此用它有啥意义?",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "eLo4dRojIIbp1hwxju-Si",
@@ -4508,7 +4746,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "Uo6XVfi5eNF9VUiaTeFlS",
@@ -4547,7 +4786,8 @@
       ],
       "updated": 1788856990643,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "PTaAsKvVNEFbG-rarB5IA",
@@ -4585,7 +4825,9 @@
       "originalText": "校验数据完整性",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "oO70g6L8edlI5IsC_tesf",
@@ -4645,7 +4887,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "JdxyIOWfjhykWivPXmI1J",
@@ -5306,7 +5549,8 @@
       "endBinding": null,
       "startArrowhead": null,
       "endArrowhead": null,
-      "polygon": true
+      "polygon": true,
+      "created": null
     },
     {
       "id": "QwG_iGLh6SHgfx8htxnAq",
@@ -5344,7 +5588,8 @@
       ],
       "updated": 1788857095476,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "8xxQ5UtdX8ryNufCWcl6S",
@@ -5385,7 +5630,9 @@
       "originalText": "重大误区",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "jtQvWkE2iqZ4a9ntNKlnQ",
@@ -5431,7 +5678,9 @@
       "originalText": "Where 全部执行完 → Select 全部执行完 → OrderBy",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "V47d_LO228XYN9lW-Mj1j",
@@ -5481,7 +5730,9 @@
       "originalText": "流水线：每个元素依次经过所有方法",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "IZLIyfllFBhLA1hGDTdSy",
@@ -5531,7 +5782,9 @@
       "originalText": "Where(...).Select(...).OrderBy(...)",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Qsuxm3stp1MDzVnSHdFqj",
@@ -5597,7 +5850,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "y5Ho6NEswLBGFpZT2Frm2",
@@ -5638,7 +5892,9 @@
       "originalText": "初以为",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": 0.5
+      "labelPosition": 0.5,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "fxw_G2zQ3QB80ox_hnY39",
@@ -5704,7 +5960,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "m6ItvPUoWPA6ihrX9u88y",
@@ -5745,7 +6002,9 @@
       "originalText": "实际上",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": 0.5
+      "labelPosition": 0.5,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "594M6YCTO1pmM3lyylXL-",
@@ -5793,7 +6052,8 @@
       "endBinding": null,
       "startArrowhead": null,
       "endArrowhead": null,
-      "polygon": false
+      "polygon": false,
+      "created": null
     },
     {
       "id": "mtWwGeKFAVd07E02H7eOK",
@@ -5846,7 +6106,8 @@
       ],
       "updated": 1788857095477,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "9n1wY0KZdMld0cSQebxMu",
@@ -5886,7 +6147,9 @@
       "originalText": "全量缓存",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "XblAtYf6e9rjcJi0R7EMh",
@@ -5935,7 +6198,8 @@
       ],
       "updated": 1788857095477,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "F02yZmMPn9WKMwpXxfOZW",
@@ -5975,7 +6239,9 @@
       "originalText": "流水线",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "zZrBCDbQbTAm7VUKcEiWr",
@@ -6044,7 +6310,9 @@
       "originalText": "【排序类】OrderBy, OrderByDescending, ThenBy, Reverse\n  处理方式：全量缓存后处理\n  缓存全部：✅ 是\n\n【集合运算类】Distinct, Union, Intersect, Except\n  处理方式：全量缓存后处理\n  缓存全部：✅ 是\n\n【分组类】GroupBy, ToLookup\n  处理方式：全量缓存后处理\n  缓存全部：✅ 是\n\n【强制执行类】ToList(), ToArray(), ToDictionary()\n  处理方式：遍历全部数据\n  缓存全部：✅ 是\n\n【聚合计算类】Count(), Sum(), Average(), Max(), Min()\n  处理方式：遍历全部数据（但不缓存）\n  缓存全部：⚠️ 需遍历全部，但不缓存\n\n【过滤/映射类】Where, Select, SelectMany\n  处理方式：流式处理，一个元素走完全程\n  缓存全部：❌ 否\n\n【截取类】Take, Skip, TakeWhile, SkipWhile\n  处理方式：流式处理，满足条件就停\n  缓存全部：❌ 否\n\n【类型转换类】Cast, OfType\n  处理方式：流式处理\n  缓存全部：❌ 否",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Z0QBCZMSZruUu-eMKE14z",
@@ -6104,7 +6372,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "ULVBr9I-T3WFz3ZXkU3Fk",
@@ -6164,7 +6433,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "BfdLKmP6ghLleBuk8j0B2",
@@ -6224,7 +6494,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "tewxCtfj1LL2YiC1k0X-S",
@@ -6284,7 +6555,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "2EQPm39QFb2Kj58iooy4P",
@@ -6344,7 +6616,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "kBtpUqhQ1al28PpE-nYlz",
@@ -6404,7 +6677,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "agliJs8Dl4_hTp0OA1x1L",
@@ -6464,7 +6738,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "zdRRn3qYXbDLQM-j_BKMG",
@@ -6535,7 +6810,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "PpPa_DO0bDhUJrG-Djxfc",
@@ -6575,7 +6851,9 @@
       "originalText": "所以",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": 0.5
+      "labelPosition": 0.5,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "0-jt7pf9r84g6X6hrcAbk",
@@ -6616,7 +6894,8 @@
       ],
       "updated": 1788857095477,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "Ymio4GIFmj25Wmy4K8pO0",
@@ -6656,7 +6935,9 @@
       "originalText": "缓存型操作（OrderBy、GroupBy、Distinct 等）应该尽可能放在最后",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "KecgaPMBbyVfysEG-bZjU",
@@ -6693,7 +6974,8 @@
       ],
       "updated": 1788857095477,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "0TsOXScUi8FYIEp5UUXgh",
@@ -6733,7 +7015,9 @@
       "originalText": "黄金法则：过滤（Where）永远最先执行",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Y1d_3YCCwpKY6ow_ucZmR",
@@ -6765,7 +7049,8 @@
       "boundElements": [],
       "updated": 1788857095477,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "sybZI2Kv9AXjOCAdLCrtI",
@@ -6803,7 +7088,9 @@
       "originalText": "3.1 依赖注入",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "WmJmEl_ny_WraWnH2C8tp",
@@ -6838,7 +7125,8 @@
       ],
       "updated": 1788858601431,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "Hwh0e8ySrTvirG7NjMYbZ",
@@ -6876,7 +7164,9 @@
       "originalText": "查询语法",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "-kFC1h9XFk75lgCMsZDZX",
@@ -6914,7 +7204,9 @@
       "originalText": "// 查询语法\nvar query = from student in students\n            orderby student.Grade descending, student.Name\n            select student;\n\n// 方法语法\nvar query = students\n    .OrderByDescending(s => s.Grade)\n    .ThenBy(s => s.Name);",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Lvqgh51vRk8FtN-W8MLqC",
@@ -6959,7 +7251,8 @@
       "endBinding": null,
       "startArrowhead": null,
       "endArrowhead": null,
-      "polygon": false
+      "polygon": false,
+      "created": null
     },
     {
       "id": "odN2Fc-vUpb375VLLSAMp",
@@ -6997,7 +7290,9 @@
       "originalText": "public class OrderService : IOrderService\n{\n    private readonly AppDbContext _dbContext;  // ← 注入 DbContext\n    public OrderService(AppDbContext dbContext)\n    {\n        _dbContext = dbContext;\n    }\n}\n\npublic class PaymentService : IPaymentService\n{\n    private readonly AppDbContext _dbContext;  // ← 注入 DbContext\n    public PaymentService(AppDbContext dbContext)\n    {\n        _dbContext = dbContext;\n    }\n}\n\npublic class EmailService : IEmailService\n{\n    private readonly AppDbContext _dbContext;  // ← 注入 DbContext\n    public EmailService(AppDbContext dbContext)\n    {\n        _dbContext = dbContext;\n    }\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Y4y7BI07nV9qqtj4Q2FHc",
@@ -7035,7 +7330,9 @@
       "originalText": "public class OrderController : Controller\n{\n    private readonly IOrderService _orderService;\n    private readonly IPaymentService _paymentService;\n    private readonly IEmailService _emailService;\n    \n    public OrderController(\n        IOrderService orderService,\n        IPaymentService paymentService,\n        IEmailService emailService)\n    {\n        _orderService = orderService;\n        _paymentService = paymentService;\n        _emailService = emailService;\n    }\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "XMPu75ng9UAUwLMrb6QDj",
@@ -7073,7 +7370,9 @@
       "originalText": "请求进来\n  ├─ 创建 OrderService\n  │    └─ new AppDbContext()  ← 对象 A\n  ├─ 创建 PaymentService\n  │    └─ new AppDbContext()  ← 对象 B（和 A 不同！）\n  └─ 创建 EmailService\n       └─ new AppDbContext()  ← 对象 C（又不同！）\n\nOrderService 用 A 添加了 Order\nPaymentService 用 B 去查询 Order\n  → 查不到！因为 A 还没 SaveChanges，B 不知道 A 的存在\n  → ❌ 业务逻辑全乱",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "BslqQZLsEiZTzplDp-4JA",
@@ -7111,7 +7410,9 @@
       "originalText": "请求进来\n  ├─ 先创建 AppDbContext 实例 X（请求开始时就创建了）\n  ├─ 创建 OrderService\n  │    └─ 复用 X\n  ├─ 创建 PaymentService\n  │    └─ 复用 X（同一个！）\n  └─ 创建 EmailService\n       └─ 复用 X（还是同一个！）\n\nOrderService 用 X 添加了 Order\nPaymentService 用 X 去查询 Order\n  → 查到了！因为 X 跟踪了所有更改\n  → ✅ 完美！",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "l3wCwjihdp7ucu5_-KLc9",
@@ -7146,7 +7447,8 @@
       ],
       "updated": 1788861018241,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "etIDwLSs84Yjrv-6VRpai",
@@ -7184,7 +7486,9 @@
       "originalText": "DbContext 是 Scoped",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "ggeUMJCZ_VpZ6GKRGggDr",
@@ -7219,7 +7523,8 @@
       ],
       "updated": 1788861018241,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "4gANRbEFpVDoqQADXKQBD",
@@ -7257,7 +7562,9 @@
       "originalText": "DbContext 是 Scoped",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "c72-5-VVH1Oio0Ct3Lfz0",
@@ -7312,7 +7619,9 @@
       "originalText": "无状态且全局共享      → Singleton\n有状态且和请求绑定  → Scoped\n轻量级、用完即弃      → Transient",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "5i-15-RBgK4YyW3FLROZ8",
@@ -7355,7 +7664,9 @@
       "originalText": "生命周期",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "RGX-3SdL2l9tvsBxqB11R",
@@ -7415,7 +7726,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "ww63wbjeiWA1W2r8fF9ef",
@@ -7450,7 +7762,8 @@
       ],
       "updated": 1788860783537,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "RezHAQtGRSNfBIYIzm6wt",
@@ -7488,7 +7801,9 @@
       "originalText": "为什么要用Scoped",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Q6Sso2BLBUfmo02npiwH-",
@@ -7531,7 +7846,9 @@
       "originalText": "配置、日志、缓存",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "-VVin2-xXycerPM8gVrKX",
@@ -7591,7 +7908,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "htojLWkGc17eam1SYNp1P",
@@ -7634,7 +7952,9 @@
       "originalText": "业务服务、DbContext、仓储",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "NkyKoEThGLUtv_6rADUNt",
@@ -7694,7 +8014,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "kQfkbIHNz_mfhLWpyEUVp",
@@ -7737,7 +8058,9 @@
       "originalText": "轻量级工具、临时处理器",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "i_pIT3f8ueP99aqbVSNGr",
@@ -7797,7 +8120,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "SJJJDNB6T62NkcqPyCsL_",
@@ -7832,7 +8156,8 @@
       ],
       "updated": 1788861069538,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "iBrgFqDMh1bi5lR0UvSWC",
@@ -7870,7 +8195,9 @@
       "originalText": "三个服务，各自注入了 DbContext",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "il_PvzLZujZiZSXWnPiz9",
@@ -7905,7 +8232,8 @@
       ],
       "updated": 1788861063806,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "2RWJ5HYk7egqZGz5GiBI-",
@@ -7943,7 +8271,9 @@
       "originalText": "Controller 注入三个服务",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "5v_5rOBKzThuAs_67do5C",
@@ -8272,7 +8602,8 @@
       "endBinding": null,
       "startArrowhead": null,
       "endArrowhead": null,
-      "polygon": true
+      "polygon": true,
+      "created": null
     },
     {
       "id": "sOdVVQDGRB9uutOs2uzrL",
@@ -8318,7 +8649,9 @@
       "originalText": "能用构造函数注入就用",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "RbkvN9TTg8yQPN9eJJon-",
@@ -8360,7 +8693,8 @@
       ],
       "updated": 1788861871184,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "3SyX3JaSg9uIb57cGwv_A",
@@ -8401,7 +8735,9 @@
       "originalText": "构造函数注入",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "YVxbx33RsmMwk_8z5IpAQ",
@@ -8443,7 +8779,8 @@
       ],
       "updated": 1788861871184,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "41d1-O_d6-ZizYhyvaTwX",
@@ -8484,7 +8821,9 @@
       "originalText": "服务定位器",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "nagc9iA3f4Gme5OiOfbxT",
@@ -8530,7 +8869,9 @@
       "originalText": "只有无法通过构造函数注入的场景（后台任务、工厂模式）才考虑",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "uUuC65GN_5YUJnTTxev-W",
@@ -8593,7 +8934,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "IpW8AwQVcDu8A2mIzTTIf",
@@ -8656,7 +8998,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "VMUcAvLjYLvmBAfDqouw5",
@@ -8688,7 +9031,8 @@
       "boundElements": [],
       "updated": 1788861871184,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "dy22oPjHvglER3-0jF1wW",
@@ -8809,7 +9153,8 @@
       "endBinding": null,
       "startArrowhead": null,
       "endArrowhead": null,
-      "polygon": true
+      "polygon": true,
+      "created": null
     },
     {
       "id": "FhP0oLTDoxuQeKRSk-1yZ",
@@ -8855,7 +9200,9 @@
       "originalText": "生命周期长的服务，不能依赖生命周期短的服务",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "VZNmyZu8buzUb4xAGqpSP",
@@ -8901,7 +9248,9 @@
       "originalText": "内存泄漏（短生命周期的对象应该被释放，却被长生命周期对象一直引用着）",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "q-wioHl-BaoGW3c9JDwkH",
@@ -8964,7 +9313,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "k5WMcdl7ropffUR5ojPqg",
@@ -8996,7 +9346,8 @@
       "boundElements": [],
       "updated": 1788861874498,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "p22A3WGJmUfP2K_vWv3XB",
@@ -9034,7 +9385,9 @@
       "originalText": "ASP.NET Core：原生支持",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "uyl079oYN1jS73-xbUNun",
@@ -9072,7 +9425,9 @@
       "originalText": "ASP.NET Framework 用的Autofac等",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "2Wu9o74YK2BGPuC6KmJ5h",
@@ -9110,7 +9465,9 @@
       "originalText": "3.2 配置系统",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "MonbZ5tOI0niStTy5T7GJ",
@@ -9148,7 +9505,9 @@
       "originalText": "后加载的会覆盖先加载的同名键",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "9DEsxcA2SO79s01bO-yzr",
@@ -9186,7 +9545,9 @@
       "originalText": "JSON 文件提供程序（AddJsonFile）： appsettings.json \n\nXML 提供程序（AddXmlFile）：支持传统的 XML 格式\n\n环境变量提供程序（AddEnvironmentVariables）：读取操作系统环境变量（带有前缀过滤，如 ASPNETCORE_），常用于 Docker/K8s 部署\n\n命令行参数提供程序（AddCommandLine）：读取启动时的 --key=value 参数",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "8f82yW_oqwWTPEaF9dtuV",
@@ -9233,7 +9594,9 @@
       "originalText": "传统普通模式（索引器直接读取）：不通过 DI，直接在代码里写 IConfiguration 接口，用 [\"Key\"] 去拿。这种模式不支持强类型校验，且散落在各处难以维护。\n\n选项模式（官方推荐）：通过 services.Configure<T>() 注册，利用 DI 注入三种接口之一。",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "-29lVCLgJ0tKSv_AP_JoJ",
@@ -9268,7 +9631,8 @@
       ],
       "updated": 1788923963944,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "5THaJQHOIng9hHFHewuh3",
@@ -9306,7 +9670,9 @@
       "originalText": "读取方式",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "I5WI4xAN7G9HKCgpxhxAh",
@@ -9341,7 +9707,8 @@
       ],
       "updated": 1788923958823,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "apCz00aETFBUHyGw923J1",
@@ -9379,7 +9746,9 @@
       "originalText": "配置源",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "IMaO4MJMsPZsoW1ucHixn",
@@ -9422,7 +9791,8 @@
       ],
       "updated": 1788923939074,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "msGiDOHr8Eg1HUYFsZONL",
@@ -9460,7 +9830,9 @@
       "originalText": "将松散的键值对配置，强类型地注入到业务逻辑类中，并遵循依赖注入原则",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "_Iciy8Lhkbt5OlMQZtiY_",
@@ -9503,7 +9875,9 @@
       "originalText": "把 Configuration[\"ConnectionStrings:Default\"] 这种字符串硬编码，变成注入一个 DatabaseOptions 类，里面有个 DefaultConnection 属性",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "vPaau-oGOHr-0VECfkxrV",
@@ -9550,7 +9924,9 @@
       "originalText": "IOptions<T>：应用启动时读取配置，之后永不更新\n\nIOptionsSnapshot<T>：每个作用域（如每个HTTP请求）都重新读取配置，总能拿到最新值，但作用域内保持不变。\n\nIOptionsMonitor<T>：单例模式下实时追踪变化，配置一改立即触发回调通知",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "OG0SF5gVeYN50TGgz10yI",
@@ -9610,7 +9986,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "2exRY9dY3rO3Z9Ip0qXP4",
@@ -9670,7 +10047,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "Xm2ZovvK-THsHYyTS6rZF",
@@ -9708,7 +10086,9 @@
       "originalText": "// 1. 定义配置类\npublic class MySettings {\n    public int RefreshInterval { get; set; }\n}\n\n// 2. 注册（Startup/Program.cs）\nbuilder.Services.Configure<MySettings>(\n    builder.Configuration.GetSection(\"MySettings\")\n);",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "MVqDu5mts0iptgPUWo0Lp",
@@ -9751,7 +10131,9 @@
       "originalText": "// 场景 A：使用 IOptions（单例缓存）\npublic class ServiceA {\n    private readonly MySettings _settings;\n    public ServiceA(IOptions<MySettings> options) {\n        _settings = options.Value;\n    }\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "bWx_xPYvkWx45YG9fqnvc",
@@ -9789,7 +10171,9 @@
       "originalText": "定义",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "7fbLiP4IU1pXOm18_SLxL",
@@ -9827,7 +10211,9 @@
       "originalText": "使用",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "uOxmAKgzvPKfDcKz3YBQY",
@@ -9891,7 +10277,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "rLnB7Hy5RSE9EgNILLk2t",
@@ -9926,7 +10313,8 @@
       ],
       "updated": 1788923963944,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "KhJTY4J7RsBRCvK2OTwmS",
@@ -9964,7 +10352,9 @@
       "originalText": "多配置源",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "h0-jIscn9D580YZYXnq_q",
@@ -10024,7 +10414,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "v9PogfEEy6fXwapZ13cZf",
@@ -10063,7 +10454,8 @@
       ],
       "updated": 1788924184771,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "yn8D9O3IFsAwp0QP0MQ1E",
@@ -10101,7 +10493,9 @@
       "originalText": "默认配置系统不支持直接从 Windows 注册表读取配置",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "U_8IgloCu2xfklHOe2OiG",
@@ -10144,7 +10538,9 @@
       "originalText": "跨平台性",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "INTdYhTuwNsKdoKW84GXd",
@@ -10204,7 +10600,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "K53IJB545hojWWLl_8td7",
@@ -10242,7 +10639,9 @@
       "originalText": "4.3 实体类配置",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "lFSgKhAuLdoZpycNZlSX3",
@@ -10277,7 +10676,8 @@
       ],
       "updated": 1788942406986,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "LI5f-E6W9YsiYQqSi_pcj",
@@ -10315,7 +10715,9 @@
       "originalText": "数据库主键的常见类型",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "0r8TZzJT6HAvZv-5l4QiI",
@@ -10353,7 +10755,9 @@
       "originalText": " 全局唯一、不暴露业务量            \n空间大（16字节）、随机插入导致索引碎片",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "XT0ljDdNQqpUJQUvyUb1r",
@@ -10391,7 +10795,9 @@
       "originalText": "分布式冲突、迁移困难\nSaveChangesAsync后才知道值",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "oPAsj7F07G_FJyXXovlAp",
@@ -10426,7 +10832,8 @@
       ],
       "updated": 1788944073724,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "5tgmfWo1Fxgr_tHnNOJkC",
@@ -10464,7 +10871,9 @@
       "originalText": "自增整数",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "6CoCOieoV4Sn0Bavvl-d2",
@@ -10502,7 +10911,9 @@
       "originalText": "空间小、索引性能好、简单",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "_dAXgSP-MuH6aMZzxZu7b",
@@ -10537,7 +10948,8 @@
       ],
       "updated": 1788944078923,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "rIXS3uPSVpF2EPU4iMefJ",
@@ -10575,7 +10987,9 @@
       "originalText": "GUID/UUID",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "y0_hGtysSkcJLXjXUQL-3",
@@ -10613,7 +11027,9 @@
       "originalText": "随机 GUID 做聚集索引是性能灾难\nMySQL  的InnoDB 引擎默认是聚集\n\n随机插入： 新数据可能落在任何位置 →页分裂 → 性能灾难\n有序插入： 新数据永远在末尾 → 很少触发页分裂",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "2I31xlYXHQLwn5AfhXTKc",
@@ -10651,7 +11067,9 @@
       "originalText": "4.5 查看EF Core生成的SQL",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "_ELcu3RSVDckDan3Ws8O6",
@@ -10689,7 +11107,9 @@
       "originalText": "protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)\n{\n    optionsBuilder\n        .UseSqlServer(\"YourConnectionString\")\n        .LogTo(Console.WriteLine, LogLevel.Information);\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "QqT0JksjvJIg4ZvVX3jUU",
@@ -10724,7 +11144,8 @@
       ],
       "updated": 1788944036378,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "L2lKpN2aJNN3GwvRkD3qD",
@@ -10762,7 +11183,9 @@
       "originalText": "LogTo",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "ilWjRYh9g7juvRgis1-w2",
@@ -10800,7 +11223,9 @@
       "originalText": "4.6 关系配置",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "3vop3IXal_U0cU8o3yBZJ",
@@ -10835,7 +11260,8 @@
       ],
       "updated": 1788945300284,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "I79cgPBOXeqGJe8fr0SSh",
@@ -10873,7 +11299,9 @@
       "originalText": "Has 看自己，With 看对面",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "fVPBGhKABp2Gc-pRWYUdj",
@@ -10913,7 +11341,9 @@
       "originalText": "modelBuilder.Entity<Blog>()\n    .HasMany(b => b.Posts)      // Blog 有 Many 个 Post\n    .WithOne(p => p.Blog)       // Post 属于 One 个 Blog\n    .HasForeignKey(p => p.BlogId);",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "hMUR3_SyzTVwWrZb9ES3s",
@@ -10953,7 +11383,9 @@
       "originalText": "modelBuilder.Entity<Post>()\n    .HasOne(p => p.Blog)        // Post 有 One 个 Blog\n    .WithMany(b => b.Posts)     // Blog 有 Many 个 Post\n    .HasForeignKey(p => p.BlogId);",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "ptBnCbprC7wJ_-xCE0z5_",
@@ -10985,7 +11417,8 @@
       "boundElements": [],
       "updated": 1788948491803,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "x_yVKyenpMAZ68UUfUyKD",
@@ -11017,7 +11450,8 @@
       "boundElements": [],
       "updated": 1788948494104,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "aevnj8QRzAnTmNVr92Zcb",
@@ -11060,7 +11494,9 @@
       "originalText": "// 基础表（被很多表引用）\npublic class User\n{\n    public int Id { get; set; }\n    public string Name { get; set; }\n    \n    // ❌ 不推荐：不声明反向导航集合\n    // public List<Order> Orders { get; set; }\n    // public List<Review> Reviews { get; set; }\n    // public List<Message> Messages { get; set; }\n}\n\n// 子表1：指向 User\npublic class Order\n{\n    public int Id { get; set; }\n    public int UserId { get; set; }\n    public User User { get; set; }  // ✅ 单向导航：Order → User\n}\n\n// 子表2：指向 User\npublic class Review\n{\n    public int Id { get; set; }\n    public int UserId { get; set; }\n    public User User { get; set; }  // ✅ 单向导航：Review → User\n}\n\n// 子表3：指向 User\npublic class Message\n{\n    public int Id { get; set; }\n    public int UserId { get; set; }\n    public User User { get; set; }  // ✅ 单向导航：Message → User\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "fbrJO6P3rZLx4hvjx6y-f",
@@ -11098,7 +11534,9 @@
       "originalText": "modelBuilder.Entity<Order>()\n    .HasOne(o => o.User)\n    .WithMany()                    // ← 无参数！User 没有 Orders 集合\n    .HasForeignKey(o => o.UserId);\n\nmodelBuilder.Entity<Review>()\n    .HasOne(r => r.User)\n    .WithMany()                    // ← 无参数！\n    .HasForeignKey(r => r.UserId);\n\nmodelBuilder.Entity<Message>()\n    .HasOne(m => m.User)\n    .WithMany()                    // ← 无参数！\n    .HasForeignKey(m => m.UserId);",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "q_btyLvLYtVoxH8xP8bPt",
@@ -11133,7 +11571,8 @@
       ],
       "updated": 1788948622362,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "2tpVI_Sb5hbUzSstqkTlj",
@@ -11171,7 +11610,9 @@
       "originalText": "WithMany() 无参数：另一侧没有导航属性",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "RYDNS7QRFnY7_dHuINC9L",
@@ -11214,7 +11655,9 @@
       "originalText": "public class Blog\n{\n    public List<Post> Posts { get; set; }  // Blog 能看到 Post\n}\n\npublic class Post\n{\n    // 没有 public Blog Blog { get; set; }  ← 没有反向导航！\n}",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "1QsFD8eXmio7w4skxCnmm",
@@ -11257,7 +11700,9 @@
       "originalText": "modelBuilder.Entity<Blog>()\n    .HasMany(b => b.Posts)\n    .WithOne()  // ← 无参数！因为 Post 没有 Blog 反向导航\n    .HasForeignKey(p => p.BlogId);",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "iSTF0MjT6s1jsvK6ySNvd",
@@ -11317,7 +11762,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "_kIKFvp1lGPXS0eFoKsoj",
@@ -11352,7 +11798,8 @@
       ],
       "updated": 1788948608132,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "LrEscXaiEPAvETk0gkGjw",
@@ -11390,7 +11837,9 @@
       "originalText": "被多个表引用的基础表，通常声明单向导航",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "ufyA9JNLwt-D5jkXOp6_2",
@@ -11429,7 +11878,8 @@
       ],
       "updated": 1788948767340,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "cEbzQXp4QToFhl36my2fh",
@@ -11467,7 +11917,9 @@
       "originalText": "保护基础表（User）不被业务膨胀拖垮",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "1zVOM08SmEQI3RPc0uWVS",
@@ -11526,7 +11978,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "JErsgkDq9Agkd-bep4q7L",
@@ -11561,7 +12014,8 @@
       ],
       "updated": 1788948793590,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "HQt5sMC7BBSwJuDAj-4lU",
@@ -11599,7 +12053,9 @@
       "originalText": "保持“纯净”",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "6_RaE_nl7iGt4Kok4WXHE",
@@ -11644,7 +12100,8 @@
       "endBinding": null,
       "startArrowhead": null,
       "endArrowhead": null,
-      "polygon": false
+      "polygon": false,
+      "created": null
     },
     {
       "id": "XbTKr2KDqWR7E0tCiR5Kt",
@@ -11682,7 +12139,9 @@
       "originalText": "5.1 EF原理",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "3_DT1mUU-AnzUZcx3H8BN",
@@ -11725,7 +12184,9 @@
       "originalText": "EF翻译不了的C#代码？",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "SiQ4Paz2n1fbykyMkf605",
@@ -11768,7 +12229,9 @@
       "originalText": "IEnumerable 是“内存里筛选数据”          --- 客户端评估\n\nIQueryable 是“数据库里筛选数据”         --- 服务端评估",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "OsWlFf7eEPBCZ0Yeljxdi",
@@ -11811,7 +12274,9 @@
       "originalText": "IEnumerable、IQueryable",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "81waXRz5xLPUYScOcGZOT",
@@ -11854,7 +12319,9 @@
       "originalText": "重写查询",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "g_c42WnPBIqC8KILtVxAv",
@@ -11892,7 +12359,9 @@
       "originalText": "很多 C# 代码 EF Core 都无法直接翻译成 SQL。当 EF Core 遇到无法翻译的代码时，就会抛出经典的 TranslationFailed 异常",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "NHnsjktaoeyOrNHd7tWNV",
@@ -11931,7 +12400,8 @@
       ],
       "updated": 1789011219878,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "6v4t1M9A7CXJvSuZU86fr",
@@ -11969,7 +12439,9 @@
       "originalText": "延迟执行",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "TSgdzd73wUVgnIXwfGkXd",
@@ -12029,7 +12501,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "HkPkjb_BhjPri9IULvBgi",
@@ -12088,7 +12561,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "ojIkwfT6ki4n6IfngjhvM",
@@ -12123,7 +12597,8 @@
       ],
       "updated": 1789011223989,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "jkaogeUxXw1g5ARKvZgoY",
@@ -12161,7 +12636,9 @@
       "originalText": "IQueryable复用",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "Mkq9pipPLZRyXqEWw4E9Y",
@@ -12199,7 +12676,9 @@
       "originalText": "public static IQueryable<Order> WhereActive(this IQueryable<Order> query)\n {\n        return query.Where(o => !o.IsDeleted && o.Status == OrderStatus.Paid);\n }",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "fsg2_JdhpwOU-fYu8a0ai",
@@ -12242,7 +12721,9 @@
       "originalText": "DataReader 和 DataTable",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "_ulVvU8b51Q15lHftsCxy",
@@ -12280,7 +12761,9 @@
       "originalText": "DataReader（流式读取）：只进不退的管道流。从数据库拉取数据时，读一条扔一条，内存里永远只存“当前这一条”\n\nDataTable（内存快照）：一次性截屏。它把数据库返回的所有数据全部加载到内存里",
       "autoResize": false,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "bPRscKT3zWWrS7hgEnWQM",
@@ -12319,7 +12802,8 @@
       ],
       "updated": 1789011239942,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "oRhiuQW8Y5n5q0npLJKo9",
@@ -12357,7 +12841,9 @@
       "originalText": "必须保持连接打开",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "BoDQ_88OTe5CdQl7fuNmH",
@@ -12396,7 +12882,8 @@
       ],
       "updated": 1789011239942,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "58wndXCjlW46p-2WRqHOM",
@@ -12434,7 +12921,9 @@
       "originalText": "可断开连接（数据全部到内存，可关连接）",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "6hu1gFjLPQNdisYmD6Sbh",
@@ -12498,7 +12987,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "fJbQ9HsDh4p1BvIO2L5-z",
@@ -12555,7 +13045,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "6aNadDedY8EcWjG1jqOsq",
@@ -12590,7 +13081,8 @@
       ],
       "updated": 1789011235253,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "bsc5dmsch-5wYOtcCKD6b",
@@ -12628,7 +13120,9 @@
       "originalText": "IQueryable底层用的是 DataReader",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "IZ74BLK9sSyXtYIZnsRhe",
@@ -12687,7 +13181,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "J9eAdUerkty0QIjjXXJW5",
@@ -12725,7 +13220,9 @@
       "originalText": "执行原生SQL",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "5uhm_aZVsVtCBVx2NnIae",
@@ -12763,7 +13260,9 @@
       "originalText": "查询用 FromSql：\n        .FromSql($\"SELECT * FROM Blogs WHERE Id = {id}\")\n\n非查询用 ExecuteSql：\n        .ExecuteSql($\"UPDATE Blogs SET Rating = {rating} WHERE Id = {id}\")",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "fdbiDcRPKZU0fYpAZzjKP",
@@ -12801,7 +13300,9 @@
       "originalText": "怎么知道实体变化了",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "gUNmV4IaG7xfRV127RuEf",
@@ -12844,7 +13345,8 @@
       ],
       "updated": 1789011857099,
       "link": null,
-      "locked": false
+      "locked": false,
+      "created": null
     },
     {
       "id": "gB-yqTnGJxzQnlhaoE-IS",
@@ -12882,7 +13384,9 @@
       "originalText": "快照更改跟踪",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "ZeqqrmFbwkwDSSC9HXrNC",
@@ -12925,7 +13429,9 @@
       "originalText": "创建实体类快照",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "w72vPOApEs5RskCq0fJ66",
@@ -12985,7 +13491,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "0-lTD7JcYfsf14c_LpqBL",
@@ -13032,7 +13539,9 @@
       "originalText": "状态",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "RQZhqDNk8kh-PefRkUied",
@@ -13092,7 +13601,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "hsSxE9l8MkTRSK62mnR4g",
@@ -13143,7 +13653,9 @@
       "originalText": "Detached\n\nUnchanged\n\nAdded\n\nModified\n\nDeleted",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "UuLSOwYoG3AForlrEtmZn",
@@ -13203,7 +13715,8 @@
       "startArrowhead": null,
       "endArrowhead": "arrow",
       "elbowed": false,
-      "moveMidPointsWithElement": false
+      "moveMidPointsWithElement": false,
+      "created": null
     },
     {
       "id": "lJ3s-Nj7kiVFKOdirauph",
@@ -13241,7 +13754,9 @@
       "originalText": "var order = await context.Orders.FindAsync(1);\nConsole.WriteLine(context.Entry(order).State);  // Unchanged\n\norder.Status = \"Canceled\";\nConsole.WriteLine(context.Entry(order).State);  // Modified\n\ncontext.Orders.Remove(order);\nConsole.WriteLine(context.Entry(order).State);  // Deleted",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "DOQqp6EEbaXnkLXrqclDg",
@@ -13279,7 +13794,9 @@
       "originalText": "查看实体状态",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "qu8cTo1dBYBXR9khK1r7C",
@@ -13326,7 +13843,9 @@
       "originalText": "无 SQL",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "l8ooGoE0GgjgM4wCD-93c",
@@ -13385,7 +13904,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "Yqckmi6hfm8bWymrC6rz6",
@@ -13444,7 +13964,8 @@
       },
       "startArrowhead": null,
       "endArrowhead": "arrow",
-      "elbowed": false
+      "elbowed": false,
+      "created": null
     },
     {
       "id": "Nb6vW-VkryAbhOIMmTj5g",
@@ -13482,7 +14003,9 @@
       "originalText": "5.2 性能优化",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "8CaXi0yf_3wSF8fxbgGbh",
@@ -13520,7 +14043,9 @@
       "originalText": "AsNoTracking禁用跟踪",
       "autoResize": true,
       "lineHeight": 1.25,
-      "labelPosition": null
+      "labelPosition": null,
+      "created": null,
+      "baseFontSize": null
     },
     {
       "id": "ztC2OD_c3huV7ImiIwcgH",
@@ -13545,7 +14070,7 @@
       "version": 46,
       "versionNonce": 1168909190,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789351828862,
       "created": 1789351807302,
       "link": null,
@@ -13585,7 +14110,7 @@
       "version": 102,
       "versionNonce": 2065841178,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789352294591,
       "created": 1789351920005,
       "link": null,
@@ -13625,7 +14150,7 @@
       "version": 139,
       "versionNonce": 459509978,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789352253237,
       "created": 1789352128205,
       "link": null,
@@ -13701,7 +14226,7 @@
       "version": 69,
       "versionNonce": 260694490,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789352178311,
       "created": 1789352149531,
       "link": null,
@@ -13741,7 +14266,7 @@
       "version": 52,
       "versionNonce": 1561006342,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789352506913,
       "created": 1789352488969,
       "link": null,
@@ -13859,7 +14384,7 @@
       "version": 93,
       "versionNonce": 930917830,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789353947715,
       "created": 1789353877143,
       "link": null,
@@ -13903,7 +14428,7 @@
       "version": 42,
       "versionNonce": 239237530,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789353947715,
       "created": 1789353922264,
       "link": null,
@@ -13932,7 +14457,7 @@
       "version": 44,
       "versionNonce": 1287562374,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789355532255,
       "created": 1789355523950,
       "link": null,
@@ -13954,7 +14479,7 @@
       "type": "text",
       "x": 3697.1548756327584,
       "y": 2300.8062204990533,
-      "width": 1217.7886186247788,
+      "width": 1068.5762230596374,
       "height": 100,
       "angle": 0,
       "strokeColor": "#1971c2",
@@ -13969,11 +14494,11 @@
       "index": "bHO",
       "roundness": null,
       "seed": 2086124294,
-      "version": 68,
-      "versionNonce": 2106725446,
+      "version": 97,
+      "versionNonce": 649177376,
       "isDeleted": false,
-      "boundElements": null,
-      "updated": 1789355569121,
+      "boundElements": [],
+      "updated": 1789655142474,
       "created": 1789355544013,
       "link": null,
       "locked": false,
@@ -14012,7 +14537,7 @@
       "version": 8,
       "versionNonce": 435061402,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789356656823,
       "created": 1789356650635,
       "link": null,
@@ -14052,7 +14577,7 @@
       "version": 112,
       "versionNonce": 1463700634,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789357249886,
       "created": 1789356713851,
       "link": null,
@@ -14092,7 +14617,7 @@
       "version": 318,
       "versionNonce": 545421382,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789357057803,
       "created": 1789356768220,
       "link": null,
@@ -14132,7 +14657,7 @@
       "version": 282,
       "versionNonce": 382688070,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789357135358,
       "created": 1789356789944,
       "link": null,
@@ -14172,7 +14697,7 @@
       "version": 474,
       "versionNonce": 198463322,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789357302554,
       "created": 1789356925868,
       "link": null,
@@ -14212,7 +14737,7 @@
       "version": 445,
       "versionNonce": 199951174,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789357292371,
       "created": 1789356937908,
       "link": null,
@@ -14319,7 +14844,7 @@
       "version": 223,
       "versionNonce": 409932506,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789357257302,
       "created": 1789357183068,
       "link": null,
@@ -14555,7 +15080,7 @@
       "version": 68,
       "versionNonce": 635852624,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440090222,
       "created": 1789439639641,
       "link": null,
@@ -14635,7 +15160,7 @@
       "version": 204,
       "versionNonce": 1908485552,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440096012,
       "created": 1789439668572,
       "link": null,
@@ -14715,7 +15240,7 @@
       "version": 288,
       "versionNonce": 1625448272,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439877804,
       "created": 1789439684025,
       "link": null,
@@ -14799,7 +15324,7 @@
       "version": 132,
       "versionNonce": 1080237904,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439979437,
       "created": 1789439707145,
       "link": null,
@@ -14839,7 +15364,7 @@
       "version": 126,
       "versionNonce": 191018320,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439979437,
       "created": 1789439723112,
       "link": null,
@@ -14879,7 +15404,7 @@
       "version": 99,
       "versionNonce": 809239984,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439900139,
       "created": 1789439765471,
       "link": null,
@@ -14921,7 +15446,7 @@
       "version": 148,
       "versionNonce": 993198416,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440090222,
       "created": 1789439806448,
       "link": null,
@@ -14982,7 +15507,7 @@
       "version": 173,
       "versionNonce": 876684208,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440096012,
       "created": 1789439810117,
       "link": null,
@@ -15077,7 +15602,7 @@
       "version": 86,
       "versionNonce": 946927440,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439979437,
       "created": 1789439823978,
       "link": null,
@@ -15117,7 +15642,7 @@
       "version": 67,
       "versionNonce": 1945472336,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439979437,
       "created": 1789439836427,
       "link": null,
@@ -15202,7 +15727,7 @@
       "version": 37,
       "versionNonce": 1520343376,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439896249,
       "created": 1789439891486,
       "link": null,
@@ -15242,7 +15767,7 @@
       "version": 87,
       "versionNonce": 1048011600,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439979437,
       "created": 1789439931791,
       "link": null,
@@ -15282,7 +15807,7 @@
       "version": 41,
       "versionNonce": 1689387440,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789439964349,
       "created": 1789439945828,
       "link": null,
@@ -15454,7 +15979,7 @@
       "version": 43,
       "versionNonce": 876438960,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440111346,
       "created": 1789440077832,
       "link": null,
@@ -15627,7 +16152,7 @@
       "version": 10,
       "versionNonce": 1698958256,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440296346,
       "created": 1789440287932,
       "link": null,
@@ -15667,7 +16192,7 @@
       "version": 47,
       "versionNonce": 1693006768,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440315094,
       "created": 1789440310307,
       "link": null,
@@ -15754,7 +16279,7 @@
       "version": 88,
       "versionNonce": 1824438192,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789440611239,
       "created": 1789440607727,
       "link": null,
@@ -15853,7 +16378,7 @@
       "version": 111,
       "versionNonce": 114217808,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789441056494,
       "created": 1789441010821,
       "link": null,
@@ -15893,7 +16418,7 @@
       "version": 155,
       "versionNonce": 2110740816,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789441124324,
       "created": 1789441076274,
       "link": null,
@@ -15967,7 +16492,7 @@
       "version": 203,
       "versionNonce": 531972528,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789441237587,
       "created": 1789441170569,
       "link": null,
@@ -16007,7 +16532,7 @@
       "version": 109,
       "versionNonce": 1629147056,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789441565750,
       "created": 1789441462363,
       "link": null,
@@ -16047,7 +16572,7 @@
       "version": 118,
       "versionNonce": 1853834064,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789441565750,
       "created": 1789441486547,
       "link": null,
@@ -16123,7 +16648,7 @@
       "version": 116,
       "versionNonce": 1784306000,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789441565750,
       "created": 1789441535878,
       "link": null,
@@ -16199,7 +16724,7 @@
       "version": 133,
       "versionNonce": 1347416912,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789441558216,
       "created": 1789441551314,
       "link": null,
@@ -16255,46 +16780,6 @@
       "labelPosition": null,
       "created": 1789615142282,
       "baseFontSize": null
-    },
-    {
-      "id": "aHAbPlmFLWzzqqy-CVLGu",
-      "type": "text",
-      "x": 3726.670827312109,
-      "y": 5149.452952762268,
-      "width": 800,
-      "height": 160,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "#ffc9c9",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIW",
-      "roundness": null,
-      "seed": 642950072,
-      "version": 87,
-      "versionNonce": 1718521016,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789615311635,
-      "created": 1789615165405,
-      "link": null,
-      "locked": false,
-      "text": "客户端响应缓存：实质是通过 [ResponseCache] 特性设置 HTTP 响应头（如 Cache-Control），告诉浏览器自行缓\n存数据。\n\n服务端响应缓存：在服务端配置中间件，使得在缓存有效期内，服务器可以直接返回已缓存的响应，而不再重新执\n行你的控制器方法。\n\n内存缓存：这是真正的“数据缓存”，将数据对象以键值对的形式存储在 Web 服务器的进程内存中，通过\nIMemoryCache 接口来操作，用于减少对数据库的查询",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "客户端响应缓存：实质是通过 [ResponseCache] 特性设置 HTTP 响应头（如 Cache-Control），告诉浏览器自行缓存数据。\n\n服务端响应缓存：在服务端配置中间件，使得在缓存有效期内，服务器可以直接返回已缓存的响应，而不再重新执行你的控制器方法。\n\n内存缓存：这是真正的“数据缓存”，将数据对象以键值对的形式存储在 Web 服务器的进程内存中，通过 IMemoryCache 接口来操作，用于减少对数据库的查询",
-      "autoResize": false,
-      "lineHeight": 1.25,
-      "labelPosition": null
     },
     {
       "id": "ReLeyCDIOF5uSkTFPPnxk",
@@ -16355,7 +16840,7 @@
       "version": 174,
       "versionNonce": 662971080,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789615711235,
       "created": 1789615185636,
       "link": null,
@@ -16525,46 +17010,6 @@
       "labelPosition": null
     },
     {
-      "id": "c_K9R2y5nFHBngclKqRY9",
-      "type": "text",
-      "x": 4019.850511793607,
-      "y": 4852.949058305701,
-      "width": 4,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bId",
-      "roundness": null,
-      "seed": 55575224,
-      "version": 3,
-      "versionNonce": 1230246600,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789615238838,
-      "created": 1789615238278,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
       "id": "2JBb2KAWWpJnrrIJhmzH5",
       "type": "text",
       "x": 3595.4147418132143,
@@ -16587,7 +17032,7 @@
       "version": 546,
       "versionNonce": 662997448,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789615711235,
       "created": 1789615271079,
       "link": null,
@@ -16627,7 +17072,7 @@
       "version": 301,
       "versionNonce": 2139313096,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616224458,
       "created": 1789615288324,
       "link": null,
@@ -16641,46 +17086,6 @@
       "containerId": null,
       "originalText": "在 Action 上标注 [ResponseCache(Duration = 60)]",
       "autoResize": false,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "mxEUtru2huyukV4HbWX0f",
-      "type": "text",
-      "x": 4760.225245598107,
-      "y": 4915.830920913831,
-      "width": 9,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIg",
-      "roundness": null,
-      "seed": 244595896,
-      "version": 3,
-      "versionNonce": 1839659208,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789615340516,
-      "created": 1789615338753,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 8,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
     },
@@ -16707,7 +17112,7 @@
       "version": 317,
       "versionNonce": 2054527688,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616224458,
       "created": 1789615369979,
       "link": null,
@@ -16721,46 +17126,6 @@
       "containerId": null,
       "originalText": "在服务器内存中缓存完整的 HTTP 响应，不进入你的控制器方法，依赖中间件",
       "autoResize": false,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "-T1EzBdw8-vBywj2SkdsQ",
-      "type": "text",
-      "x": 4311.895982484081,
-      "y": 4936.08989892562,
-      "width": 9,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIi",
-      "roundness": null,
-      "seed": 1419601592,
-      "version": 3,
-      "versionNonce": 1224208072,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789615419307,
-      "created": 1789615418456,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 8,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
     },
@@ -16787,7 +17152,7 @@
       "version": 334,
       "versionNonce": 2083166136,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616203594,
       "created": 1789615421147,
       "link": null,
@@ -16863,7 +17228,7 @@
       "version": 371,
       "versionNonce": 2101479864,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616203594,
       "created": 1789615461892,
       "link": null,
@@ -16876,46 +17241,6 @@
       "verticalAlign": "middle",
       "containerId": "oB-GL4wG38U5ySR-N4raG",
       "originalText": "不建议：如果客户端发来 Cache-Control: no-cache，服务端缓存也会失效",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "WnS88kS8bG_Lf3m_zovlI",
-      "type": "text",
-      "x": 4565.002024965303,
-      "y": 5088.9533550483275,
-      "width": 9,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIl",
-      "roundness": null,
-      "seed": 1675144392,
-      "version": 5,
-      "versionNonce": 1017104312,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789615461675,
-      "created": 1789615460409,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 8,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
       "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
@@ -16943,7 +17268,7 @@
       "version": 302,
       "versionNonce": 240682696,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616216382,
       "created": 1789615505895,
       "link": null,
@@ -16983,7 +17308,7 @@
       "version": 347,
       "versionNonce": 226951624,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616224458,
       "created": 1789615581137,
       "link": null,
@@ -17023,7 +17348,7 @@
       "version": 450,
       "versionNonce": 954954952,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616216382,
       "created": 1789615602774,
       "link": null,
@@ -17039,52 +17364,6 @@
       "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
-    },
-    {
-      "id": "Jh_JD1OGW4R5-K1MMaT9X",
-      "type": "line",
-      "x": 5128.245828638753,
-      "y": 2026.0738051819171,
-      "width": 0,
-      "height": 4817.0658941854435,
-      "angle": 0,
-      "strokeColor": "#1e1e1e",
-      "backgroundColor": "transparent",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "dotted",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIp",
-      "roundness": {
-        "type": 2
-      },
-      "seed": 1162218168,
-      "version": 397,
-      "versionNonce": 2019855048,
-      "isDeleted": true,
-      "boundElements": [],
-      "updated": 1789616153546,
-      "link": null,
-      "locked": false,
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          0,
-          4817.0658941854435
-        ]
-      ],
-      "startBinding": null,
-      "endBinding": null,
-      "startArrowhead": null,
-      "endArrowhead": null,
-      "polygon": false,
-      "created": 1789616150780
     },
     {
       "id": "9B42H1tKofaQ8McxedX4w",
@@ -17131,46 +17410,6 @@
       "endArrowhead": null,
       "polygon": false,
       "created": 1789616155177
-    },
-    {
-      "id": "IrUXeIX7SGSL0E-xabVO2",
-      "type": "text",
-      "x": 4883.031581048916,
-      "y": 274.1862045042817,
-      "width": 4,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "#ffc9c9",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIr",
-      "roundness": null,
-      "seed": 109270712,
-      "version": 38,
-      "versionNonce": 65590712,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789616260197,
-      "created": 1789616241923,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "labelPosition": null
     },
     {
       "id": "-SJzDkaUUF9qa3jyAL-eL",
@@ -17231,7 +17470,7 @@
       "version": 62,
       "versionNonce": 4020408,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616269302,
       "created": 1789616264122,
       "link": null,
@@ -17244,46 +17483,6 @@
       "verticalAlign": "middle",
       "containerId": "-SJzDkaUUF9qa3jyAL-eL",
       "originalText": "缓存穿透",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "X5EUtJE26NWAJxkDgAZ4w",
-      "type": "text",
-      "x": 5090.769255346042,
-      "y": 241.51753728436898,
-      "width": 4,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIt",
-      "roundness": null,
-      "seed": 1664710344,
-      "version": 3,
-      "versionNonce": 2028678072,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789616263895,
-      "created": 1789616263114,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
       "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
@@ -17463,7 +17662,7 @@
       "version": 198,
       "versionNonce": 1013773256,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616845557,
       "created": 1789616282754,
       "link": null,
@@ -17477,46 +17676,6 @@
       "containerId": null,
       "originalText": "查询数据库中不存在的数据。缓存里，数据库都没有，每次请求都绕过缓存直接查库\n解决方案：空值缓存 + 参数校验（把 null 也缓存起来） 或 布隆过滤器 ",
       "autoResize": false,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "TPXLMh6hbtk4MUTfGzuvQ",
-      "type": "text",
-      "x": 5011.284782062094,
-      "y": 263.32752522574145,
-      "width": 4,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bIz",
-      "roundness": null,
-      "seed": 2055794872,
-      "version": 51,
-      "versionNonce": 1882326728,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789616792361,
-      "created": 1789616320978,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
     },
@@ -17543,7 +17702,7 @@
       "version": 32,
       "versionNonce": 2068445896,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616812304,
       "created": 1789616351287,
       "link": null,
@@ -17583,7 +17742,7 @@
       "version": 47,
       "versionNonce": 1267050936,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789616850725,
       "created": 1789616455892,
       "link": null,
@@ -17596,126 +17755,6 @@
       "verticalAlign": "top",
       "containerId": null,
       "originalText": "大量 Key 设置了相同的绝对过期时间\n解决方案：过期时间随机化",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "5dgW3fpqfxz1k1XEMtZZO",
-      "type": "text",
-      "x": 5015.828932598218,
-      "y": 420.20637417968345,
-      "width": 4,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bJ2",
-      "roundness": null,
-      "seed": 322990776,
-      "version": 35,
-      "versionNonce": 1199323592,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789616808120,
-      "created": 1789616467433,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "FfciXzFrMlaeqRugF3M60",
-      "type": "text",
-      "x": 5032.941638047048,
-      "y": 340.6190731160089,
-      "width": 4,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bJ3",
-      "roundness": null,
-      "seed": 1599816632,
-      "version": 6,
-      "versionNonce": 649493176,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789616800843,
-      "created": 1789616709202,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
-      "autoResize": true,
-      "lineHeight": 1.25,
-      "labelPosition": null
-    },
-    {
-      "id": "ivL16LJSDGXcP87Epk34K",
-      "type": "text",
-      "x": 4854.3030702974775,
-      "y": 466.5047813111585,
-      "width": 4,
-      "height": 20,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "transparent",
-      "fillStyle": "cross-hatch",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "groupIds": [],
-      "frameId": null,
-      "index": "bJ4",
-      "roundness": null,
-      "seed": 1214538936,
-      "version": 3,
-      "versionNonce": 848777416,
-      "isDeleted": true,
-      "boundElements": null,
-      "updated": 1789617237983,
-      "created": 1789617234407,
-      "link": null,
-      "locked": false,
-      "text": "",
-      "fontSize": 16,
-      "baseFontSize": null,
-      "fontFamily": 6,
-      "textAlign": "left",
-      "verticalAlign": "top",
-      "containerId": null,
-      "originalText": "",
       "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
@@ -17783,7 +17822,7 @@
       "version": 91,
       "versionNonce": 1265454776,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617316861,
       "created": 1789617296630,
       "link": null,
@@ -17823,7 +17862,7 @@
       "version": 61,
       "versionNonce": 222971592,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617334238,
       "created": 1789617329523,
       "link": null,
@@ -17863,7 +17902,7 @@
       "version": 36,
       "versionNonce": 979358408,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617364423,
       "created": 1789617340674,
       "link": null,
@@ -17903,7 +17942,7 @@
       "version": 96,
       "versionNonce": 1290502088,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617515296,
       "created": 1789617358199,
       "link": null,
@@ -18030,7 +18069,7 @@
       "version": 246,
       "versionNonce": 798409144,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617564019,
       "created": 1789617446397,
       "link": null,
@@ -18108,7 +18147,7 @@
       "version": 163,
       "versionNonce": 1202195384,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617578946,
       "created": 1789617457372,
       "link": null,
@@ -18150,7 +18189,7 @@
       "version": 183,
       "versionNonce": 499994552,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617562534,
       "created": 1789617471700,
       "link": null,
@@ -18211,7 +18250,7 @@
       "version": 177,
       "versionNonce": 522048696,
       "isDeleted": false,
-      "boundElements": null,
+      "boundElements": [],
       "updated": 1789617578947,
       "created": 1789617475821,
       "link": null,
@@ -18286,6 +18325,2669 @@
       "autoResize": true,
       "lineHeight": 1.25,
       "labelPosition": null
+    },
+    {
+      "id": "SfcjfeEbst8FrsXeSe3mR",
+      "type": "text",
+      "x": 4935.133897042049,
+      "y": 1975.2126274696736,
+      "width": 466,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJG",
+      "roundness": null,
+      "seed": 1677554912,
+      "version": 55,
+      "versionNonce": 7944480,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789652805875,
+      "created": 1789652744462,
+      "link": null,
+      "locked": false,
+      "text": "维度               中间件             筛选器（Filter）\n作用范围        整个 HTTP 管道        MVC/Web API 内部",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 8,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "维度               中间件             筛选器（Filter）\n作用范围        整个 HTTP 管道        MVC/Web API 内部",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "OE1hJZsuWR6ojnX9VVHRb",
+      "type": "text",
+      "x": 4899.551602843233,
+      "y": 1899.5776138943872,
+      "width": 9,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJH",
+      "roundness": null,
+      "seed": 648594720,
+      "version": 3,
+      "versionNonce": 288351456,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789652760381,
+      "created": 1789652758969,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 8,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "aX70s-N1fndKHXn163r2c",
+      "type": "text",
+      "x": 4838.039117670453,
+      "y": 1850.5576853055902,
+      "width": 136,
+      "height": 35,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJI",
+      "roundness": null,
+      "seed": 1795920096,
+      "version": 312,
+      "versionNonce": 2084433184,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789652767814,
+      "link": null,
+      "locked": false,
+      "text": "7.5 中间件",
+      "fontSize": 28,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "7.5 中间件",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null,
+      "created": 1789652762356,
+      "baseFontSize": null
+    },
+    {
+      "id": "S79lRUZ16NTYFlwi6IPdL",
+      "type": "text",
+      "x": 4877.666608636667,
+      "y": 1936.0026434629199,
+      "width": 157,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJJ",
+      "roundness": null,
+      "seed": 1587249440,
+      "version": 41,
+      "versionNonce": 1138152736,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789652909697,
+      "created": 1789652778424,
+      "link": null,
+      "locked": false,
+      "text": "中间件 vs 筛选器",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "中间件 vs 筛选器",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "w8LJ5bHtnP7cNvQ2rSvct",
+      "type": "text",
+      "x": 4880.86889099089,
+      "y": 1895.7801346868596,
+      "width": 616,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJK",
+      "roundness": null,
+      "seed": 1337724192,
+      "version": 40,
+      "versionNonce": 2137550112,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789652918382,
+      "created": 1789652910767,
+      "link": null,
+      "locked": false,
+      "text": "HTTP 请求流经 ASP.NET Core 的请求管道，中间件在管道中依次生效",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 6,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "HTTP 请求流经 ASP.NET Core 的请求管道，中间件在管道中依次生效",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "FM2sNGcoiOm2SuyQRoTdP",
+      "type": "text",
+      "x": 4930.036357924279,
+      "y": 2120.374973453247,
+      "width": 701.9601428224071,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJL",
+      "roundness": null,
+      "seed": 1138098464,
+      "version": 124,
+      "versionNonce": 999935200,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789653153848,
+      "created": 1789653124027,
+      "link": null,
+      "locked": false,
+      "text": "Use 用于向请求管道注册一个可继续传递的中间件，其行为由是否调用 next 决定；\nRun 用于注册终端中间件，标志管道终止；\nMap 用于依据路径前缀将请求分流至独立子管道，匹配前缀在进入分支后从请求路径中移除",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 6,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Use 用于向请求管道注册一个可继续传递的中间件，其行为由是否调用 next 决定；\nRun 用于注册终端中间件，标志管道终止；\nMap 用于依据路径前缀将请求分流至独立子管道，匹配前缀在进入分支后从请求路径中移除",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "cliZzPSvvmclrFcHslNtz",
+      "type": "text",
+      "x": 4883.071590826822,
+      "y": 2064.454985641476,
+      "width": 166,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJM",
+      "roundness": null,
+      "seed": 751528224,
+      "version": 30,
+      "versionNonce": 106412256,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789653149947,
+      "created": 1789653143455,
+      "link": null,
+      "locked": false,
+      "text": "Use / Run / Map",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "Use / Run / Map",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "eUxa6dbrW9HxEf6D2UrAj",
+      "type": "text",
+      "x": 4837.924171271811,
+      "y": 2224.237398973509,
+      "width": 95,
+      "height": 35,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJN",
+      "roundness": null,
+      "seed": 132020448,
+      "version": 74,
+      "versionNonce": 548820256,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789653287439,
+      "created": 1789653277246,
+      "link": null,
+      "locked": false,
+      "text": "9 DDD",
+      "fontSize": 28,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "9 DDD",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "jsXynCbTmRelp_yC8E_gQ",
+      "type": "text",
+      "x": 4889.911447660782,
+      "y": 2335.632327347535,
+      "width": 620,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJO",
+      "roundness": null,
+      "seed": 302836000,
+      "version": 55,
+      "versionNonce": 1701698784,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789654816219,
+      "created": 1789653973596,
+      "link": null,
+      "locked": false,
+      "text": "以业务领域为核心的软件设计方法论，让代码结构和业务模型一一对应",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "以业务领域为核心的软件设计方法论，让代码结构和业务模型一一对应",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "wI04RypqnO2gci9Z-G3ee",
+      "type": "ellipse",
+      "x": 5390.00622703238,
+      "y": 2494.7496605567367,
+      "width": 142.7248510405252,
+      "height": 54.494958243238216,
+      "angle": 0,
+      "strokeColor": "#f08c00",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJP",
+      "roundness": null,
+      "seed": 107389152,
+      "version": 331,
+      "versionNonce": 1150004448,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "gZ5RiSFGOWQWAXyCHGIPd"
+        }
+      ],
+      "updated": 1789655355255,
+      "created": 1789654020646,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "gZ5RiSFGOWQWAXyCHGIPd",
+      "type": "text",
+      "x": 5441.407797545345,
+      "y": 2509.7302624212202,
+      "width": 40,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#f08c00",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJQ",
+      "roundness": null,
+      "seed": 1005118752,
+      "version": 311,
+      "versionNonce": 339939552,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654023402,
+      "link": null,
+      "locked": false,
+      "text": "实体",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "wI04RypqnO2gci9Z-G3ee",
+      "originalText": "实体",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "CNr0O9qCEx8ROhvQiBh2k",
+      "type": "text",
+      "x": 5276.958569210937,
+      "y": 2492.534639742788,
+      "width": 103.14525633400638,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#f08c00",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJR",
+      "roundness": null,
+      "seed": 1725547808,
+      "version": 590,
+      "versionNonce": 1064170720,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654034502,
+      "link": null,
+      "locked": false,
+      "text": "有唯一标识的\n对象，标识不\n变则对象不变",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "有唯一标识的对象，标识不变则对象不变",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "C1mFtIWn46GQcinD10Zjs",
+      "type": "text",
+      "x": 5053.308986434917,
+      "y": 2597.6321186066807,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJS",
+      "roundness": null,
+      "seed": 1208280352,
+      "version": 4,
+      "versionNonce": 521572640,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789654063993,
+      "created": 1789654061537,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "IniopwD1-Wl3CrzYACvqm",
+      "type": "ellipse",
+      "x": 5085.094039864458,
+      "y": 2503.832148647711,
+      "width": 142.7248510405252,
+      "height": 54.494958243238216,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJT",
+      "roundness": null,
+      "seed": 443157728,
+      "version": 316,
+      "versionNonce": 194795744,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "O02qlSUEL4WE-KzVOOCtA"
+        }
+      ],
+      "updated": 1789655355255,
+      "created": 1789654062947,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "O02qlSUEL4WE-KzVOOCtA",
+      "type": "text",
+      "x": 5126.495610377423,
+      "y": 2518.8127505121947,
+      "width": 60,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJU",
+      "roundness": null,
+      "seed": 1599434976,
+      "version": 298,
+      "versionNonce": 207502560,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789654062947,
+      "link": null,
+      "locked": false,
+      "text": "值对象",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "IniopwD1-Wl3CrzYACvqm",
+      "originalText": "值对象",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "D1Fc3AiShMlL50_0o6PMd",
+      "type": "text",
+      "x": 4940.019010038199,
+      "y": 2499.7821188644066,
+      "width": 135.74765816507897,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJV",
+      "roundness": null,
+      "seed": 762257632,
+      "version": 382,
+      "versionNonce": 1665376480,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654070386,
+      "link": null,
+      "locked": false,
+      "text": "没有唯一标识，由\n属性值决定相等性\n的对象，不可变",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "没有唯一标识，由属性值决定相等性的对象，不可变",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "ZXf7yJ_1FGPv20noQq-os",
+      "type": "text",
+      "x": 5051.359105310407,
+      "y": 2429.605977558432,
+      "width": 208,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJW",
+      "roundness": null,
+      "seed": 1855961312,
+      "version": 467,
+      "versionNonce": 2145158368,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654089999,
+      "link": null,
+      "locked": false,
+      "text": "联系地址、经纬度\n值不该被改，只该被替换\n有参构造，属性不允许外部改",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "联系地址、经纬度\n值不该被改，只该被替换\n有参构造，属性不允许外部改",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "lmY2KB7FrnvBzO-QxXj5o",
+      "type": "text",
+      "x": 5325.99878361636,
+      "y": 2693.6470054387164,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJX",
+      "roundness": null,
+      "seed": 1717840160,
+      "version": 4,
+      "versionNonce": 291984672,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789654117213,
+      "created": 1789654114610,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "rvIDrdeM2IoTvBGYLr4mA",
+      "type": "text",
+      "x": 5606.5035266809955,
+      "y": 2544.4345801761797,
+      "width": 145.69015526836134,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJa",
+      "roundness": null,
+      "seed": 1483537696,
+      "version": 254,
+      "versionNonce": 1605953760,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654135387,
+      "link": null,
+      "locked": false,
+      "text": "一组相关对象的一致\n性边界，作为一个整\n体被修改和保存",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "一组相关对象的一致性边界，作为一个整体被修改和保存",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "ehPP358nsch4bu40LP7F4",
+      "type": "text",
+      "x": 5513.921113692596,
+      "y": 2622.2845799184533,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJb",
+      "roundness": null,
+      "seed": 60646688,
+      "version": 4,
+      "versionNonce": 1524568352,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789654148786,
+      "created": 1789654146743,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "yFWKcjtESVkXwP5FvtEme",
+      "type": "ellipse",
+      "x": 5108.449081363492,
+      "y": 2597.252106762086,
+      "width": 142.7248510405252,
+      "height": 54.494958243238216,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJc",
+      "roundness": null,
+      "seed": 249138400,
+      "version": 263,
+      "versionNonce": 1315491040,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "sy9AFOmseNSK4ZfIWAZDm"
+        }
+      ],
+      "updated": 1789655355255,
+      "created": 1789654147626,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "sy9AFOmseNSK4ZfIWAZDm",
+      "type": "text",
+      "x": 5149.850651876457,
+      "y": 2612.2327086265695,
+      "width": 60,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJd",
+      "roundness": null,
+      "seed": 433385696,
+      "version": 249,
+      "versionNonce": 628895968,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789654147626,
+      "link": null,
+      "locked": false,
+      "text": "聚合根",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "yFWKcjtESVkXwP5FvtEme",
+      "originalText": "聚合根",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "rCtfy803kdXDhw9X6CtQb",
+      "type": "text",
+      "x": 5266.1212328258125,
+      "y": 2597.632118606681,
+      "width": 136.18523230118083,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#e03131",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJe",
+      "roundness": null,
+      "seed": 346988768,
+      "version": 320,
+      "versionNonce": 209917152,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654153945,
+      "link": null,
+      "locked": false,
+      "text": "聚合的入口对象，\n外部只能通过它访\n问聚合内部",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "聚合的入口对象，外部只能通过它访问聚合内部",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "f8gO6r7r2cLxzIwBkOHIb",
+      "type": "text",
+      "x": 5199.711387922356,
+      "y": 2772.7944843885184,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJf",
+      "roundness": null,
+      "seed": 1860946144,
+      "version": 4,
+      "versionNonce": 811556064,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789654183828,
+      "created": 1789654180764,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "vx2vd2iZGqTdgzowpuVuC",
+      "type": "ellipse",
+      "x": 4956.641519501528,
+      "y": 2793.1743774435313,
+      "width": 142.7248510405252,
+      "height": 54.494958243238216,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJg",
+      "roundness": null,
+      "seed": 1051075872,
+      "version": 219,
+      "versionNonce": 957184224,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "tzVFQK_trI380S_I8GDYt"
+        },
+        {
+          "id": "LlyxLKteHwGaCyJnWFn4n",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789655355255,
+      "created": 1789654182410,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "tzVFQK_trI380S_I8GDYt",
+      "type": "text",
+      "x": 4988.043090014493,
+      "y": 2808.154979308015,
+      "width": 80,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJh",
+      "roundness": null,
+      "seed": 216301856,
+      "version": 202,
+      "versionNonce": 782982368,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789654182410,
+      "link": null,
+      "locked": false,
+      "text": "领域服务",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "vx2vd2iZGqTdgzowpuVuC",
+      "originalText": "领域服务",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "cugIAM0cDrwPg_s6so5KC",
+      "type": "text",
+      "x": 4938.033778080655,
+      "y": 2862.3218563933324,
+      "width": 201.89027440157764,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJi",
+      "roundness": null,
+      "seed": 732942624,
+      "version": 372,
+      "versionNonce": 2129445088,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654188361,
+      "link": null,
+      "locked": false,
+      "text": "当某个业务操作不属于任何\n实体或值对象，且涉及多个\n聚合时，放在领域服务里",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "当某个业务操作不属于任何实体或值对象，且涉及多个聚合时，放在领域服务里",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "gnNo2gqALOhKCcdhwKPfS",
+      "type": "text",
+      "x": 5461.806226688743,
+      "y": 2828.5869218392845,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJj",
+      "roundness": null,
+      "seed": 758162720,
+      "version": 4,
+      "versionNonce": 824856864,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789654308664,
+      "created": 1789654306336,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "CtLcAZeJeaiE-qDNll0yc",
+      "type": "ellipse",
+      "x": 5397.791161672335,
+      "y": 2790.579419028476,
+      "width": 142.7248510405252,
+      "height": 54.494958243238216,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJk",
+      "roundness": null,
+      "seed": 1689930976,
+      "version": 217,
+      "versionNonce": 157394144,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "7Of9Aq5aNSc4giFcsgAWO"
+        },
+        {
+          "id": "CKHJs9ral3mmlSt8o-CDX",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789655355255,
+      "created": 1789654307519,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "7Of9Aq5aNSc4giFcsgAWO",
+      "type": "text",
+      "x": 5429.1927321853,
+      "y": 2805.5600208929595,
+      "width": 80,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJl",
+      "roundness": null,
+      "seed": 1973268704,
+      "version": 202,
+      "versionNonce": 999950560,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789654307519,
+      "link": null,
+      "locked": false,
+      "text": "应用服务",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "CtLcAZeJeaiE-qDNll0yc",
+      "originalText": "应用服务",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "rKQdymTOMtSI1xULBi3K5",
+      "type": "text",
+      "x": 5397.828616331587,
+      "y": 2863.6193356008607,
+      "width": 166.00516140542913,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJm",
+      "roundness": null,
+      "seed": 1633116384,
+      "version": 269,
+      "versionNonce": 1361439968,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654318931,
+      "link": null,
+      "locked": false,
+      "text": "编排用例流程，协调领\n域对象、仓储、领域服\n务，本身不含业务规则",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "编排用例流程，协调领域对象、仓储、领域服务，本身不含业务规则",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "Pvn3QRI3fMbyVtuwi_YZ3",
+      "type": "text",
+      "x": 5272.371292650146,
+      "y": 3045.2692756047095,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJn",
+      "roundness": null,
+      "seed": 1348476128,
+      "version": 4,
+      "versionNonce": 1201982752,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789654364096,
+      "created": 1789654361603,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "0vcJ0o9d-_qC70pJuNTd0",
+      "type": "ellipse",
+      "x": 5164.241459419468,
+      "y": 2790.579359633685,
+      "width": 142.7248510405252,
+      "height": 54.494958243238216,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJo",
+      "roundness": null,
+      "seed": 1280446688,
+      "version": 223,
+      "versionNonce": 328552672,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "_uXVKLNUGa6FR0yKwOQrj"
+        },
+        {
+          "id": "SSiMTdXp55MS3-r-Zu0s7",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789655355255,
+      "created": 1789654363217,
+      "link": null,
+      "locked": false
+    },
+    {
+      "id": "_uXVKLNUGa6FR0yKwOQrj",
+      "type": "text",
+      "x": 5195.643029932433,
+      "y": 2805.5599614981684,
+      "width": 80,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJp",
+      "roundness": null,
+      "seed": 496825568,
+      "version": 208,
+      "versionNonce": 444085472,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789654363217,
+      "link": null,
+      "locked": false,
+      "text": "领域事件",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "0vcJ0o9d-_qC70pJuNTd0",
+      "originalText": "领域事件",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "hhrG-KqEbAKKkXkNSb2x-",
+      "type": "text",
+      "x": 5170.70197971145,
+      "y": 2861.024258396224,
+      "width": 160.38523264481591,
+      "height": 60,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJq",
+      "roundness": null,
+      "seed": 1499502880,
+      "version": 263,
+      "versionNonce": 190748896,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789654368622,
+      "link": null,
+      "locked": false,
+      "text": "领域中发生的、业务上\n值得关注的事情，用于\n解耦聚合之间的协作",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "领域中发生的、业务上值得关注的事情，用于解耦聚合之间的协作",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "VDx_YswnGQkRih3QWCzwr",
+      "type": "text",
+      "x": 4925.62141186927,
+      "y": 3046.0389059309223,
+      "width": 565,
+      "height": 840,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJr",
+      "roundness": null,
+      "seed": 1313686816,
+      "version": 139,
+      "versionNonce": 193899808,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "C1xnB3-9Rhmu2lRgY0BJI",
+          "type": "arrow"
+        },
+        {
+          "id": "z7kU3yhsN-gicxpBQjlOK",
+          "type": "arrow"
+        },
+        {
+          "id": "l19pVl0wVYT8oEJnENDA6",
+          "type": "arrow"
+        },
+        {
+          "id": "68HxubRJDnGrD8OkTf6rj",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789657108437,
+      "created": 1789654693536,
+      "link": null,
+      "locked": false,
+      "text": "UserRegistration.sln\n│\n├── src/\n│   ├── UserRegistration.Domain/              ← 领域层 ★核心\n│   │   ├── UserRegistration.Domain.csproj\n│   │   ├── Shared/\n│   │   │   ├── DomainException.cs\n│   │   │   └── IDomainEvent.cs\n│   │   └── Users/\n│   │       ├── User.cs                       （聚合根）\n│   │       ├── UserId.cs                     （值对象）\n│   │       ├── Email.cs                      （值对象）\n│   │       ├── IUserRepository.cs            （仓储接口）\n│   │       └── UserRegisteredEvent.cs        （领域事件）\n│   │\n│   ├── UserRegistration.Application/         ← 应用层\n│   │   ├── UserRegistration.Application.csproj\n│   │   ├── Common/\n│   │   │   ├── IUnitOfWork.cs\n│   │   │   └── IEmailSender.cs\n│   │   └── Users/\n│   │       ├── UserAppService.cs             （应用服务）\n│   │       ├── RegisterUserDto.cs\n│   │       └── UserDto.cs\n│   │\n│   ├── UserRegistration.Infrastructure/      ← 基础设施层\n│   │   ├── UserRegistration.Infrastructure.csproj\n│   │   ├── Persistence/\n│   │   │   ├── AppDbContext.cs\n│   │   │   ├── UserRepository.cs\n│   │   │   └── UnitOfWork.cs\n│   │   └── Email/\n│   │       └── SmtpEmailSender.cs\n│   │\n│   └── UserRegistration.Api/                 ← 表现层\n│       ├── UserRegistration.Api.csproj\n│       ├── Program.cs\n│       ├── appsettings.json\n│       └── Controllers/\n│           └── UserController.cs\n│\n└── UserRegistration.sln",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 8,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "UserRegistration.sln\n│\n├── src/\n│   ├── UserRegistration.Domain/              ← 领域层 ★核心\n│   │   ├── UserRegistration.Domain.csproj\n│   │   ├── Shared/\n│   │   │   ├── DomainException.cs\n│   │   │   └── IDomainEvent.cs\n│   │   └── Users/\n│   │       ├── User.cs                       （聚合根）\n│   │       ├── UserId.cs                     （值对象）\n│   │       ├── Email.cs                      （值对象）\n│   │       ├── IUserRepository.cs            （仓储接口）\n│   │       └── UserRegisteredEvent.cs        （领域事件）\n│   │\n│   ├── UserRegistration.Application/         ← 应用层\n│   │   ├── UserRegistration.Application.csproj\n│   │   ├── Common/\n│   │   │   ├── IUnitOfWork.cs\n│   │   │   └── IEmailSender.cs\n│   │   └── Users/\n│   │       ├── UserAppService.cs             （应用服务）\n│   │       ├── RegisterUserDto.cs\n│   │       └── UserDto.cs\n│   │\n│   ├── UserRegistration.Infrastructure/      ← 基础设施层\n│   │   ├── UserRegistration.Infrastructure.csproj\n│   │   ├── Persistence/\n│   │   │   ├── AppDbContext.cs\n│   │   │   ├── UserRepository.cs\n│   │   │   └── UnitOfWork.cs\n│   │   └── Email/\n│   │       └── SmtpEmailSender.cs\n│   │\n│   └── UserRegistration.Api/                 ← 表现层\n│       ├── UserRegistration.Api.csproj\n│       ├── Program.cs\n│       ├── appsettings.json\n│       └── Controllers/\n│           └── UserController.cs\n│\n└── UserRegistration.sln",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "tjPXUEZjcLsWdLfz_IPd9",
+      "type": "text",
+      "x": 4854.139177237062,
+      "y": 2977.894265920349,
+      "width": 168,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJs",
+      "roundness": null,
+      "seed": 677390560,
+      "version": 53,
+      "versionNonce": 755018016,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655359951,
+      "created": 1789654772965,
+      "link": null,
+      "locked": false,
+      "text": "DDD典型项目结构",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "DDD典型项目结构",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "7RUIqFniJYBcC0nT_InlO",
+      "type": "text",
+      "x": 4860.728914851895,
+      "y": 2291.5173413523644,
+      "width": 120,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJt",
+      "roundness": null,
+      "seed": 1533839584,
+      "version": 136,
+      "versionNonce": 954405088,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789654828943,
+      "created": 1789654819344,
+      "link": null,
+      "locked": false,
+      "text": "9.2 基本概念",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "9.2 基本概念",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "30ZqtddcIwOsBrIPL79x-",
+      "type": "text",
+      "x": 5568.161362423767,
+      "y": 3269.641526401982,
+      "width": 153.87058098138644,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJu",
+      "roundness": null,
+      "seed": 629171424,
+      "version": 204,
+      "versionNonce": 1003893984,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "l19pVl0wVYT8oEJnENDA6",
+          "type": "arrow"
+        },
+        {
+          "id": "68HxubRJDnGrD8OkTf6rj",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789657108437,
+      "created": 1789655017200,
+      "link": null,
+      "locked": false,
+      "text": "接口在领域层\n实现在基础设施层",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "接口在领域层\n实现在基础设施层",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "l19pVl0wVYT8oEJnENDA6",
+      "type": "arrow",
+      "x": 5462.666191154958,
+      "y": 3292.71157386627,
+      "width": 107.43363373684133,
+      "height": 0.000059394791151134996,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dashed",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJv",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1484022048,
+      "version": 254,
+      "versionNonce": 53200160,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789657070382,
+      "created": 1789655081009,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          107.43363373684133,
+          -0.000059394791151134996
+        ]
+      ],
+      "startBinding": {
+        "elementId": "VDx_YswnGQkRih3QWCzwr",
+        "mode": "inside",
+        "fixedPoint": [
+          0.9505217332490061,
+          0.2936579380182712
+        ]
+      },
+      "endBinding": {
+        "elementId": "30ZqtddcIwOsBrIPL79x-",
+        "mode": "inside",
+        "fixedPoint": [
+          0.012598005776467858,
+          0.5767497017374239
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "PhpjwKJZjuEESjy5FrN8w",
+      "type": "text",
+      "x": 6456.226114234505,
+      "y": 2984.2867431394593,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJw",
+      "roundness": null,
+      "seed": 2109480224,
+      "version": 3,
+      "versionNonce": 1916013792,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789655218238,
+      "created": 1789655217899,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "LlyxLKteHwGaCyJnWFn4n",
+      "type": "arrow",
+      "x": 5221.335088163363,
+      "y": 2685.737695100087,
+      "width": 183.86864377246184,
+      "height": 102.18578961484445,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJx",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1420494048,
+      "version": 88,
+      "versionNonce": 1507359968,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789655355255,
+      "created": 1789655326441,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -183.86864377246184,
+          102.18578961484445
+        ]
+      ],
+      "startBinding": {
+        "elementId": "IFz4A0aeyQMGv7n1PjfTy",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5001,
+          1.0000000000000004
+        ]
+      },
+      "endBinding": {
+        "elementId": "vx2vd2iZGqTdgzowpuVuC",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5001,
+          0
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "SSiMTdXp55MS3-r-Zu0s7",
+      "type": "arrow",
+      "x": 5231.493900408008,
+      "y": 2685.7919165300727,
+      "width": 6.89312966478974,
+      "height": 105.27793607995955,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJy",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 681679072,
+      "version": 153,
+      "versionNonce": 125165792,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789655330239,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          6.89312966478974,
+          105.27793607995955
+        ]
+      ],
+      "startBinding": {
+        "elementId": "IFz4A0aeyQMGv7n1PjfTy",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5001,
+          1.0000000000000004
+        ]
+      },
+      "endBinding": {
+        "elementId": "0vcJ0o9d-_qC70pJuNTd0",
+        "mode": "inside",
+        "fixedPoint": [
+          0.5195000738328106,
+          0.009000703774432732
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "CKHJs9ral3mmlSt8o-CDX",
+      "type": "arrow",
+      "x": 5242.598446680573,
+      "y": 2685.7156116706587,
+      "width": 225.44578862771777,
+      "height": 106.65172014690097,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bJz",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 300812576,
+      "version": 137,
+      "versionNonce": 1673970912,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789655355255,
+      "created": 1789655335687,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          225.44578862771777,
+          106.65172014690097
+        ]
+      ],
+      "startBinding": {
+        "elementId": "IFz4A0aeyQMGv7n1PjfTy",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5001,
+          1.0000000000000004
+        ]
+      },
+      "endBinding": {
+        "elementId": "CtLcAZeJeaiE-qDNll0yc",
+        "mode": "inside",
+        "fixedPoint": [
+          0.4922273389937414,
+          0.03280877436594043
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false
+    },
+    {
+      "id": "Ur_JXSWy7p8G7kf1zr7zB",
+      "type": "text",
+      "x": 5566.622012525816,
+      "y": 3215.0425329178324,
+      "width": 220.76272318148582,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK0",
+      "roundness": null,
+      "seed": 1267689696,
+      "version": 171,
+      "versionNonce": 2016058656,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "z7kU3yhsN-gicxpBQjlOK",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789657045996,
+      "created": 1789655433595,
+      "link": null,
+      "locked": false,
+      "text": "空接口IAggregateRoot 是贴\n在类上的\"我是聚合根\"标签",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "空接口IAggregateRoot 是贴在类上的\"我是聚合根\"标签",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "eKNtHc1h3ajlGrvoRR-8z",
+      "type": "text",
+      "x": 5558.907945927018,
+      "y": 3120.6641789653704,
+      "width": 523.6381018436005,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK1",
+      "roundness": null,
+      "seed": 913751264,
+      "version": 353,
+      "versionNonce": 855593184,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "Sw8YtsoOG1VxEL5uJRh7O",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789656145797,
+      "created": 1789655587070,
+      "link": null,
+      "locked": false,
+      "text": "贫血模型    对象只有数据（属性），没有行为；业务逻辑写在服务类里\n充血模型    对象既有数据又有行为，业务逻辑写在对象自己身上",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "贫血模型    对象只有数据（属性），没有行为；业务逻辑写在服务类里\n充血模型    对象既有数据又有行为，业务逻辑写在对象自己身上",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "kMLE8xKWq0L_KH6dE4PQ9",
+      "type": "text",
+      "x": 5567.952102611536,
+      "y": 3459.677674885226,
+      "width": 522,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK2",
+      "roundness": null,
+      "seed": 1506204960,
+      "version": 195,
+      "versionNonce": 1108954336,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "9YGvmpbWr6CF0En4Nx9o9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789656158785,
+      "created": 1789655786843,
+      "link": null,
+      "locked": false,
+      "text": "领域服务     承载业务规则，当某个规则\"放哪个实体都不合适\"时，放这里\n应用服务     只编排流程，协调实体、仓储、领域服务，不含业务规则",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "领域服务     承载业务规则，当某个规则\"放哪个实体都不合适\"时，放这里\n应用服务     只编排流程，协调实体、仓储、领域服务，不含业务规则",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "_4q395yJ-zdlnFGt1RJNC",
+      "type": "text",
+      "x": 5787.918685113069,
+      "y": 3378.8458528252963,
+      "width": 176,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK3",
+      "roundness": null,
+      "seed": 414143776,
+      "version": 280,
+      "versionNonce": 991668448,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "9YGvmpbWr6CF0En4Nx9o9",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789656159580,
+      "created": 1789655821198,
+      "link": null,
+      "locked": false,
+      "text": "涉及多个聚合，需要协调\n放领域服务",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "涉及多个聚合，需要协调\n放领域服务",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "9YGvmpbWr6CF0En4Nx9o9",
+      "type": "arrow",
+      "x": 5818.2941646009285,
+      "y": 3415.2164135394955,
+      "width": 23.967467140218105,
+      "height": 38.96126134573069,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK4",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 105053472,
+      "version": 385,
+      "versionNonce": 796101856,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789656159580,
+      "created": 1789655837901,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -23.967467140218105,
+          38.96126134573069
+        ]
+      ],
+      "startBinding": {
+        "elementId": "_4q395yJ-zdlnFGt1RJNC",
+        "mode": "inside",
+        "fixedPoint": [
+          0.17258795163556587,
+          0.90926401785498
+        ]
+      },
+      "endBinding": {
+        "elementId": "kMLE8xKWq0L_KH6dE4PQ9",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.40795567448031095,
+          0.4079556744803085
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "8F3lPf1P9nEPkfk9MDU_A",
+      "type": "text",
+      "x": 5651.14696241482,
+      "y": 3060.4463525464325,
+      "width": 403.2945774516227,
+      "height": 19.023329125076543,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK5",
+      "roundness": null,
+      "seed": 68300064,
+      "version": 100,
+      "versionNonce": 2098610400,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "Sw8YtsoOG1VxEL5uJRh7O",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789656163656,
+      "created": 1789655978727,
+      "link": null,
+      "locked": false,
+      "text": "贫血模型面向数据库建模，让\"表 → 类\"的映射变得极其方便",
+      "fontSize": 15.218663300061232,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "贫血模型面向数据库建模，让\"表 → 类\"的映射变得极其方便",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "Sw8YtsoOG1VxEL5uJRh7O",
+      "type": "arrow",
+      "x": 5824.389848368769,
+      "y": 3084.969681671509,
+      "width": 156.15898006025964,
+      "height": 30.194497293861332,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK6",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 872364320,
+      "version": 384,
+      "versionNonce": 106636512,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789656163657,
+      "created": 1789655997769,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -156.15898006025964,
+          30.194497293861332
+        ]
+      ],
+      "startBinding": {
+        "elementId": "8F3lPf1P9nEPkfk9MDU_A",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.5001,
+          1
+        ]
+      },
+      "endBinding": {
+        "elementId": "eKNtHc1h3ajlGrvoRR-8z",
+        "mode": "orbit",
+        "fixedPoint": [
+          0.11071486217140815,
+          0.11071486217140318
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "VCVHPF3ZKTaJxzwgeOzDW",
+      "type": "text",
+      "x": 4858.7109431029385,
+      "y": 3928.070229578873,
+      "width": 293,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK7",
+      "roundness": null,
+      "seed": 1895747808,
+      "version": 34,
+      "versionNonce": 1010057504,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789656264129,
+      "created": 1789656260143,
+      "link": null,
+      "locked": false,
+      "text": "WithOne / HasOne / OwnsOne",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "WithOne / HasOne / OwnsOne",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "hm1IfAiY6zR_sNV01zJf0",
+      "type": "text",
+      "x": 4910.492601833415,
+      "y": 3966.1574518707066,
+      "width": 460,
+      "height": 25,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK8",
+      "roundness": null,
+      "seed": 1522685216,
+      "version": 65,
+      "versionNonce": 1135589600,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789656358265,
+      "created": 1789656267877,
+      "link": null,
+      "locked": false,
+      "text": "HasOne / WithOne 是\"关系配置\"（两个实体之间）",
+      "fontSize": 20,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "HasOne / WithOne 是\"关系配置\"（两个实体之间）",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "nXPe88wjVr7jsDJ1W-BoJ",
+      "type": "text",
+      "x": 4941.275593710076,
+      "y": 4093.040769454781,
+      "width": 992.4208827498107,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bK9",
+      "roundness": null,
+      "seed": 672700704,
+      "version": 79,
+      "versionNonce": 827718880,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789656377148,
+      "created": 1789656335771,
+      "link": null,
+      "locked": false,
+      "text": "从属实体的字段会被“打平”到父表里。比如 Order 拥有 ShippingAddress，数据库里就是 Order 表多了几列 ShippingAddress_Street",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "从属实体的字段会被“打平”到父表里。比如 Order 拥有 ShippingAddress，数据库里就是 Order 表多了几列 ShippingAddress_Street",
+      "autoResize": false,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "KcG69dPe994BqWrQv3oaC",
+      "type": "text",
+      "x": 4914.527895080158,
+      "y": 4059.92317834733,
+      "width": 311,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bKA",
+      "roundness": null,
+      "seed": 1217490144,
+      "version": 23,
+      "versionNonce": 1356392672,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789656347322,
+      "created": 1789656344309,
+      "link": null,
+      "locked": false,
+      "text": "OwnsOne 是\"归属配置\"（值对象属于实体）",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "OwnsOne 是\"归属配置\"（值对象属于实体）",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "InEjJHXbHrHrPEsm6Ahwr",
+      "type": "text",
+      "x": 4944.57558819798,
+      "y": 4004.3493084796314,
+      "width": 144,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bKB",
+      "roundness": null,
+      "seed": 815356192,
+      "version": 29,
+      "versionNonce": 335158496,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1789656372486,
+      "created": 1789656368481,
+      "link": null,
+      "locked": false,
+      "text": "会生成两张独立的表",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "会生成两张独立的表",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "P0otpmSMZgthDzxSnx7fB",
+      "type": "text",
+      "x": 5764.366977986364,
+      "y": 3295.8436950847513,
+      "width": 481,
+      "height": 40,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dotted",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bKC",
+      "roundness": null,
+      "seed": 1715679520,
+      "version": 64,
+      "versionNonce": 88099040,
+      "isDeleted": false,
+      "boundElements": [
+        {
+          "id": "C1xnB3-9Rhmu2lRgY0BJI",
+          "type": "arrow"
+        }
+      ],
+      "updated": 1789657025611,
+      "created": 1789656995366,
+      "link": null,
+      "locked": false,
+      "text": "耦合      = 逻辑被 5 个后续动作\"绑架\"\n领域事件 = 支付逻辑只声明\"发生了\"，后续谁做、做几个，它都不管",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "originalText": "耦合      = 逻辑被 5 个后续动作\"绑架\"\n领域事件 = 支付逻辑只声明\"发生了\"，后续谁做、做几个，它都不管",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": null
+    },
+    {
+      "id": "C1xnB3-9Rhmu2lRgY0BJI",
+      "type": "arrow",
+      "x": 5459.148466619081,
+      "y": 3316.801792104563,
+      "width": 299.7185113672822,
+      "height": 0.9369043089718616,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dashed",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bKD",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 2137726240,
+      "version": 270,
+      "versionNonce": 1657173216,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789657027943,
+      "created": 1789656998276,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          299.7185113672822,
+          -0.9369043089718616
+        ]
+      ],
+      "startBinding": {
+        "elementId": "VDx_YswnGQkRih3QWCzwr",
+        "mode": "inside",
+        "fixedPoint": [
+          0.9442956721235597,
+          0.3223367692543342
+        ]
+      },
+      "endBinding": {
+        "elementId": "P0otpmSMZgthDzxSnx7fB",
+        "mode": "orbit",
+        "fixedPoint": [
+          0,
+          0.5001
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "z7kU3yhsN-gicxpBQjlOK",
+      "type": "arrow",
+      "x": 5451.483050809227,
+      "y": 3234.399230071536,
+      "width": 109.63896171658871,
+      "height": 0.6163822473818072,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dashed",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bKE",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1604134176,
+      "version": 245,
+      "versionNonce": 253360416,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789657045997,
+      "created": 1789657035362,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          109.63896171658871,
+          0.6163822473818072
+        ]
+      ],
+      "startBinding": {
+        "elementId": "VDx_YswnGQkRih3QWCzwr",
+        "mode": "inside",
+        "fixedPoint": [
+          0.9307285644955002,
+          0.22423848111977804
+        ]
+      },
+      "endBinding": {
+        "elementId": "Ur_JXSWy7p8G7kf1zr7zB",
+        "mode": "orbit",
+        "fixedPoint": [
+          0,
+          0.5001
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "68HxubRJDnGrD8OkTf6rj",
+      "type": "arrow",
+      "x": 5272.142379027666,
+      "y": 3637.7886594479637,
+      "width": 360.3903816933125,
+      "height": 337.27578912904164,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dashed",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bKF",
+      "roundness": {
+        "type": 2
+      },
+      "seed": 1393571104,
+      "version": 670,
+      "versionNonce": 1947701472,
+      "isDeleted": false,
+      "boundElements": [],
+      "updated": 1789657130487,
+      "created": 1789657076926,
+      "link": null,
+      "locked": false,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          222.35469270092744,
+          -75.69541868909118
+        ],
+        [
+          360.3903816933125,
+          -337.27578912904164
+        ]
+      ],
+      "startBinding": {
+        "elementId": "VDx_YswnGQkRih3QWCzwr",
+        "mode": "inside",
+        "fixedPoint": [
+          0.6133114462980463,
+          0.7044639922821921
+        ]
+      },
+      "endBinding": {
+        "elementId": "30ZqtddcIwOsBrIPL79x-",
+        "mode": "inside",
+        "fixedPoint": [
+          0.41834766520442407,
+          0.7717835979235019
+        ]
+      },
+      "startArrowhead": null,
+      "endArrowhead": null,
+      "elbowed": false,
+      "moveMidPointsWithElement": false
+    },
+    {
+      "id": "Vu_MKJNNoHYU6kDKsQtlm",
+      "type": "text",
+      "x": 5362.37938414168,
+      "y": 3531.4484201218866,
+      "width": 6,
+      "height": 20,
+      "angle": 0,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "transparent",
+      "fillStyle": "cross-hatch",
+      "strokeWidth": 1,
+      "strokeStyle": "dashed",
+      "roughness": 0,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "index": "bKG",
+      "roundness": null,
+      "seed": 534027552,
+      "version": 5,
+      "versionNonce": 1305444576,
+      "isDeleted": true,
+      "boundElements": null,
+      "updated": 1789657099433,
+      "created": 1789657097027,
+      "link": null,
+      "locked": false,
+      "text": "",
+      "fontSize": 16,
+      "baseFontSize": null,
+      "fontFamily": 5,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "68HxubRJDnGrD8OkTf6rj",
+      "originalText": "",
+      "autoResize": true,
+      "lineHeight": 1.25,
+      "labelPosition": 0.5
     }
   ],
   "appState": {
