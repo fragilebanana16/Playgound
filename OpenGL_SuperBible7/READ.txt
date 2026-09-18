@@ -1,6 +1,7 @@
 重新整理目录结构，每个例子在各自的build下单独CMake
-1.H:\jsProjects\RESUME\Playground\OpenGL_SuperBible7\src\simpleclear\build>cmake -G "Visual Studio 16 2019" -A x64 ..
+1.H:\jsProjects\RESUME\Playground\OpenGL_SuperBible7\src\simpleclear\build>  cmake -G "Visual Studio 16 2019" -A x64 ..
 2.打开sln run
+或  Developer Powershell for vs2019执行 msbuild xxx.sln /p:Configuration=Release /p:Platform=x64
 
 sb7链接
 https://github.com/openglsuperbible/sb7code/tree/master
