@@ -1,0 +1,45 @@
+重新整理目录结构，每个例子在各自的build下单独CMake
+1.H:\jsProjects\RESUME\Playground\OpenGL_SuperBible7\src\simpleclear\build>cmake -G "Visual Studio 16 2019" -A x64 ..
+2.打开sln run
+
+sb7链接
+https://github.com/openglsuperbible/sb7code/tree/master
+
+
+用 CMake，但只生成你要的那个示例（推荐，最省事）
+1. 准备环境
+
+安装 CMake（官网下载，安装时勾选 “Add to PATH”）
+安装 Visual Studio 2019 或 2022（工作负载选 “使用 C++ 的桌面开发”）
+
+2. 先编译 GLFW（只做一次）
+打开 Developer Command Prompt for VS（或普通 cmd），进入项目目录：
+Bashcd 你的路径\sb7code\extern\glfw-3.0.4
+cmake -G "Visual Studio 17 2022" -A x64 .
+（如果是 VS 2019 就改成 "Visual Studio 16 2019"）
+然后打开生成的 GLFW.sln，分别编译 Debug 和 Release。
+编译完后：
+
+把 src\Debug\glfw3.lib 复制到项目根目录的 lib 文件夹，并改名为 glfw3_d.lib
+把 src\Release\glfw3.lib 复制到 lib 文件夹（不改名）
+
+3. 只编译你想要的示例
+打开根目录的 CMakeLists.txt，找到这一大段：
+cmakeset(EXAMPLES
+  alienrain
+  basicfbo
+  ...
+  simpleclear
+  singlepoint
+  ...
+)
+只保留你当前要编译的那个，其他全部删掉或注释掉。
+例如只想编译 simpleclear：
+cmakeset(EXAMPLES
+  simpleclear
+)
+然后进入 build 目录执行：
+Bashcd 你的路径\sb7code\build
+cmake -G "Visual Studio 17 2022" -A x64 ..
+打开生成的 superbible7.sln，只编译你留下的那个项目即可。可执行文件会出现在 bin 目录。
+想换下一个示例时，再改 CMakeLists.txt 里的列表，重新 cmake 一次就行。
