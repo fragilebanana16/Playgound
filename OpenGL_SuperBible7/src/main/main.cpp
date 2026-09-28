@@ -1,10 +1,11 @@
 #include <sb7.h>
+#include <shader.h>   // sb7::shader::load
 
 class singlepoint_app : public sb7::application
 {
     void init()
     {
-        static const char title[] = "OpenGL SuperBible - Single Triangle";
+        static const char title[] = "OpenGL SuperBible - Main";
 
         sb7::application::init();
 
@@ -13,45 +14,16 @@ class singlepoint_app : public sb7::application
 
     virtual void startup()
     {
-        static const char * vs_source[] =
-        {
-            "#version 420 core                                                 \n"
-            "                                                                  \n"
-            "void main(void)                                                   \n"
-            "{                                                                 \n"
-            "    const vec4 vertices[] = vec4[](vec4( 0.25, -0.25, 0.5, 1.0),  \n"
-            "                                   vec4(-0.25, -0.25, 0.5, 1.0),  \n"
-            "                                   vec4( 0.25,  0.25, 0.5, 1.0)); \n"
-            "                                                                  \n"
-            "    gl_Position = vertices[gl_VertexID];                          \n"
-            "}                                                                 \n"
-        };
-
-        static const char * fs_source[] =
-        {
-            "#version 420 core                                                 \n"
-            "                                                                  \n"
-            "out vec4 color;                                                   \n"
-            "                                                                  \n"
-            "void main(void)                                                   \n"
-            "{                                                                 \n"
-            "    color = vec4(0.5, 0.5, 1.0, 1.0);                             \n"
-            "}                                                                 \n"
-        };
+        GLuint vs = sb7::shader::load("./shaders/main.vs.glsl", GL_VERTEX_SHADER, true);
+        GLuint fs = sb7::shader::load("./shaders/main.fs.glsl", GL_FRAGMENT_SHADER, true);
 
         program = glCreateProgram();
-        GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fs, 1, fs_source, NULL);
-        glCompileShader(fs);
-
-        GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vs, 1, vs_source, NULL);
-        glCompileShader(vs);
-
         glAttachShader(program, vs);
         glAttachShader(program, fs);
-
         glLinkProgram(program);
+
+        glDeleteShader(vs);
+        glDeleteShader(fs);
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -59,8 +31,8 @@ class singlepoint_app : public sb7::application
 
     virtual void render(double currentTime)
     {
-        static const GLfloat green[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        glClearBufferfv(GL_COLOR, 0, green);
+        static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        glClearBufferfv(GL_COLOR, 0, black);
 
         glUseProgram(program);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -73,8 +45,8 @@ class singlepoint_app : public sb7::application
     }
 
 private:
-    GLuint          program;
-    GLuint          vao;
+    GLuint program;
+    GLuint vao;
 };
 
 DECLARE_MAIN(singlepoint_app)

@@ -7,6 +7,8 @@ cmake-build-*/
 
 # 每个示例目录下的 build/
 src/**/build/
+src/**/Debug/
+src/**/Release/
 examples/**/build/
 
 # ============================================

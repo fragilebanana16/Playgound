@@ -27,6 +27,11 @@ add_library(sb7 STATIC
 )
 
 add_executable(main WIN32 main.cpp)
+add_custom_command(TARGET main POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+        $<TARGET_FILE_DIR:main>/shaders
+)
 set_property(TARGET main PROPERTY DEBUG_POSTFIX _d)
 
 target_link_libraries(main
