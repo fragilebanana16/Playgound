@@ -1,5 +1,5 @@
 /*
- * Copyright � 2012-2015 Graham Sellers
+ * Copyright 2012-2015 Graham Sellers
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -222,7 +222,7 @@ unsigned int load(const char * filename, unsigned int tex)
     data_start = ftell(fp) + h.keypairbytes;
     fseek(fp, 0, SEEK_END);
     data_end = ftell(fp);
-    fseek(fp, data_start, SEEK_SET);
+    fseek(fp, (long)data_start, SEEK_SET);
 
     data = new unsigned char [data_end - data_start];
     memset(data, 0, data_end - data_start);

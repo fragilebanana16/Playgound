@@ -1,33 +1,10 @@
-/*
- * Copyright ?2012-2015 Graham Sellers
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next
- * paragraph) shall be included in all copies or substantial portions of the
- * Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
 #include <sb7.h>
 
 class singlepoint_app : public sb7::application
 {
     void init()
     {
-        static const char title[] = "OpenGL SuperBible - Single Point";
+        static const char title[] = "OpenGL SuperBible - Single Triangle";
 
         sb7::application::init();
 
@@ -38,24 +15,28 @@ class singlepoint_app : public sb7::application
     {
         static const char * vs_source[] =
         {
-            "#version 420 core                             \n"
-            "                                              \n"
-            "void main(void)                               \n"
-            "{                                             \n"
-            "    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);   \n"
-            "}                                             \n"
+            "#version 420 core                                                 \n"
+            "                                                                  \n"
+            "void main(void)                                                   \n"
+            "{                                                                 \n"
+            "    const vec4 vertices[] = vec4[](vec4( 0.25, -0.25, 0.5, 1.0),  \n"
+            "                                   vec4(-0.25, -0.25, 0.5, 1.0),  \n"
+            "                                   vec4( 0.25,  0.25, 0.5, 1.0)); \n"
+            "                                                                  \n"
+            "    gl_Position = vertices[gl_VertexID];                          \n"
+            "}                                                                 \n"
         };
 
         static const char * fs_source[] =
         {
-            "#version 420 core                             \n"
-            "                                              \n"
-            "out vec4 color;                               \n"
-            "                                              \n"
-            "void main(void)                               \n"
-            "{                                             \n"
-            "    color = vec4(0.0, 0.8, 1.0, 1.0);         \n"
-            "}                                             \n"
+            "#version 420 core                                                 \n"
+            "                                                                  \n"
+            "out vec4 color;                                                   \n"
+            "                                                                  \n"
+            "void main(void)                                                   \n"
+            "{                                                                 \n"
+            "    color = vec4(0.5, 0.5, 1.0, 1.0);                             \n"
+            "}                                                                 \n"
         };
 
         program = glCreateProgram();
@@ -78,17 +59,11 @@ class singlepoint_app : public sb7::application
 
     virtual void render(double currentTime)
     {
-        GLfloat r = 0.5f + 0.5f * sinf(currentTime);
-        GLfloat g = 0.5f + 0.5f * sinf(currentTime + 2.094f);  // +120бу
-        GLfloat b = 0.5f + 0.5f * sinf(currentTime + 4.189f);  // +240бу
-        const GLfloat color[] = { r, g, b, 1.0f };
-        glClearBufferfv(GL_COLOR, 0, color);
+        static const GLfloat green[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        glClearBufferfv(GL_COLOR, 0, green);
 
         glUseProgram(program);
-
-        glPointSize(40.0f);
-
-        glDrawArrays(GL_POINTS, 0, 1);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
     virtual void shutdown()
