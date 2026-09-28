@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(singlepoint)
+project(main)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -26,10 +26,10 @@ add_library(sb7 STATIC
     ${ROOT_DIR}/src/sb7/gl3w.c
 )
 
-add_executable(singlepoint WIN32 singlepoint.cpp)
-set_property(TARGET singlepoint PROPERTY DEBUG_POSTFIX _d)
+add_executable(main WIN32 main.cpp)
+set_property(TARGET main PROPERTY DEBUG_POSTFIX _d)
 
-target_link_libraries(singlepoint
+target_link_libraries(main
     sb7
     optimized glfw3
     debug glfw3_d
