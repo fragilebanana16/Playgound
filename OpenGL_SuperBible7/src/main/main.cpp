@@ -36,7 +36,9 @@ class singlepoint_app : public sb7::application
 
         glUseProgram(program);
         GLfloat attrib[] = { (float)sin(currentTime) * 0.5f, 0.0f, 0.0f, 0.0f };
+        GLfloat attribColor[] = { (float)sin(currentTime) * 0.5f, 0.5f, 0.5f, 0.0f };
         glVertexAttrib4fv(0, attrib);
+        glVertexAttrib4fv(1, attribColor);
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
