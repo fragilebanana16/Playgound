@@ -62,7 +62,7 @@ GLFWwindow* win = glfwGetCurrentContext();
         ImGui::NewFrame();
 
         // ---------------- 清屏 ----------------
-        static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
+        static const GLfloat green[] = { 0.0f, 0.0f, 0.0f, 1.0f };
         glClearBufferfv(GL_COLOR, 0, green);
 
         // ---------------- 用程序 ----------------
@@ -70,11 +70,13 @@ GLFWwindow* win = glfwGetCurrentContext();
 
         // ---------------- ImGui 控件 ----------------
         static float tessLevel = 5.0f;
+        static float tessLevelOut = 5.0f;
         static bool  showDemo  = false;
 
         ImGui::Begin("Tessellation Controls");
         ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
         ImGui::SliderFloat("Tess Level", &tessLevel, 1.0f, 16.0f);
+        ImGui::SliderFloat("Tess Level Out", &tessLevelOut, 1.0f, 16.0f);
         ImGui::Checkbox("Show Demo Window", &showDemo);
         ImGui::End();
 
@@ -83,9 +85,11 @@ GLFWwindow* win = glfwGetCurrentContext();
 
         // ---------------- 设置 uniform（必须在 draw 之前） ----------------
         GLint loc = glGetUniformLocation(program, "uTessLevel");
+        GLint locOut = glGetUniformLocation(program, "uTessLevelOut");
         if (loc >= 0)
             glUniform1f(loc, tessLevel);
-
+        if (locOut >= 0)
+            glUniform1f(locOut, tessLevelOut);
         // ---------------- 画 3D ----------------
         glDrawArrays(GL_PATCHES, 0, 3);
 
