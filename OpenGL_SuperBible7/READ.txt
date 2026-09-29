@@ -6,6 +6,9 @@
 sb7链接
 https://github.com/openglsuperbible/sb7code/tree/master
 
+imgui3.4
+https://github.com/glfw/glfw/releases
+
 
 用 CMake，但只生成你要的那个示例（推荐，最省事）
 1. 准备环境
