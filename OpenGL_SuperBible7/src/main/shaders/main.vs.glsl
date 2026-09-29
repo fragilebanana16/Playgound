@@ -1,10 +1,11 @@
-#version 410 core
+#version 430 core
 
-void main(void)
+layout (location = 0) in vec3 aPos;
+
+out vec3 vColor;
+
+void main()
 {
-    const vec4 vertices[] = vec4[](vec4( 0.25, -0.25, 0.5, 1.0),
-                                   vec4(-0.25, -0.25, 0.5, 1.0),
-                                   vec4( 0.25,  0.25, 0.5, 1.0));
-
-    gl_Position = vertices[gl_VertexID];
+    vColor = aPos * 0.5 + 0.5;   // 用位置当颜色，方便看
+    gl_Position = vec4(aPos, 1.0);
 }
