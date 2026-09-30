@@ -37,9 +37,11 @@ class tessellated_app : public sb7::application
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        // 注意：用 GL_DYNAMIC_DRAW，因为要频繁更新
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
         glBindVertexArray(0);
@@ -53,6 +55,19 @@ class tessellated_app : public sb7::application
         glClearBufferfv(GL_COLOR, 0, green);
 
         glUseProgram(program);
+        // ---- 每帧更新顶点 2 的位置 ----
+        float newVertex[] = {
+            (float)sin(currentTime) * 0.5f,
+             0.8f,
+             0.0f
+        };
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);   // 必须先绑
+        glBufferSubData(
+            GL_ARRAY_BUFFER,
+            2 * 3 * sizeof(float),   // 顶点 2 的偏移 = 24
+            sizeof(newVertex),
+            newVertex
+        );
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
