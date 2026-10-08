@@ -1,79 +1,64 @@
 #include <sb7.h>
 #include <shader.h>
 
-class tessellated_app : public sb7::application
+class interleaved_app : public sb7::application
 {
-    void init()
+    void init() override
     {
-        static const char title[] = "OpenGL SuperBible - Simple Triangle";
-
+        static const char title[] = "OpenGL - Interleaved DSA";
         sb7::application::init();
-
         memcpy(info.title, title, sizeof(title));
     }
 
-    virtual void startup()
+    virtual void startup() override
     {
-        GLuint vs = sb7::shader::load("./shaders/main.vs.glsl", GL_VERTEX_SHADER,   true);
+        GLuint vs = sb7::shader::load("./shaders/main.vs.glsl", GL_VERTEX_SHADER, true);
         GLuint fs = sb7::shader::load("./shaders/main.fs.glsl", GL_FRAGMENT_SHADER, true);
 
         program = glCreateProgram();
         glAttachShader(program, vs);
         glAttachShader(program, fs);
         glLinkProgram(program);
-
         glDeleteShader(vs);
         glDeleteShader(fs);
 
-        // ---- 顶点数据：一个三角形 ----
         static const GLfloat vertices[] = {
-            -0.8f, -0.8f, 0.0f,
-             0.8f, -0.8f, 0.0f,
-             0.0f,  0.8f, 0.0f
+            -0.8f, -0.8f, 0.0f,   1.0f, 0.0f, 0.0f,
+             0.8f, -0.8f, 0.0f,   0.0f, 1.0f, 0.0f,
+             0.0f,  0.8f, 0.0f,   0.0f, 0.0f, 1.0f
         };
 
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        const GLsizei stride = 6 * sizeof(float);
 
-        glGenBuffers(1, &vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glCreateBuffers(1, &vbo);
+        glCreateVertexArrays(1, &vao);
 
-        // 注意：用 GL_DYNAMIC_DRAW，因为要频繁更新
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+        glNamedBufferData(vbo, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+        glVertexArrayVertexBuffer(vao, 0, vbo, 0, stride);
 
-        glBindVertexArray(0);
+        glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(vao, 0, 0);
+        glEnableVertexArrayAttrib(vao, 0);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // 想看填充改成 GL_FILL
+        glVertexArrayAttribFormat(vao, 1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float));
+        glVertexArrayAttribBinding(vao, 1, 0);
+        glEnableVertexArrayAttrib(vao, 1);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    virtual void render(double currentTime)
+    virtual void render(double currentTime) override
     {
-        static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
-        glClearBufferfv(GL_COLOR, 0, green);
+        static const GLfloat bg[] = { 0.1f, 0.1f, 0.1f, 1.0f };
+        glClearBufferfv(GL_COLOR, 0, bg);
 
         glUseProgram(program);
-        // ---- 每帧更新顶点 2 的位置 ----
-        float newVertex[] = {
-            (float)sin(currentTime) * 0.5f,
-             0.8f,
-             0.0f
-        };
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);   // 必须先绑
-        glBufferSubData(
-            GL_ARRAY_BUFFER,
-            2 * 3 * sizeof(float),   // 顶点 2 的偏移 = 24
-            sizeof(newVertex),
-            newVertex
-        );
-
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
-    virtual void shutdown()
+    virtual void shutdown() override
     {
         glDeleteBuffers(1, &vbo);
         glDeleteVertexArrays(1, &vao);
@@ -86,4 +71,4 @@ private:
     GLuint vbo;
 };
 
-DECLARE_MAIN(tessellated_app)
+DECLARE_MAIN(interleaved_app);
