@@ -1,117 +1,203 @@
 #include <sb7.h>
-#include <shader.h>   // sb7::shader::load
+#include <shader.h>
+#include <vmath.h>
 
-// ---- ImGui ----
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-class tessellated_app : public sb7::application
+class spinning_cube_app : public sb7::application
 {
     void init()
     {
-        static const char title[] = "OpenGL SuperBible - Tessellation";
-
+        static const char title[] = "OpenGL SuperBible - Spinning Cube";
         sb7::application::init();
-
         memcpy(info.title, title, sizeof(title));
     }
 
     virtual void startup()
     {
-        // ---------------- 着色器 ----------------
-        GLuint vs  = sb7::shader::load("./shaders/main.vs.glsl",  GL_VERTEX_SHADER,          true);
-        GLuint tcs = sb7::shader::load("./shaders/main.tcs.glsl", GL_TESS_CONTROL_SHADER,    true);
-        GLuint tes = sb7::shader::load("./shaders/main.tes.glsl", GL_TESS_EVALUATION_SHADER, true);
-        GLuint fs  = sb7::shader::load("./shaders/main.fs.glsl",  GL_FRAGMENT_SHADER,        true);
+
+        GLuint vs = sb7::shader::load("./shaders/main.vs.glsl", GL_VERTEX_SHADER,   true);
+        GLuint fs = sb7::shader::load("./shaders/main.fs.glsl", GL_FRAGMENT_SHADER, true);
 
         program = glCreateProgram();
         glAttachShader(program, vs);
-        glAttachShader(program, tcs);
-        glAttachShader(program, tes);
         glAttachShader(program, fs);
         glLinkProgram(program);
 
         glDeleteShader(vs);
-        glDeleteShader(tcs);
-        glDeleteShader(tes);
         glDeleteShader(fs);
+
+
+        mv_location   = glGetUniformLocation(program, "mv_matrix");
+        proj_location = glGetUniformLocation(program, "proj_matrix");
+
+
+        static const GLfloat vertex_positions[] =
+        {
+
+            -0.25f,  0.25f, -0.25f,
+            -0.25f, -0.25f, -0.25f,
+             0.25f, -0.25f, -0.25f,
+             0.25f, -0.25f, -0.25f,
+             0.25f,  0.25f, -0.25f,
+            -0.25f,  0.25f, -0.25f,
+
+
+            -0.25f,  0.25f,  0.25f,
+             0.25f,  0.25f,  0.25f,
+             0.25f, -0.25f,  0.25f,
+             0.25f, -0.25f,  0.25f,
+            -0.25f, -0.25f,  0.25f,
+            -0.25f,  0.25f,  0.25f,
+
+
+            -0.25f,  0.25f,  0.25f,
+            -0.25f,  0.25f, -0.25f,
+            -0.25f, -0.25f, -0.25f,
+            -0.25f, -0.25f, -0.25f,
+            -0.25f, -0.25f,  0.25f,
+            -0.25f,  0.25f,  0.25f,
+
+
+             0.25f,  0.25f,  0.25f,
+             0.25f, -0.25f,  0.25f,
+             0.25f, -0.25f, -0.25f,
+             0.25f, -0.25f, -0.25f,
+             0.25f,  0.25f, -0.25f,
+             0.25f,  0.25f,  0.25f,
+
+
+            -0.25f,  0.25f, -0.25f,
+             0.25f,  0.25f, -0.25f,
+             0.25f,  0.25f,  0.25f,
+             0.25f,  0.25f,  0.25f,
+            -0.25f,  0.25f,  0.25f,
+            -0.25f,  0.25f, -0.25f,
+
+
+            -0.25f, -0.25f, -0.25f,
+            -0.25f, -0.25f,  0.25f,
+             0.25f, -0.25f,  0.25f,
+             0.25f, -0.25f,  0.25f,
+             0.25f, -0.25f, -0.25f,
+            -0.25f, -0.25f, -0.25f
+        };
+
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER,
+                     sizeof(vertex_positions),
+                     vertex_positions,
+                     GL_STATIC_DRAW); // GL_STATIC_DRAW: only use once
+ 
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL); // location = 0, xyz 3 , stride 3, offset null
+        glEnableVertexAttribArray(0);
 
-        // ---------------- ImGui 初始化 ----------------
+        glBindVertexArray(0);
+
+
+        aspect = (float)info.windowWidth / (float)info.windowHeight;
+        if (aspect <= 0.0f) aspect = 1.0f;
+        proj_matrix = vmath::perspective(50.0f, aspect, 0.1f, 1000.0f); // degree, near, far
+
+
+        glEnable(GL_DEPTH_TEST);
+
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
         ImGui::StyleColorsDark();
-GLFWwindow* win = glfwGetCurrentContext();
-        ImGui_ImplGlfw_InitForOpenGL(win , true);
+
+        GLFWwindow* win = glfwGetCurrentContext();
+        ImGui_ImplGlfw_InitForOpenGL(win, true);
         ImGui_ImplOpenGL3_Init("#version 410");
     }
 
     virtual void render(double currentTime)
     {
-        // ---------------- ImGui 新帧 ----------------
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // ---------------- 清屏 ----------------
-        static const GLfloat green[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        glClearBufferfv(GL_COLOR, 0, green);
+        static const GLfloat bg[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        glClearBufferfv(GL_COLOR, 0, bg);
 
-        // ---------------- 用程序 ----------------
-        glUseProgram(program);
+        static const GLfloat one = 1.0f;
+        glClearBufferfv(GL_DEPTH, 0, &one);
 
-        // ---------------- ImGui 控件 ----------------
-        static float tessLevel = 5.0f;
-        static float tessLevelOut = 5.0f;
-        static bool  showDemo  = false;
+        static float rotSpeed  = 1.0f;
+        static bool  wireframe = false;
 
-        ImGui::Begin("Tessellation Controls");
+        ImGui::Begin("Spinning Cube Controls");
         ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-        ImGui::SliderFloat("Tess Level", &tessLevel, 1.0f, 16.0f);
-        ImGui::SliderFloat("Tess Level Out", &tessLevelOut, 1.0f, 16.0f);
-        ImGui::Checkbox("Show Demo Window", &showDemo);
+        ImGui::SliderFloat("Rotation Speed", &rotSpeed, 0.0f, 5.0f);
+        ImGui::Checkbox("Wireframe", &wireframe);
         ImGui::End();
 
-        if (showDemo)
-            ImGui::ShowDemoWindow(&showDemo);
+        glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 
-        // ---------------- 设置 uniform（必须在 draw 之前） ----------------
-        GLint loc = glGetUniformLocation(program, "uTessLevel");
-        GLint locOut = glGetUniformLocation(program, "uTessLevelOut");
-        if (loc >= 0)
-            glUniform1f(loc, tessLevel);
-        if (locOut >= 0)
-            glUniform1f(locOut, tessLevelOut);
-        // ---------------- 画 3D ----------------
-        glDrawArrays(GL_PATCHES, 0, 3);
+        glUseProgram(program);
 
-        // ---------------- 渲染 ImGui ----------------
+        float f = (float)currentTime * (float)M_PI * 0.1f * rotSpeed;
+
+        vmath::mat4 mv_matrix =
+            vmath::translate(0.0f, 0.0f, -4.0f) *
+
+            vmath::rotate((float)currentTime * 45.0f * rotSpeed, 0.0f, 1.0f, 0.0f) *
+            vmath::rotate((float)currentTime * 81.0f * rotSpeed, 1.0f, 0.0f, 0.0f);
+
+        glUniformMatrix4fv(mv_location,   1, GL_FALSE, mv_matrix);
+        glUniformMatrix4fv(proj_location, 1, GL_FALSE, proj_matrix);
+
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
+    virtual void onResize(int w, int h)
+    {
+        sb7::application::onResize(w, h);
+        aspect = (float)info.windowWidth / (float)info.windowHeight;
+        if (aspect <= 0.0f) aspect = 1.0f;
+        proj_matrix = vmath::perspective(50.0f, aspect, 0.1f, 1000.0f);
+    }
+
     virtual void shutdown()
     {
-        // ---------------- 关闭 ImGui ----------------
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
 
+        glDeleteBuffers(1, &vbo);
         glDeleteVertexArrays(1, &vao);
         glDeleteProgram(program);
     }
 
 private:
-    GLuint          program;
-    GLuint          vao;
+    GLuint program = 0;
+    GLuint vao = 0;
+    GLuint vbo = 0;
+
+    GLint  mv_location = -1;
+    GLint  proj_location = -1;
+
+    float  aspect = 1.0f;
+    vmath::mat4 proj_matrix;
 };
 
-DECLARE_MAIN(tessellated_app)
+DECLARE_MAIN(spinning_cube_app)
