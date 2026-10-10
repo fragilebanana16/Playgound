@@ -1,9 +1,10 @@
 #version 430 core
 
-in vec3 vColor;
+uniform sampler2D s;
+
 out vec4 color;
 
-void main()
+void main(void)
 {
-    color = vec4(vColor, 1.0);
+    color = texture(s, gl_FragCoord.xy / textureSize(s, 0));
 }
