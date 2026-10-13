@@ -10,6 +10,7 @@ src/**/build/
 src/**/Debug/
 src/**/Release/
 examples/**/build/
+media/
 
 # ============================================
 # 编译产物

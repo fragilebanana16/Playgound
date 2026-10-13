@@ -45,7 +45,9 @@ add_library(imgui STATIC
 target_compile_definitions(imgui PRIVATE GLFW_EXPOSE_NATIVE_WGL)
 # ---------------- main ----------------
 add_executable(main WIN32 main.cpp)
-
+set_target_properties(main PROPERTIES
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
+)
 add_custom_command(TARGET main POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/shaders
