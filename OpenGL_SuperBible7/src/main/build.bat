@@ -31,9 +31,8 @@ if errorlevel 1 (
 
 echo [DEBUG] 启动程序...
 if exist "%~dp0bin\Debug\main_d.exe" (
-    cd /d "%~dp0bin\Debug"
-    :: 在独立窗口中运行 exe，并等待其结束；关闭该窗口不会影响本脚本
-    start "main_d" /wait main_d.exe
+    cd /d "%~dp0..\.."
+    start "main_d" /wait "%~dp0bin\Debug\main_d.exe"
     echo.
     echo [DEBUG] 程序运行结束，返回码: !errorlevel!
 ) else (
