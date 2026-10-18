@@ -1,0 +1,32 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "win-x64",
+      "displayName": "Windows x64 (Visual Studio 2022)",
+      "description": "依赖全部来自本工程 third_party\\，没有任何机器特定的绝对路径，可以直接跟着仓库一起拷走。",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "release",
+      "displayName": "Release",
+      "configurePreset": "win-x64",
+      "configuration": "Release"
+    },
+    {
+      "name": "reldbg",
+      "displayName": "RelWithDebInfo —— 有调试信息，可以断点自己的代码",
+      "configurePreset": "win-x64",
+      "configuration": "RelWithDebInfo"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+// ============================================================================
+//  GroundGrid —— 地面网格（阶段 2）
+//
+//  两个作用：
+//    1. 让太阳的 PCF 阴影**有地方落**。没有地面时，模型只能自己投到自己身上，
+//       地面上那层"接触阴影"完全出不来（第 4 节"画质开关"里开着的那套阴影
+//       等于白开）。
+//    2. 给一个**尺度参照**：模型不再是浮在虚空里。
+//
+//  为什么不用官方 samples/materials/groundShadow.mat 那种写法：
+//    那个是 unlit + shadowMultiplier : true，baseColor 纯黑 —— 它画出来的是
+//    **一条地面上的影子**，地面上别的什么都看不见（AR 用的"隐形接影板"）。
+//    我们要的是"能看见的网格线 + 阴影落在上面"，所以走正常光照：shadingModel
+//    lit，太阳的直接光被阴影遮掉，网格线那一段就暗下去。
+//    （shadowMultiplier 只对 unlit 有效 —— 见 docs/Materials.md.html:2031。）
+//
+//  网格线是**纯程序化**的（fract + fwidth），不用贴图、不用 uv：
+//    fwidth 给出该像素在世界里跨了多远，线宽因此自动收敛到 ~1px，
+//    近处不会太细、远处不会有摩尔纹。
+//
+//  为什么 blending 用 fade 而不是 transparent：
+//    transparent 的 alpha **只作用于漫反射**（docs/Materials.md.html:1684），
+//    镜面高光会原样糊在画面上 —— 一个半透明的地面会飘着一块太阳高光。
+//    fade 是"alpha 也作用到镜面"，正是给"让一个受光物体淡入淡出"用的。
+//    代价：fade 要求 baseColor 是**预乘 alpha** 的
+//    （surface_shading_lit.fs:30-32 会先 unpremultiply 取回 albedo），
+//    所以下面写的是 col.rgb * a。
+// ============================================================================
+
+material {
+    name : GroundGrid,
+    shadingModel : lit,
+    blending : fade,
+
+    // 从下面看就不该看见地面（转台可以转到地板以下）。
+    // 剩下的问题只是三角形绕序要让它**朝上**那一面是正面。
+    culling : back,
+
+    parameters : [
+        // 底板：线性空间的 rgb + 自身不透明度
+        { type : float4, name : baseColor },
+        // 网格线：线性空间的 rgb + 自身不透明度
+        { type : float4, name : lineColor },
+        // 一格在世界里多大（米）。世界坐标算的，所以整个平面共用一套格子
+        { type : float, name : gridSpacing },
+        // 超过 fadeRadius 开始淡出，到 fadeRadius 完全透明，不留硬边
+        { type : float, name : fadeRadius },
+        // 淡出从 fadeRadius 的百分之几开始（0.4 = 内侧 40% 不淡）
+        { type : float, name : fadeStart },
+        { type : float, name : roughness }
+    ],
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+
+        // 世界坐标，只用 xz：地面是轴对齐的一块平板
+        vec2 p = getWorldPosition().xz;
+
+        // 程序化网格：先归一化到"格"为单位，再算到最近一条线的像素距离
+        vec2  c = p / materialParams.gridSpacing;
+        vec2  d = abs(fract(c - 0.5) - 0.5) / max(fwidth(c), vec2(1e-5));
+        float line = 1.0 - min(min(d.x, d.y), 1.0);   // 线上 = 1，格子里 = 0
+
+        // 径向淡出：地平线处完全透明
+        float r = length(p);
+        float fade = 1.0 - smoothstep(materialParams.fadeRadius * materialParams.fadeStart,
+                                      materialParams.fadeRadius, r);
+
+        vec4  col = mix(materialParams.baseColor, materialParams.lineColor, line);
+        float a   = col.a * fade;
+
+        // fade 要求预乘 alpha（见文件头注释）
+        material.baseColor = vec4(col.rgb * a, a);
+        material.roughness = materialParams.roughness;
+        material.reflectance = 0.0;      // 纯漫反射地面，别糊一层高光
+    }
+}

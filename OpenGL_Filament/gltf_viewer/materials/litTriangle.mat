@@ -1,0 +1,43 @@
+// ============================================================================
+//  LitTriangle —— 一个真正的 PBR 材质（shadingModel : lit）
+//
+//  和 MyHelloTriangle 里的 bakedColor.mat 的区别：
+//    bakedColor.mat  shadingModel : unlit  -> 不参与光照，永远不像 PBR
+//    这个            shadingModel : lit    -> 走 Filament 的 metallic-roughness 光照模型
+//
+//  顶点属性：position / normal（lit 隐式需要） + color（通过 requires 声明）
+// ============================================================================
+
+material {
+    name : LitTriangle,
+    shadingModel : lit,
+
+    // 顶点色。颜色是线性空间的，后面 vertex buffer 里用 UBYTE4 + normalized 提供
+    requires : [
+        color
+    ],
+
+    parameters : [
+        { type : float, name : roughness,   min : 0.0, max : 1.0 },
+        { type : float, name : metallic,    min : 0.0, max : 1.0 },
+        { type : float, name : reflectance, min : 0.0, max : 1.0 }
+    ],
+
+    // 法线贴图 / 各向异性等高级特性的抗锯齿处理，开了画面更干净
+    specularAntiAliasing : true,
+    culling : back
+}
+
+fragment {
+    void material(inout MaterialInputs material) {
+        prepareMaterial(material);
+
+        // 顶点色直接作为 baseColor（albedo）
+        material.baseColor = getColor();
+
+        // 这三个是 PBR 的核心参数：粗糙度 / 金属度 / 反射率
+        material.roughness   = materialParams.roughness;
+        material.metallic    = materialParams.metallic;
+        material.reflectance = materialParams.reflectance;
+    }
+}
