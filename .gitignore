@@ -42,6 +42,7 @@
 
 /OpenGL/libraries/**
 /OpenGL/vs/Demo/x64/*
+/OpenGL/**/build/*
 
 /PHP/ThreeJSTest
 
