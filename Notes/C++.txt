@@ -1,0 +1,14 @@
+#### constexpr 
+编译期算出来，避免运行期开销
+和 const 的区别：const 只保证"运行时不可修改"，constexpr 保证"编译期就能确定值"
+
+#### 类模板
+template<typename T>        // 模板参数列表（必须紧贴在类定义前）
+struct Box {                // 普通类定义，但里面可以用 T
+    T value;
+    T get() const { return value; }
+};
+矩阵而言：
+template<int nrows, int ncols>
+struct mat { ... };
+mat<3, 3> m;        // 传的是整数 3, 3，非类型参数，mat<3,3>是种类型
